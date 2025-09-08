@@ -1,22 +1,15 @@
-import os
-from dotenv import load_dotenv
 from fastapi import FastAPI
-from supabase import create_client, Client
-
-# Cargar las variables de entorno del archivo .env
-load_dotenv()
-
-# Obtener las credenciales de Supabase
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-
-# Inicializar el cliente de Supabase
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+from routes import pacientes #, medicos, atenciones, codigos_rias
 
 # Inicializar la aplicación de FastAPI
-app = FastAPI()
+app = FastAPI(
+    title="Santa Helena del Valle IPS API",
+    version="0.1.0",
+    description="API para la gestión de pacientes, médicos y atenciones."
+)
 
-# Endpoint de prueba para verificar la conexión a la base de datos
-from routes import pacientes
-
-app.include_router(pacientes.router, tags=["Pacientes"])
+# Incluir las rutas de los diferentes módulos
+app.include_router(pacientes.router)
+# app.include_router(medicos.router)
+# app.include_router(atenciones.router)
+# app.include_router(codigos_rias.router)
