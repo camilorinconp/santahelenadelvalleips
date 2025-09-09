@@ -85,3 +85,67 @@ En lugar de intentar que la tabla `atenciones` contenga *todos* los campos posib
 -   **Eficiencia:** La tabla principal `atenciones` se mantiene ligera, y las tablas de detalle solo almacenan los datos relevantes para su tipo.
 -   **Escalabilidad:** Es fácil añadir nuevos tipos de atención sin modificar la tabla principal.
 -   **Cumplimiento Normativo:** Permite capturar la granularidad de datos que la Resolución 3280 exige para sus indicadores.
+
+## 4. Seguimiento del Avance del Proyecto
+
+Este documento sirve como una guía viva para el progreso del proyecto, asegurando la trazabilidad y la claridad para cualquier miembro del equipo.
+
+**Objetivo:** Alcanzar el 100% de implementación de los requisitos de datos y reportes de la Resolución 3280.
+
+**Estado General:** En progreso.
+
+### 4.1. Fase 1: Especialización de Atenciones Individuales Clave
+
+| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
+| :--- | :--- | :--- | :--- | :--- |
+| Definir e implementar `AtencionPrimeraInfancia` | **Completado** | Modelo Pydantic, tabla DB, rutas API y pruebas implementadas y pasando. | `models/atencion_primera_infancia_model.py`, `routes/atencion_primera_infancia.py`, `tests/test_atencion_primera_infancia.py` | 2025-09-08 |
+| Definir e implementar `AtencionMaternoPerinatal` | **Completado** | Modelo Pydantic, tabla DB, rutas API y pruebas implementadas y pasando. | `models/atencion_materno_perinatal_model.py`, `routes/atencion_materno_perinatal.py`, `tests/test_atencion_materno_perinatal.py` | 2025-09-08 |
+| Definir e implementar `TamizajeOncologico` | Pendiente | Análisis inicial de requisitos de la Resolución 3280. | N/A | 2025-09-08 |
+| Definir e implementar `ControlCronicidad` | Pendiente | Análisis inicial de requisitos de la Resolución 3280. | N/A | 2025-09-08 |
+| **Otras Atenciones Individuales** | Pendiente | Identificación de otros tipos de atención individual que requieran especialización. | N/A | 2025-09-08 |
+
+### 4.2. Fase 2: Consolidación de Intervenciones Colectivas
+
+| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
+| :--- | :--- | :--- | :--- | :--- |
+| Definir e implementar `IntervencionColectiva` | **Completado** | Modelo Pydantic, tabla DB, rutas API básicas y pruebas implementadas y pasando. | `models/intervencion_colectiva_model.py`, `routes/intervenciones_colectivas.py`, `tests/test_intervenciones_colectivas.py` | 2025-09-08 |
+| Expandir CRUD para `IntervencionColectiva` | Pendiente | Implementación inicial de `POST` y `GET` (todos/por ID). | `routes/intervenciones_colectivas.py` | 2025-09-08 |
+| Especializar tipos de `IntervencionColectiva` | Pendiente | Análisis inicial de la necesidad de especialización. | N/A | 2025-09-08 |
+
+### 4.3. Fase 3: Integración y Análisis Transversal de Datos
+
+| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
+| :--- | :--- | :--- | :--- | :--- |
+| Refinar manejo de `entornos` | Pendiente | `entorno` añadido como campo `TEXT` en `atenciones`. | `models/atencion_model.py` | 2025-09-08 |
+| Diseñar estrategia de vinculación `atenciones` (polimórfica) | Pendiente | Propuesta arquitectónica definida. | `docs/recomendaciones_equipo_asesor_externo.md` | 2025-09-08 |
+| Desarrollar módulos de reporte y consulta | Pendiente | Análisis de requisitos de indicadores de la Resolución 3280. | N/A | 2025-09-08 |
+
+### 4.4. Fase 4: Lógica de Negocio y Reglas
+
+| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
+| :--- | :--- | :--- | :--- | :--- |
+| Implementar validaciones específicas de la Resolución 3280 | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar flujos de trabajo y lógica de remisión | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar lógica de cálculo de indicadores | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar gestión de "Plan de Cuidado" | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+
+### 4.5. Fase 5: Reportes y Analíticas
+
+| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
+| :--- | :--- | :--- | :--- | :--- |
+| Desarrollar servicios de agregación de datos | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar endpoints de reportes | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+
+### 4.6. Fase 6: Seguridad
+
+| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
+| :--- | :--- | :--- | :--- | :--- |
+| Implementar gestión de usuarios y roles | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar políticas RLS granulares | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar autorización en la API | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+
+### 4.7. Fase 7: Interfaz de Usuario (UI)
+
+| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
+| :--- | :--- | :--- | :--- | :--- |
+| Diseño e implementación de UI | Pendiente | N/A | N/A | 2025-09-08 |
