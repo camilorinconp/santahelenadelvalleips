@@ -72,6 +72,7 @@ def test_01_crear_atencion():
         "paciente_id": paciente_id_creado,
         "medico_id": medico_id_creado, # Usar el ID del médico creado
         "fecha_atencion": "2025-09-08",
+        "entorno": "Institucional",
         "descripcion": "Consulta de control general"
     }
     response = client.post("/atenciones/", json=datos_atencion)
