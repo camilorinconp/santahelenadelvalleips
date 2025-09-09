@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import pacientes, atenciones #, medicos, codigos_rias
+from routes import pacientes, atenciones, intervenciones_colectivas #, medicos, codigos_rias
 
 # Inicializar la aplicación de FastAPI
 app = FastAPI(
@@ -11,5 +11,6 @@ app = FastAPI(
 # Incluir las rutas de los diferentes módulos
 app.include_router(pacientes.router)
 app.include_router(atenciones.router)
+app.include_router(intervenciones_colectivas.router)
 # app.include_router(medicos.router)
 # app.include_router(codigos_rias.router)
