@@ -3,3 +3,4 @@ from .medico_model import Medico
 from .paciente_model import Paciente
 from .intervencion_colectiva_model import IntervencionColectiva
 from .atencion_primera_infancia_model import AtencionPrimeraInfancia
+from .atencion_materno_perinatal_model import AtencionMaternoPerinatal
