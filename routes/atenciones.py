@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from supabase import Client
-from models.atencion_model import Atencion
+from models import Atencion
 from database import get_supabase_client
 from uuid import UUID
 

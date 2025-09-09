@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from supabase import Client
-from models.intervencion_colectiva_model import IntervencionColectiva
+from models import IntervencionColectiva
 from database import get_supabase_client
 from typing import List
 

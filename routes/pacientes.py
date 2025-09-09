@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from supabase import Client
-from models.paciente_model import Paciente
+from models import Paciente
 from database import get_supabase_client
 
 # Crear el router
