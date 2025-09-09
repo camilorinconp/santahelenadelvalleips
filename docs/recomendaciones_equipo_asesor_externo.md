@@ -14,3 +14,25 @@ Este documento centraliza las lecciones aprendidas y buenas prácticas identific
 4.  **Restricciones de Unicidad (`UNIQUE`):** Aplicar esta restricción únicamente cuando la lógica de negocio lo exija de forma estricta. Una columna como `especialidad` en la tabla `medicos` no debe ser única, ya que es natural tener múltiples médicos con la misma especialidad.
 
 Mantener esta sincronía previene errores difíciles de depurar y asegura que la aplicación se comporte como se espera.
+
+## 2. Patrones de Diseño para la Base de Datos
+
+Para mantener la integridad, consistencia y robustez de la base de datos, hemos establecido los siguientes patrones de diseño:
+
+### 2.1. Columnas de Timestamp (creado_en, updated_at)
+
+-   **`creado_en`**: Su propósito es registrar la fecha de creación de una fila. **Nunca debe cambiar**. 
+    -   **Configuración:** `Type: timestamptz`, `Is Nullable: No`, `Default Value: now()`.
+
+-   **`updated_at`**: Su propósito es registrar la **última fecha de modificación** de una fila. Debe actualizarse con cada cambio.
+    -   **Configuración:** `Type: timestamptz`, `Is Nullable: Sí` (para permitir la creación inicial con valor nulo), y debe ser actualizada automáticamente por un **Trigger** de base de datos (`moddatetime`).
+
+### 2.2. Políticas para Llaves Foráneas (Foreign Keys)
+
+La acción que se toma cuando una fila referenciada es eliminada (`ON DELETE`) es crítica para la integridad de los datos.
+
+-   **`ON DELETE: CASCADE`**: Usar cuando el registro "hijo" no tiene sentido sin el "padre".
+    -   **Ejemplo:** La relación `atenciones.paciente_id` -> `pacientes.id`. Si se borra un paciente, todas sus atenciones deben borrarse con él para no dejar datos huérfanos.
+
+-   **`ON DELETE: SET NULL`**: Usar cuando el registro "hijo" sigue siendo valioso históricamente, aunque el "padre" se elimine. La columna de la llave foránea debe ser **Nullable**.
+    -   **Ejemplo:** La relación `atenciones.medico_id` -> `medicos.id`. Si un médico es eliminado del sistema, la atención sigue siendo un evento válido en la historia del paciente. El campo `medico_id` simplemente se vuelve `NULL`.

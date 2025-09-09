@@ -4,7 +4,7 @@ API para la gestión de pacientes, médicos y atenciones de la IPS Santa Helena 
 
 ## Estado del Proyecto
 
-En desarrollo activo. La funcionalidad base para el CRUD de Pacientes y la creación y consulta de Atenciones está completa y verificada con un conjunto de pruebas automatizadas que pasan exitosamente. El sistema se encuentra en un estado estable.
+En desarrollo activo. La funcionalidad para Pacientes y Atenciones individuales está completa y estable. Se ha definido el modelo de datos y la estructura de base de datos para la gestión de Intervenciones Colectivas, alineando el proyecto con los requerimientos de la Resolución 3280.
 
 ## Stack Tecnológico
 
