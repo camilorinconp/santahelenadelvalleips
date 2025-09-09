@@ -4,7 +4,7 @@ API para la gestión de pacientes, médicos y atenciones de la IPS Santa Helena 
 
 ## Estado del Proyecto
 
-En desarrollo activo. La funcionalidad para Pacientes y Atenciones individuales está completa y estable. Se ha definido el modelo de datos y la estructura de base de datos para la gestión de Intervenciones Colectivas, alineando el proyecto con los requerimientos de la Resolución 3280.
+En desarrollo activo. La funcionalidad para Pacientes y Atenciones individuales (incluyendo Primera Infancia y Materno Perinatal) está completa y estable. Se ha definido el modelo de datos y la estructura de base de datos para la gestión de Intervenciones Colectivas, alineando el proyecto con los requerimientos de la Resolución 3280.
 
 ## Stack Tecnológico
 

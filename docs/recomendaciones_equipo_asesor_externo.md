@@ -45,12 +45,15 @@ La acción que se toma cuando una fila referenciada es eliminada (`ON DELETE`) e
 
 1.  **Fase 1: Especialización de Atenciones Individuales Clave**
     *   **Objetivo:** Reemplazar la `descripcion` genérica por campos estructurados para los tipos de atención individual más críticos y con mayores requisitos de datos.
-    *   **Avance Actual:** Modelo `AtencionPrimeraInfancia` definido.
+    *   **Avance Actual:** Modelo `AtencionPrimeraInfancia` y `AtencionMaternoPerinatal` definidos e implementados.
     *   **Próximos Pasos:**
         *   Crear la tabla `atencion_primera_infancia` en Supabase (con sus triggers y RLS).
         *   Implementar las rutas API (CRUD) para `AtencionPrimeraInfancia`.
         *   Escribir pruebas unitarias y de integración para `AtencionPrimeraInfancia`.
-        *   **A Futuro:** Identificar otros tipos de atención individual que requieran especialización (ej. `AtencionMaternoPerinatal`, `TamizajeOncologico`, `ControlCronicidad`) y repetir el proceso.
+        *   Crear la tabla `atencion_materno_perinatal` en Supabase (con sus triggers y RLS).
+        *   Implementar las rutas API (CRUD) para `AtencionMaternoPerinatal`.
+        *   Escribir pruebas unitarias y de integración para `AtencionMaternoPerinatal`.
+        *   **A Futuro:** Identificar otros tipos de atención individual que requieran especialización (ej. `TamizajeOncologico`, `ControlCronicidad`) y repetir el proceso.
 
 2.  **Fase 2: Consolidación de Intervenciones Colectivas**
     *   **Objetivo:** Desarrollar completamente el soporte para intervenciones dirigidas a grupos y comunidades.
