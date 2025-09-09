@@ -4,3 +4,6 @@ from .paciente_model import Paciente
 from .intervencion_colectiva_model import IntervencionColectiva
 from .atencion_primera_infancia_model import AtencionPrimeraInfancia
 from .atencion_materno_perinatal_model import AtencionMaternoPerinatal
+from .tamizaje_oncologico_model import TamizajeOncologico
+from .control_cronicidad_model import ControlCronicidad
+from .control_hipertension_model import ControlHipertensionDetalles
