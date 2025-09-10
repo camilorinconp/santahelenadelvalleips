@@ -1,10 +1,11 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
+from uuid import UUID # Importar UUID
 
 class ControlDiabetesDetalles(BaseModel):
-    id: Optional[UUID4] = None
-    control_cronicidad_id: UUID4 # FK a la tabla ControlCronicidad
+    id: Optional[UUID] = None
+    control_cronicidad_id: UUID # FK a la tabla ControlCronicidad
 
     ultima_hba1c: Optional[float] = None
     fecha_ultima_hba1c: Optional[date] = None
