@@ -152,27 +152,29 @@ Este documento sirve como una guía viva para el progreso del proyecto, aseguran
 | :--- | :--- | :--- | :--- | :--- |
 | Diseño e implementación de UI | Pendiente | N/A | N/A | 2025-09-08 |
 
-## 5. Hitos y Lecciones Aprendidas (2025-09-10)
+## NOTA IMPORTANTE: Estrategia de Documentación y Colaboración (2025-09-10)
 
-En esta fecha, se realizó una sesión intensiva de depuración y refactorización que estabilizó por completo la suite de pruebas del proyecto. Las lecciones aprendidas y acciones tomadas son un pilar para el futuro del desarrollo.
+Estimado Equipo Consultor Externo,
 
-### 5.1. Implementación del Flujo de Migraciones de Base de Datos
+Para optimizar nuestra colaboración y asegurar la máxima eficiencia en el proyecto "Santa Helena del Valle IPS", hemos formalizado una estrategia clara de documentación y flujo de trabajo.
 
-- **Problema:** Los cambios en el esquema de la base de datos se realizaban manualmente en el panel de Supabase, lo que causaba inconsistencias con los modelos de la aplicación y dificultaba la depuración.
-- **Solución:** Se implementó un flujo de trabajo de **migraciones de base de datos** utilizando la **CLI oficial de Supabase**. Todos los cambios en el esquema ahora se gestionan como archivos de migración SQL versionados en el directorio `supabase/migrations`.
-- **Estado:** Completado. El proyecto ahora tiene un método robusto y profesional para la gestión de cambios en la base de datos.
+**Su rol como Equipo Consultor Externo es crucial y se centra en la guía estratégica y el aseguramiento de la calidad arquitectónica.**
 
-### 5.2. Sincronización Total de Modelos, Rutas y Base de Datos
+### Reglas Claras para la Colaboración y Documentación:
 
-- **Problema:** Una serie de 14 tests fallaban debido a una profunda desincronización entre los modelos Pydantic, la lógica de las rutas de la API y el esquema real de la base de datos.
-- **Solución:** Se realizó un proceso de depuración metódico:
-    1. Se crearon y aplicaron migraciones para añadir todas las columnas faltantes en las tablas de detalle (`atencion_materno_perinatal`, `atencion_primera_infancia`, etc.).
-    2. Se corrigieron las restricciones de nulidad (`NOT NULL`) y se establecieron valores por defecto (`DEFAULT now()`) para los campos `creado_en`.
-    3. Se refactorizó la lógica de creación en todas las rutas polimórficas para asegurar un manejo de transacciones y relaciones correcto y consistente.
-    4. Se ajustaron los modelos Pydantic y los tests para reflejar la lógica final.
-- **Estado:** Completado. Los 25 tests del proyecto ahora pasan con éxito, confirmando la estabilidad de la capa de datos y la API.
+1.  **No Modifican Código Directamente:** Su valiosa experiencia se canaliza a través de la asesoría y revisión, no mediante la implementación directa en el repositorio.
+2.  **Revisión de Pull Requests (PRs):** Son revisores obligatorios en todos nuestros PRs. Su foco es la **alineación arquitectónica, la robustez, la escalabilidad y el cumplimiento de la Resolución 3280**.
+3.  **Su Guía Documental Maestra: Este Documento (`docs/recomendaciones_equipo_asesor_externo.md`)**
+    *   **Propósito:** Este archivo es su principal canal de comunicación y su "guía documental". Todas sus **recomendaciones, directrices, lecciones aprendidas de alto nivel, decisiones arquitectónicas y el roadmap estratégico** deben plasmarse y mantenerse actualizadas aquí.
+    *   **Cómo Contribuir:** Para añadir o modificar contenido en este documento, por favor, háganlo a través de un **Pull Request**. Este PR será revisado por nuestro equipo, sirviendo como un paso de verificación formal antes de que la directriz se considere oficial.
+4.  **Propuestas y Discusiones Previas:**
+    *   Para ideas o propuestas que requieran discusión antes de ser formalizadas en este documento, por favor, inicien un **GitHub Issue** o un **Tema de Discussion** en el repositorio. Esto permite una colaboración transparente y con trazabilidad, identificando claramente a cada participante.
 
-### 5.3. Lección Clave sobre el Caché de Esquema de Supabase
+**En resumen:**
+*   **Para directrices estratégicas y arquitectónicas:** Pull Request a este documento (`docs/recomendaciones_equipo_asesor_externo.md`).
+*   **Para discusiones y propuestas:** GitHub Issues o Discussions.
+*   **Para el código y su documentación interna (README.md, docstrings):** Responsabilidad del Equipo Principal.
 
-- **Observación:** Durante la depuración, la API de Supabase (PostgREST) a menudo no reflejaba inmediatamente los cambios aplicados a través de las migraciones, reportando columnas como inexistentes cuando ya habían sido creadas. El reinicio de los servicios locales (`supabase stop` y `start`) o del proyecto en la nube (Pausar/Restaurar) demostró ser una solución efectiva para forzar la recarga del caché del esquema.
-- **Recomendación:** Si después de una migración un test falla con un error de "columna no encontrada", el primer paso de diagnóstico debe ser reiniciar los servicios de Supabase para descartar un problema de caché.
+Esta estructura asegura que su valiosa guía estratégica sea el pilar del proyecto, con un proceso claro para su incorporación y validación.
+
+Agradecemos su compromiso y colaboración para hacer de este proyecto un éxito.
