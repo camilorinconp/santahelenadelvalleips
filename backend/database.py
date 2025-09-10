@@ -2,8 +2,9 @@ import os
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
-# Cargar variables de entorno
-load_dotenv()
+# Cargar variables de entorno solo si no estamos en producción
+if os.environ.get("ENV") != "production":
+    load_dotenv()
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")

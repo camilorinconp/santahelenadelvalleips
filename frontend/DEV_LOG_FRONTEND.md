@@ -19,3 +19,32 @@ Este documento (`DEV_LOG_FRONTEND.md`) registra las decisiones y los pasos de de
 
 -   Instalar las dependencias principales (`MUI`, `axios`, `react-query`, `react-router-dom`).
 -   Configurar la estructura de directorios base dentro de `frontend/src/`.
+
+---
+
+### **2025-09-10**
+
+**Objetivo:** Actualizar la documentación del proyecto.
+
+**Acciones:**
+
+1.  **Actualización de `backend/README.md`:** Se actualizó para reflejar la estructura de monorepo y se añadieron secciones sobre prácticas de desarrollo y operación (gestión de secretos, CI/CD, fijación de dependencias).
+2.  **Actualización de `frontend/README_FRONTEND.md`:** Se refactorizó para ser más conciso y específico del frontend, complementando el `README` principal.
+
+---
+
+### **2025-09-10**
+
+**Objetivo:** Implementar funcionalidad CRUD de pacientes.
+
+**Acciones:**
+
+1.  **Listar Pacientes:** Implementación de la tabla de pacientes con `DataGrid` y `useQuery`.
+2.  **Crear Pacientes:** Implementación del formulario de creación con `react-hook-form` y `zod`, y conexión a la API con `useMutation`.
+3.  **Eliminar Pacientes:** Implementación de la función de eliminación con confirmación y `useMutation`.
+4.  **Editar Pacientes:** Refactorización del formulario para soportar edición, carga de datos existentes y actualización vía API con `useMutation`.
+
+**Problemas Pendientes:**
+
+*   **Edición de Pacientes:** La actualización de datos no se persiste correctamente en el backend. Se requiere depuración.
+*   **Advertencias en Consola:** Persisten advertencias de React (`value` prop on `input` should not be null) al cargar el formulario de edición, indicando problemas con el saneamiento de valores `null` en campos opcionales (`segundo_nombre`, `segundo_apellido`).

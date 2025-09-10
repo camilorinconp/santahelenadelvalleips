@@ -1,43 +1,40 @@
-# Proyecto Frontend - IPS Santa Helena del Valle
+# Frontend de la Aplicación IPS Santa Helena del Valle
 
-Este documento (`README_FRONTEND.md`) es la fuente de la verdad y la guía principal para el desarrollo de la interfaz de usuario (frontend) de la aplicación de gestión de Rutas Integrales de Atención en Salud (RIAS).
+Este documento (`README_FRONTEND.md`) contiene la información específica para el desarrollo y operación de la aplicación frontend, que es una Single Page Application (SPA) construida con React y TypeScript.
 
-## 1. Propósito
+Para una visión general del proyecto, stack tecnológico completo y prácticas de desarrollo generales, consulta el `backend/README.md` en la raíz del monorepo.
 
-El frontend es una **Single Page Application (SPA)** diseñada para ser utilizada por profesionales de la salud. Su objetivo es proporcionar una herramienta de trabajo robusta, eficiente e intuitiva para registrar y consultar las atenciones médicas de los pacientes, siguiendo los lineamientos de la Resolución 3280.
+## 1. Stack Tecnológico Específico del Frontend
 
-## 2. Stack Tecnológico Principal
+-   **Framework:** React con TypeScript
+-   **Librería de UI:** Material-UI (MUI)
+-   **Gestión de Estado del Servidor:** React Query (TanStack Query)
+-   **Cliente HTTP:** Axios
+-   **Enrutamiento:** React Router
+-   **Gestión de Formularios:** React Hook Form con Zod
 
-| Categoría             | Elección                                                              | Razón                                                                                                                              |
-| --------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **Framework**         | [React](https://reactjs.org/) con [TypeScript](https://www.typescriptlang.org/) | Estándar de la industria, basado en componentes y con tipado estático para una integración segura y sin errores con la API de FastAPI. |
-| **Librería de UI**    | [Material-UI (MUI)](https://mui.com/)                                 | Suite de componentes completa y profesional, ideal para aplicaciones densas en datos y formularios complejos. Acelera el desarrollo. |
-| **Gestión de Estado** | [React Query (TanStack Query)](https://tanstack.com/query/latest)     | Simplifica drásticamente la obtención, cacheo y sincronización de datos del servidor, manejando estados de carga y error.        |
-| **Cliente HTTP**      | [Axios](https://axios-http.com/)                                      | Cliente HTTP robusto y estándar para la comunicación con el backend.                                                               |
-| **Enrutamiento**      | [React Router](https://reactrouter.com/)                              | Librería estándar para la gestión de rutas en aplicaciones React.                                                                  |
-| **Gestión de Paquetes** | [npm](https://www.npmjs.com/)                                         | Gestor de paquetes estándar en el ecosistema de JavaScript.                                                                        |
-
-## 3. Arquitectura y Estructura de Directorios
+## 2. Estructura de Directorios
 
 La estructura del proyecto está organizada por funcionalidades para mantener el código modular y escalable.
 
 ```
 frontend/
 ├── src/
-│   ├── api/              # Configuración de Axios y funciones de llamada a la API (ej. atencionesApi.ts)
-│   ├── components/       # Componentes de UI genéricos y reutilizables (Button, Input, etc.)
-│   ├── features/         # Lógica y componentes por funcionalidad de negocio (Pacientes, Atenciones)
-│   ├── hooks/            # Hooks personalizados (ej. useAuth)
+│   ├── api/              # Configuración de Axios y funciones de llamada a la API
+│   ├── components/       # Componentes de UI genéricos y reutilizables
+│   ├── features/         # Lógica y componentes por funcionalidad de negocio (ej. pacientes/)
+│   ├── hooks/            # Hooks personalizados
 │   ├── pages/            # Componentes que representan una página/ruta completa
+│   ├── utils/            # Funciones de utilidad generales (ej. formatters.ts)
 │   ├── App.tsx           # Componente raíz con el enrutador principal
 │   └── ...
 ├── package.json
 └── tsconfig.json
 ```
 
-### 3.1. Manejo de Atenciones Polimórficas
+### 2.1. Manejo de Atenciones Polimórficas
 
-Este es el reto arquitectónico principal. La solución implementada es un "Asistente de Creación" (`CrearAtencionWizard`):
+Este es un patrón arquitectónico clave en el proyecto. La solución implementada en el frontend es un "Asistente de Creación" (`CrearAtencionWizard`):
 
 1.  **Selección de Tipo:** El usuario elige el `tipo_atencion` desde un desplegable.
 2.  **Renderizado Dinámico:** El asistente renderiza el formulario específico (ej. `AtencionPrimeraInfanciaForm`) correspondiente al tipo seleccionado.
@@ -45,7 +42,9 @@ Este es el reto arquitectónico principal. La solución implementada es un "Asis
     a. Se envía el formulario de **detalle** al endpoint específico (ej. `POST /atencion-primera-infancia/`).
     b. Con el ID del detalle, se crea el registro principal en `POST /atenciones/`.
 
-## 4. Cómo Empezar
+## 3. Cómo Empezar con el Frontend
+
+Desde el directorio `frontend/`:
 
 1.  **Instalar dependencias:**
     ```bash
@@ -56,8 +55,34 @@ Este es el reto arquitectónico principal. La solución implementada es un "Asis
     npm start
     ```
 
-## 5. Guías de Desarrollo
+## 4. Guías de Desarrollo Específicas del Frontend
 
-- **Tipado Estricto:** Todo nuevo código debe tener una cobertura de tipos adecuada. Aprovechar los modelos de la API.
-- **Componentes Reutilizables:** Antes de crear un nuevo componente de UI, verificar si existe uno similar en `MUI` o en `src/components`.
-- **Manejo de Estado del Servidor:** Utilizar `React Query` para toda la interacción con la API. Evitar el uso de `useState` para almacenar datos del servidor.
+Estas guías complementan las prácticas generales definidas en el `backend/README.md`.
+
+-   **Tipado Estricto:** Todo nuevo código debe tener una cobertura de tipos adecuada. Aprovechar los modelos de la API y los esquemas de Zod.
+-   **Componentes Reutilizables:** Antes de crear un nuevo componente de UI, verificar si existe uno similar en `MUI` o en `src/components`.
+-   **Manejo de Estado del Servidor:** Utilizar `React Query` para toda la interacción con la API (obtención, cacheo, mutaciones). Evitar el uso de `useState` para almacenar datos del servidor.
+-   **Gestión de Formularios:** Usar `react-hook-form` para el estado del formulario y `zod` para la validación.
+
+### 4.1. Gestión de Secretos y Variables de Entorno
+
+-   **Implementación:** Para el frontend, las variables de entorno (ej. `REACT_APP_API_URL`) se configuran en el servicio de despliegue (como Vercel). No deben ser versionadas en Git.
+
+### 4.2. Automatización (CI/CD para Frontend)
+
+-   **Validaciones:** El flujo de CI (definido en `.github/workflows/ci.yml`) ejecutará automáticamente:
+    -   `npm install`: Para asegurar que las dependencias se instalen correctamente.
+    -   `npm run lint`: Para verificar el estilo y la calidad del código (configurado en `package.json`).
+    -   `npm test`: Para ejecutar las pruebas unitarias del frontend.
+
+### 4.3. Fijar Dependencias
+
+-   **Implementación:** El archivo `package-lock.json` (generado por npm) ya cumple la función de fijar las versiones exactas de todas las dependencias de Node.js, asegurando la reproducibilidad.
+
+## 5. Cómo Ejecutar las Pruebas del Frontend
+
+Desde el directorio `frontend/`:
+
+```bash
+npm test
+```

@@ -69,3 +69,25 @@ Nuestra estrategia se basa en dos pilares fundamentales:
 La estrategia actual es **sólida y muy adecuada** para el proyecto, especialmente por su alineación con la Resolución 3280 y la flexibilidad del modelo polimórfico. Los desafíos que hemos encontrado son manejables y, al abordarlos, fortaleceremos aún más la robustez del sistema.
 
 El plan de **Expansión y Detalle de Modelos de Datos** (Fase 1) es el paso correcto a seguir. Después de eso, nos enfocaremos en las recomendaciones para la consulta de datos polimórficos y la implementación de lógica de negocio más compleja.
+
+---
+
+### **2025-09-10**
+
+**Objetivo:** Implementar recomendaciones de arquitectura y funcionalidad CRUD de pacientes.
+
+**Acciones:**
+
+1.  **Gestión de Secretos:** Se modificó `backend/database.py` para cargar variables de entorno condicionalmente (solo en desarrollo).
+2.  **Fijación de Dependencias:** Se generó `backend/requirements.txt` usando `pip freeze` para asegurar la reproducibilidad.
+3.  **CI/CD con GitHub Actions:** Se creó `backend/.github/workflows/ci.yml` para automatizar pruebas y linting de backend y frontend.
+4.  **CRUD de Pacientes (Frontend):**
+    *   **Listar:** Implementado y funcional.
+    *   **Crear:** Implementado y funcional.
+    *   **Eliminar:** Implementado y funcional.
+    *   **Editar:** Implementado, pero presenta problemas de actualización y advertencias en consola.
+
+**Problemas Pendientes:**
+
+*   **Edición de Pacientes:** La actualización de datos no se persiste correctamente en el backend. Se requiere depuración.
+*   **Advertencias en Consola:** Persisten advertencias de React (`value` prop on `input` should not be null) al cargar el formulario de edición, indicando problemas con el saneamiento de valores `null` en campos opcionales (`segundo_nombre`, `segundo_apellido`).

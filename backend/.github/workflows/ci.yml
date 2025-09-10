@@ -1,0 +1,64 @@
+name: CI/CD Monorepo
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend_ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Backend Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run Backend Linter (Ruff)
+        run: |
+          pip install ruff
+          ruff check backend/
+
+      - name: Run Backend Formatter Check (Ruff)
+        run: |
+          pip install ruff
+          ruff format backend/ --check
+
+      - name: Run Backend Tests (Pytest)
+        run: |
+          pip install pytest
+          pytest backend/
+
+  frontend_ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies
+        run: |
+          npm ci --prefix frontend
+
+      - name: Run Frontend Linter (ESLint)
+        run: |
+          npm run lint --prefix frontend
+
+      - name: Run Frontend Tests
+        run: |
+          npm test --prefix frontend

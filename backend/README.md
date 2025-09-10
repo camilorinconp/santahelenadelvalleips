@@ -1,79 +1,136 @@
-# API de Gestión para Santa Helena del Valle IPS
+# Proyecto Monorepo: IPS Santa Helena del Valle
 
-API para la gestión de pacientes, médicos y atenciones de la IPS Santa Helena del Valle. El proyecto utiliza FastAPI y se conecta a una base de datos PostgreSQL gestionada por Supabase.
+Este repositorio contiene el proyecto completo para la IPS Santa Helena del Valle, implementado como un monorepo que incluye tanto el backend API como el frontend de la aplicación.
 
-## Estado del Proyecto
+## 1. Visión General del Proyecto
 
-En desarrollo activo. La funcionalidad para Pacientes y Atenciones individuales (incluyendo Primera Infancia y Materno Perinatal) está completa y estable. Se ha definido el modelo de datos y la estructura de base de datos para la gestión de Intervenciones Colectivas, alineando el proyecto con los requerimientos de la Resolución 3280.
+El proyecto es una API REST para una Institución Prestadora de Salud (IPS) en Colombia, cuyo objetivo es gestionar las Rutas Integrales de Atención en Salud (RIAS) según la normativa colombiana (Resolución 3280). El frontend es una Single Page Application (SPA) que consume esta API para proporcionar una interfaz de usuario.
 
-## Stack Tecnológico
+## 2. Estructura del Monorepo
 
-- **Backend:** Python 3.12
-- **Framework:** FastAPI
-- **Base de Datos:** PostgreSQL (a través de Supabase)
-- **Testing:** Pytest
-- **Servidor ASGI:** Uvicorn
+El repositorio está organizado en las siguientes carpetas principales:
 
----
+-   `backend/`: Contiene todo el código de la API (Python, FastAPI).
+-   `frontend/`: Contiene el código de la aplicación web (React, TypeScript).
 
-## Configuración del Entorno Local
+## 3. Stack Tecnológico
 
-Sigue estos pasos para configurar el proyecto en tu máquina.
+### Backend
+-   **Lenguaje:** Python 3.12+
+-   **Framework:** FastAPI
+-   **Base de Datos:** PostgreSQL (gestionada a través de Supabase)
+-   **Testing:** Pytest
+-   **Servidor ASGI:** Uvicorn
 
-### 1. Prerrequisitos
+### Frontend
+-   **Framework:** React con TypeScript
+-   **Librería de UI:** Material-UI (MUI)
+-   **Gestión de Estado:** React Query (TanStack Query)
+-   **Cliente HTTP:** Axios
+-   **Enrutamiento:** React Router
 
-- Tener Python 3.12 o superior instalado.
-- Tener Git instalado.
+## 4. Configuración del Entorno Local
 
-### 2. Clonar el Repositorio
+Sigue estos pasos para configurar el proyecto completo en tu máquina.
+
+### 4.1. Prerrequisitos
+
+-   Tener Python 3.12 o superior instalado.
+-   Tener Node.js y npm (o Yarn) instalados.
+-   Tener Git instalado.
+
+### 4.2. Clonar el Repositorio
 
 ```bash
 git clone https://github.com/camilorinconp/santahelenadelvalleips.git
 cd santahelenadelvalleips
 ```
 
-### 3. Crear y Activar Entorno Virtual
+### 4.3. Configuración del Backend
 
+1.  **Navegar al directorio del backend:**
+    ```bash
+    cd backend
+    ```
+2.  **Crear y Activar Entorno Virtual:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate # macOS/Linux
+    # .\venv\Scripts\activate # Windows
+    ```
+3.  **Instalar Dependencias:**
+    ```bash
+    cp .env.example .env # Asegúrate de rellenar .env con tus credenciales de Supabase
+    pip install -r requirements.txt
+    ```
+4.  **Volver a la raíz del proyecto:**
+    ```bash
+    cd ..
+    ```
+
+### 4.4. Configuración del Frontend
+
+Consulta el `frontend/README_FRONTEND.md` para las instrucciones de configuración del frontend.
+
+## 5. Cómo Ejecutar la Aplicación (Ambos Servidores)
+
+Para ejecutar la aplicación completa, necesitas iniciar tanto el servidor del backend como el del frontend.
+
+### 5.1. Iniciar el Backend
+
+Desde la raíz del proyecto:
 ```bash
-# Crear el entorno virtual
-python3 -m venv venv
-
-# Activar en macOS/Linux
-source venv/bin/activate
-
-# (Si usas Windows, el comando es: .\venv\Scripts\activate)
+cd backend && ./venv/bin/uvicorn main:app --reload &
 ```
 
-### 4. Instalar Dependencias
+### 5.2. Iniciar el Frontend
 
-Crea un archivo `.env` a partir del ejemplo y luego instala los paquetes requeridos.
-
+Desde la raíz del proyecto:
 ```bash
-# (Asegúrate de rellenar .env con tus credenciales de Supabase)
-cp .env.example .env
-
-# Instalar paquetes
-pip install -r requirements.txt
+cd frontend && npm start &
 ```
 
----
+La API estará disponible en `http://127.0.0.1:8000` y la aplicación frontend en `http://localhost:3000`.
 
-## Cómo Ejecutar la Aplicación
+## 6. Prácticas de Desarrollo y Operación
 
-Con el entorno virtual activado, ejecuta el siguiente comando para iniciar el servidor de desarrollo:
+Estas son las prácticas esenciales para mantener la calidad, seguridad y eficiencia del proyecto.
 
-```bash
-uvicorn main:app --reload
-```
+### 6.1. Gestión de Entorno y Secretos
 
-La API estará disponible en `http://127.0.0.1:8000`.
+-   **Principio:** Los secretos (claves de API, credenciales de DB) nunca deben ser versionados en Git. Para desarrollo, se usa `.env` (excluido por `.gitignore`). Para producción, se deben inyectar de forma segura como variables de entorno en el servidor de despliegue.
+-   **Implementación:**
+    -   **Backend:** Las variables de entorno son leídas por FastAPI. El entorno de despliegue debe proveerlas.
+    -   **Frontend:** Vercel (o el servicio de hosting) permite configurar variables de entorno de forma segura para el proceso de construcción y ejecución.
 
-La documentación interactiva (Swagger UI) se encuentra en `http://127.0.0.1:8000/docs`.
+### 6.2. Automatización (Integración Continua - CI/CD)
 
-## Cómo Ejecutar las Pruebas
+-   **Principio:** Todo cambio de código debe ser validado automáticamente para asegurar la calidad, consistencia y detectar errores tempranamente.
+-   **Herramienta:** GitHub Actions (`.github/workflows/ci.yml`).
+-   **Validaciones:**
+    -   **Instalación de Dependencias:** Asegurar que todas las dependencias se instalen correctamente.
+    -   **Linting y Formateo:** Ejecutar linters (ej. `ruff` para Python, `eslint` para JS/TS) y formateadores (ej. `black` para Python, `prettier` para JS/TS) para mantener el estilo de código.
+    -   **Pruebas Unitarias/Integración:** Ejecutar `pytest` para el backend y `npm test` para el frontend.
 
-Para verificar que todo funciona correctamente, ejecuta el conjunto de pruebas automatizadas:
+### 6.3. Fijar Dependencias
 
+-   **Principio:** Asegurar la reproducibilidad del entorno de desarrollo y producción fijando las versiones exactas de todas las dependencias (directas e indirectas).
+-   **Implementación:**
+    -   **Backend:** Utilizar `pip freeze > requirements.txt` para generar un `requirements.txt` completo. Este archivo debe ser versionado.
+    -   **Frontend:** `package-lock.json` (generado por npm) ya cumple esta función para las dependencias de Node.js.
+
+## 7. Cómo Ejecutar las Pruebas
+
+### 7.1. Pruebas del Backend
+
+Desde el directorio `backend/` (con el entorno virtual activado):
 ```bash
 pytest -v
+```
+
+### 7.2. Pruebas del Frontend
+
+Desde el directorio `frontend/`:
+```bash
+npm test
 ```

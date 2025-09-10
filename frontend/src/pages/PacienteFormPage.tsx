@@ -1,14 +1,14 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { TextField, Button, Box, Typography, MenuItem, CircularProgress } from '@mui/material';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { createPaciente, PacienteData } from '../api/pacientesApi';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createPaciente, getPacienteById, updatePaciente, PacienteData } from '../api/pacientesApi';
 
-// 1. Definir el esquema de validación con Zod
+// El esquema de validación no cambia
 const pacienteSchema = z.object({
   tipo_documento: z.string().min(1, 'El tipo de documento es requerido'),
   numero_documento: z.string().min(1, 'El número de documento es requerido'),
@@ -25,21 +25,21 @@ const pacienteSchema = z.object({
 export default function PacienteFormPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { id } = useParams<{ id: string }>(); // Obtener el ID de la URL
+  const isEditMode = !!id;
 
-  // 2. Configurar la mutación para crear el paciente
-  const mutation = useMutation({
-    mutationFn: createPaciente,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pacientes'] });
-      navigate('/pacientes');
-    },
+  // 1. Si estamos en modo edición, obtener los datos del paciente
+  const { data: pacienteData, isLoading: isLoadingPaciente } = useQuery({
+    queryKey: ['pacientes', id],
+    queryFn: () => getPacienteById(id!),
+    enabled: isEditMode, // Solo ejecutar esta query si estamos en modo edición
   });
 
-  // 3. Configurar react-hook-form
   const {
     control,
     handleSubmit,
     formState: { errors },
+    reset, // Función para resetear el formulario con nuevos valores
   } = useForm<PacienteData>({
     resolver: zodResolver(pacienteSchema),
     defaultValues: {
@@ -54,19 +54,65 @@ export default function PacienteFormPage() {
     },
   });
 
-  // 4. Manejador de envío que llama a la mutación
+  // 2. Usar un useEffect para poblar el formulario cuando los datos se cargan
+  useEffect(() => {
+    if (pacienteData) {
+      console.log('Datos del paciente antes de formatear:', pacienteData);
+      // Formatear la fecha para el input type="date"
+      const formattedData = {
+        ...pacienteData,
+        fecha_nacimiento: pacienteData.fecha_nacimiento.split('T')[0],
+        // Saneamiento del campo genero
+        genero: (pacienteData.genero === 'M' || pacienteData.genero === 'F') ? pacienteData.genero : 'M',
+      };
+      console.log('Datos del paciente después de formatear:', formattedData);
+      reset(formattedData);
+    }
+  }, [pacienteData, reset]);
+
+  // 3. Mutaciones para crear y actualizar
+  const createMutation = useMutation({
+    mutationFn: createPaciente,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pacientes'] });
+      navigate('/pacientes');
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: updatePaciente,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pacientes'] });
+      navigate('/pacientes');
+    },
+  });
+
+  // 4. El manejador de envío ahora decide qué mutación llamar
   const onSubmit = (data: PacienteData) => {
-    mutation.mutate(data);
+    console.log('Submitting form. isEditMode:', isEditMode, 'ID:', id, 'Data:', data);
+    if (isEditMode) {
+      updateMutation.mutate({ id: id!, ...data });
+    } else {
+      createMutation.mutate(data);
+    }
   };
+
+  const mutation = isEditMode ? updateMutation : createMutation;
+
+  if (isLoadingPaciente) {
+    return <CircularProgress />;
+  }
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>Crear Nuevo Paciente</Typography>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        {isEditMode ? 'Editar Paciente' : 'Crear Nuevo Paciente'}
+      </Typography>
       {mutation.isError && (
-        <Typography color="error" sx={{ mb: 2 }}>Error al crear el paciente: {mutation.error.message}</Typography>
+        <Typography color="error" sx={{ mb: 2 }}>Error: {mutation.error.message}</Typography>
       )}
       
-      {/* Fila 1 */}
+      {/* El resto del formulario es idéntico */}
       <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Controller
@@ -91,7 +137,6 @@ export default function PacienteFormPage() {
         </Box>
       </Box>
 
-      {/* Fila 2 */}
       <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Controller
@@ -109,7 +154,6 @@ export default function PacienteFormPage() {
         </Box>
       </Box>
 
-      {/* Fila 3 */}
       <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Controller
@@ -127,7 +171,6 @@ export default function PacienteFormPage() {
         </Box>
       </Box>
 
-      {/* Fila 4 */}
       <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
         <Box sx={{ flex: 1 }}>
           <Controller
@@ -151,11 +194,25 @@ export default function PacienteFormPage() {
       </Box>
 
       <Box sx={{ mt: 3, position: 'relative' }}>
-        <Button type="submit" variant="contained" color="primary" disabled={mutation.isPending}>
-          Guardar Paciente
+        <Button 
+          type="submit" 
+          variant="contained" 
+          color="primary"
+          disabled={mutation.isPending}
+        >
+          {isEditMode ? 'Actualizar Paciente' : 'Guardar Paciente'}
         </Button>
         {mutation.isPending && (
-          <CircularProgress size={24} sx={{ position: 'absolute', top: '50%', left: '50%', marginTop: '-12px', marginLeft: '-12px' }} />
+          <CircularProgress
+            size={24}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: '-12px',
+              marginLeft: '-12px',
+            }}
+          />
         )}
       </Box>
     </Box>

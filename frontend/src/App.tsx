@@ -26,7 +26,8 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="pacientes" element={<PacientesPage />} />
-        <Route path="pacientes/nuevo" element={<PacienteFormPage />} /> {/* Añadir la nueva ruta */}
+        <Route path="pacientes/nuevo" element={<PacienteFormPage />} />
+        <Route path="pacientes/editar/:id" element={<PacienteFormPage />} /> {/* Nueva ruta para editar */}
         <Route path="atenciones" element={<AtencionesPage />} />
       </Route>
       
