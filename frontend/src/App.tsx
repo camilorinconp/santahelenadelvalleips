@@ -6,6 +6,7 @@ import { Box, Typography } from '@mui/material';
 import Layout from './components/Layout';
 import PacientesPage from './pages/PacientesPage';
 import AtencionesPage from './pages/AtencionesPage';
+import PacienteFormPage from './pages/PacienteFormPage'; // Importar la nueva página
 
 // Placeholder para la página de inicio, ahora vivirá dentro del Layout
 function HomePage() {
@@ -25,6 +26,7 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="pacientes" element={<PacientesPage />} />
+        <Route path="pacientes/nuevo" element={<PacienteFormPage />} /> {/* Añadir la nueva ruta */}
         <Route path="atenciones" element={<AtencionesPage />} />
       </Route>
       

@@ -14,6 +14,9 @@ export interface Paciente {
   genero: string;
 }
 
+// Tipo para los datos del formulario, excluyendo el id que es generado por el servidor
+export type PacienteData = Omit<Paciente, 'id'>;
+
 // Configuración de la instancia de Axios
 // La URL base apunta al backend de FastAPI. 
 // Asumimos que el backend corre en el puerto 8000.
@@ -32,6 +35,17 @@ export const getPacientes = async (): Promise<Paciente[]> => {
   } catch (error) {
     console.error('Error fetching pacientes:', error);
     // En una aplicación real, manejaríamos este error de forma más elegante
+    throw error;
+  }
+};
+
+// Función para crear un nuevo paciente
+export const createPaciente = async (pacienteData: PacienteData): Promise<Paciente> => {
+  try {
+    const response = await apiClient.post<{ data: Paciente[] }>('/pacientes/', pacienteData);
+    return response.data.data[0]; // El backend devuelve un array con el nuevo objeto
+  } catch (error) {
+    console.error('Error creating paciente:', error);
     throw error;
   }
 };

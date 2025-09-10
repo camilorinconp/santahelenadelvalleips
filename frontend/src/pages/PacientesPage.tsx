@@ -1,7 +1,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import { getPacientes } from '../api/pacientesApi';
 
 // Definición de las columnas para la tabla de pacientes
@@ -50,7 +51,16 @@ export default function PacientesPage() {
 
   return (
     <Box sx={{ height: 600, width: '100%' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>Gestión de Pacientes</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4">Gestión de Pacientes</Typography>
+        <Button
+          variant="contained"
+          component={RouterLink}
+          to="/pacientes/nuevo"
+        >
+          Nuevo Paciente
+        </Button>
+      </Box>
       <DataGrid
         rows={pacientes || []}
         columns={columns}
