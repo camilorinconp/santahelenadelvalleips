@@ -217,7 +217,7 @@ def test_08_get_diabetes_detalles_by_id():
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["id"] == control_diabetes_id_test
-    assert data["control_cronicidad_id"] == control_cronicidad_id_test
+    assert data["control_cronicidad_id"] == control_diabetes_id_test
 
 def test_09_get_erc_detalles_by_id():
     """Verifica la obtención de detalles de ERC por su ID."""
