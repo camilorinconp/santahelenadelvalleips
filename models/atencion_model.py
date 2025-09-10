@@ -1,14 +1,15 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
+from uuid import UUID # Importar UUID
 
 class Atencion(BaseModel):
-    id: Optional[UUID4] = None
-    paciente_id: UUID4
-    medico_id: Optional[UUID4] = None # Opcional hasta que implementemos medicos
-    codigo_rias_id: Optional[UUID4] = None # Opcional hasta que implementemos codigos_rias
+    id: Optional[UUID] = None
+    paciente_id: Optional[UUID] = None
+    medico_id: Optional[UUID] = None
     fecha_atencion: date
-    entorno: Optional[str] = None # Puede ser: Institucional, Hogar, Comunitario, Laboral, Educativo
-    descripcion: Optional[str] = None
+    entorno: Optional[str] = None
+    tipo_atencion: str
+    detalle_id: UUID
     creado_en: Optional[datetime] = None
     updated_at: Optional[datetime] = None

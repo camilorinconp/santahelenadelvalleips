@@ -1,10 +1,13 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
+from uuid import UUID # Importar UUID
 
 class ControlCronicidad(BaseModel):
-    id: Optional[UUID4] = None
-    atencion_id: UUID4 # FK a la tabla de atenciones generales
+    id: Optional[UUID] = None # Usar UUID
+    paciente_id: UUID
+    medico_id: Optional[UUID] = None
+    atencion_id: Optional[UUID] = None # Vínculo con la atención general
 
     # Campos Generales del Control de Cronicidad
     tipo_cronicidad: str # Ej: "Diabetes", "Hipertensión", "EPOC", "Enfermedad Cardiovascular"
@@ -18,7 +21,7 @@ class ControlCronicidad(BaseModel):
     imc: Optional[float] = None
     
     # Conexión a tabla de detalles específicos
-    detalle_cronicidad_id: Optional[UUID4] = None # FK a la tabla de detalles específicos (ej. ControlHipertensionDetalles)
+    detalle_cronicidad_id: Optional[UUID] = None # FK a la tabla de detalles específicos (ej. ControlHipertensionDetalles)
 
     complicaciones_observadas: Optional[str] = None
     observaciones: Optional[str] = None

@@ -1,10 +1,14 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
+from uuid import UUID # Importar UUID
 
 class AtencionPrimeraInfancia(BaseModel):
-    id: Optional[UUID4] = None
-    atencion_id: UUID4 # FK a la tabla de atenciones generales
+    id: Optional[UUID] = None # Usar UUID
+    paciente_id: UUID
+    medico_id: Optional[UUID] = None
+    fecha_atencion: date
+    entorno: Optional[str] = None
     
     # Datos Antropométricos y Nutricionales
     peso_kg: Optional[float] = None

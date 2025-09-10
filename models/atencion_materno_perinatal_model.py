@@ -1,10 +1,15 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
+from uuid import UUID # Importar UUID
 
 class AtencionMaternoPerinatal(BaseModel):
-    id: Optional[UUID4] = None
-    atencion_id: UUID4 # FK a la tabla de atenciones generales
+    id: Optional[UUID] = None # Usar UUID
+    paciente_id: Optional[UUID] = None # Hacer opcional como workaround para el problema de caché de Supabase
+    atencion_id: Optional[UUID] = None
+    medico_id: Optional[UUID] = None
+    fecha_atencion: date
+    entorno: Optional[str] = None
 
     # Datos de la Gestación
     estado_gestacional_semanas: Optional[int] = None

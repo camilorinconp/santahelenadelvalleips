@@ -1,10 +1,13 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
+from uuid import UUID # Importar UUID
 
 class TamizajeOncologico(BaseModel):
-    id: Optional[UUID4] = None
-    atencion_id: UUID4 # FK a la tabla de atenciones generales
+    id: Optional[UUID] = None # Usar UUID
+    paciente_id: UUID
+    medico_id: Optional[UUID] = None
+    atencion_id: Optional[UUID] = None # Vínculo con la atención general
 
     # Campos Generales del Tamizaje
     tipo_tamizaje: str # Ej: "Cuello Uterino", "Mama", "Próstata", "Colon y Recto"

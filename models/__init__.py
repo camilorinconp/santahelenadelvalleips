@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from .atencion_model import Atencion
 from .medico_model import Medico
 from .paciente_model import Paciente
@@ -7,15 +9,6 @@ from .atencion_materno_perinatal_model import AtencionMaternoPerinatal
 from .tamizaje_oncologico_model import TamizajeOncologico
 from .control_cronicidad_model import ControlCronicidad
 from .control_hipertension_model import ControlHipertensionDetalles
-from .control_diabetes_model import ControlDiabetesDetalles
-from .control_erc_model import ControlERCDetalles
-from .control_dislipidemia_model import ControlDislipidemiaDetalles
-from .control_diabetes_model import ControlDiabetesDetalles
-from .control_erc_model import ControlERCDetalles
-from .control_dislipidemia_model import ControlDislipidemiaDetalles
-from .control_diabetes_model import ControlDiabetesDetalles
-from .control_erc_model import ControlERCDetalles
-from .control_dislipidemia_model import ControlDislipidemiaDetalles
 from .control_diabetes_model import ControlDiabetesDetalles
 from .control_erc_model import ControlERCDetalles
 from .control_dislipidemia_model import ControlDislipidemiaDetalles

@@ -1,9 +1,10 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date
+from uuid import UUID # Importar UUID
 
 class Paciente(BaseModel):
-    id: Optional[UUID4] = None
+    id: Optional[UUID] = None # Usar UUID
     tipo_documento: str
     numero_documento: str
     primer_nombre: str
