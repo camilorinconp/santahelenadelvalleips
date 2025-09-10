@@ -71,6 +71,8 @@ La acción que se toma cuando una fila referenciada es eliminada (`ON DELETE`) e
 
 ### 3.2. Recomendación Arquitectónica de Alto Nivel
 
+**Nota de Priorización (2025-09-09):** Por decisión del equipo, se priorizará el inicio de la **Fase 3 (Integración y Análisis Transversal de Datos)**, específicamente la implementación de la arquitectura polimórfica para las atenciones individuales. Esta decisión se basa en que dicha arquitectura es el pilar técnico fundamental para la futura generación de indicadores y reportes, siendo el cambio de mayor impacto estratégico para el proyecto. Las tareas restantes de la Fase 2, como la especialización de `IntervencionColectiva`, se posponen para una futura intervención.
+
 Como equipo experto en bases de datos y arquitectura de software, nuestra recomendación de mayor nivel para la persistencia de datos y la articulación con la Resolución 3280 es la siguiente:
 
 **Principio Arquitectónico Central: Evolución de la Tabla `atenciones` hacia un Registro de Eventos Polimórfico.**
@@ -109,7 +111,7 @@ Este documento sirve como una guía viva para el progreso del proyecto, aseguran
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
 | Definir e implementar `IntervencionColectiva` | **Completado** | Modelo Pydantic, tabla DB, rutas API básicas y pruebas implementadas y pasando. | `models/intervencion_colectiva_model.py`, `routes/intervenciones_colectivas.py`, `tests/test_intervenciones_colectivas.py` | 2025-09-08 |
-| Expandir CRUD para `IntervencionColectiva` | Pendiente | Implementación inicial de `POST` y `GET` (todos/por ID). | `routes/intervenciones_colectivas.py` | 2025-09-08 |
+| Expandir CRUD para `IntervencionColectiva` | **Completado** | Implementados endpoints GET (todos, por ID, por filtro), POST, PUT y DELETE. | `routes/intervenciones_colectivas.py`, `tests/test_intervenciones_colectivas.py` | 2025-09-09 |
 | Especializar tipos de `IntervencionColectiva` | Pendiente | Análisis inicial de la necesidad de especialización. | N/A | 2025-09-08 |
 
 ### 4.3. Fase 3: Integración y Análisis Transversal de Datos
