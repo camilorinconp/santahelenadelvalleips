@@ -1,5 +1,10 @@
+from fastapi import APIRouter, HTTPException, status, Depends
+from supabase import Client
+from models import AtencionMaternoPerinatal
+from database import get_supabase_client
 from typing import List
 from uuid import UUID, uuid4
+from datetime import date, datetime
 
 router = APIRouter(
     prefix="/atenciones-materno-perinatal",
@@ -59,7 +64,7 @@ def create_atencion_materno_perinatal(atencion_detalle: AtencionMaternoPerinatal
         db.table("atencion_materno_perinatal").delete().eq("id", created_detalle['id']).execute()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al actualizar el detalle_id en la atención genérica: {e}")
 
-    return created_detalle
+    return AtencionMaternoPerinatal(**created_detalle)
 
 # Obtener todas las atenciones materno perinatales
 @router.get("/", response_model=List[AtencionMaternoPerinatal])

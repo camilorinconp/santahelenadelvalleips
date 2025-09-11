@@ -17,7 +17,7 @@ Para mantener la integridad, consistencia y robustez de la base de datos, hemos 
 
 ### 2.1. Columnas de Timestamp (creado_en, updated_at)
 
--   **`creado_en`**: Su propósito es registrar la fecha de creación de una fila. **Nunca debe cambiar**. 
+-   **`creado_en`**: Su propósito es registrar la fecha de creación de una fila. **Nunca debe cambiar**.
     -   **Configuración:** `Type: timestamptz`, `Is Nullable: No`, `Default Value: now()`.
 
 -   **`updated_at`**: Su propósito es registrar la **última fecha de modificación** de una fila. Debe actualizarse con cada cambio.
@@ -39,48 +39,68 @@ La acción que se toma cuando una fila referenciada es eliminada (`ON DELETE`) e
 
 **Objetivo General:** Lograr la capacidad de registrar y analizar datos de salud con la granularidad y estructura necesarias para el monitoreo y evaluación exigidos por la Resolución 3280.
 
-**Estrategia:** Evolucionar el modelo de `Atenciones` de un registro genérico a un sistema que soporte tipos de atención especializados, manteniendo la flexibilidad y la trazabilidad.
+**Estrategia:** Evolucionar el modelo de `Atenciones` de un registro genérico a un sistema que soporte tipos de atención especializados, manteniendo la flexibilidad y la trazabilidad, con un enfoque polimórfico.
 
 **Fases de Implementación:**
 
-1.  **Fase 1: Especialización de Atenciones Individuales Clave**
-    *   **Objetivo:** Reemplazar la `descripcion` genérica por campos estructurados para los tipos de atención individual más críticos y con mayores requisitos de datos.
-    *   **Avance Actual:** Modelo `AtencionPrimeraInfancia` y `AtencionMaternoPerinatal` definidos e implementados.
-    *   **Próximos Pasos:**
-        *   Crear la tabla `atencion_primera_infancia` en Supabase (con sus triggers y RLS).
-        *   Implementar las rutas API (CRUD) para `AtencionPrimeraInfancia`.
-        *   Escribir pruebas unitarias y de integración para `AtencionPrimeraInfancia`.
-        *   Crear la tabla `atencion_materno_perinatal` en Supabase (con sus triggers y RLS).
-        *   Implementar las rutas API (CRUD) para `AtencionMaternoPerinatal`.
-        *   Escribir pruebas unitarias y de integración para `AtencionMaternoPerinatal`.
-        *   **A Futuro:** Identificar otros tipos de atención individual que requieran especialización (ej. `TamizajeOncologico`, `ControlCronicidad`) y repetir el proceso.
+1.  **Fase 1: Consolidación de RIAS Individuales Clave (Basado en Resolución 3280)**
+    *   **Objetivo:** Implementar completamente las RIAS individuales prioritarias, asegurando la granularidad de datos y la lógica polimórfica según la Resolución 3280.
+    *   **Tareas:**
+        *   **1.1. Implementación Completa de `ControlCronicidad` (Prioridad Alta)**
+            *   **Descripción:** Desarrollar los modelos de datos, la lógica de negocio y los endpoints API para la gestión polimórfica de los controles de cronicidad (Hipertensión, Diabetes, ERC, Dislipidemia), según las especificaciones de la Resolución 3280.
+            *   **Acciones Clave:**
+                *   **Modelado de Datos:** Confirmar/ajustar modelos Pydantic para `ControlCronicidad` (general) y sus tablas de detalle específicas (`ControlHipertensionDetalles`, `ControlDiabetesDetalles`, `ControlERCDetalles`, `ControlDislipidemiaDetalles`), incluyendo todos los campos de anamnesis, examen físico, paraclínicos y plan de cuidado mencionados en la resolución para estas condiciones.
+                *   **Refactorización de Lógica de Creación:** Ajustar el endpoint `POST /control-cronicidad/` en `routes/control_cronicidad.py` para implementar el flujo polimórfico correcto:
+                    1.  Insertar el registro en la tabla de **detalles específica** (ej. `control_hipertension_detalles`).
+                    2.  Obtener el `id` del registro de detalle (`detalle_cronicidad_id`).
+                    3.  Crear el registro en la tabla `control_cronicidad`, utilizando el `detalle_cronicidad_id` obtenido y el `tipo_cronicidad` correspondiente.
+                    4.  Crear/Actualizar la entrada genérica en la tabla `atenciones`, vinculándola con el `id` del registro de `control_cronicidad` a través de `detalle_id` y `tipo_atencion` (ej. "Control Cronicidad - Hipertensión").
+                *   **Endpoints de Consulta:** Asegurar/desarrollar endpoints para consultar los detalles específicos de cronicidad, posiblemente utilizando el `detalle_cronicidad_id` del registro general.
+                *   **Pruebas:** Escribir pruebas unitarias y de integración exhaustivas para validar el flujo polimórfico y las reglas de negocio.
+        *   **1.2. Implementación Completa de `TamizajeOncologico` (Prioridad Alta)**
+            *   **Descripción:** Desarrollar los modelos de datos, la lógica de negocio y los endpoints API para los tamizajes de cáncer de Cuello Uterino, Mama, Próstata y Colon y Recto, siguiendo las secciones 9, 10, 11 y 12 de la Resolución 3280.
+            *   **Acciones Clave:**
+                *   **Modelado de Datos (Refactorización Potencial):** Evaluar la necesidad de crear modelos de detalle específicos para cada tipo de tamizaje oncológico (ej., `TamizajeCuelloUterinoDetalles`, `TamizajeMamaDetalles`) para una implementación verdaderamente polimórfica y granular, similar al enfoque de `ControlCronicidad`. Si se decide por esta refactorización, ajustar el modelo `TamizajeOncologico` actual para que actúe como un "padre" polimórfico.
+                *   **Lógica de Negocio:** Implementar reglas para la frecuencia de tamizajes por edad y riesgo, criterios de positividad, y flujos de remisión para pruebas confirmatorias o manejo, según la resolución.
+                *   **Endpoints API:** Desarrollar/ajustar endpoints para la gestión de cada tipo de tamizaje, considerando el flujo polimórfico si se refactoriza el modelado.
+                *   **Pruebas:** Asegurar cobertura de pruebas para todos los flujos.
+        *   **1.3. Implementación Detallada de la Ruta Materno Perinatal (RIAMP) (Prioridad Muy Alta)**
+            *   **Descripción:** Implementar las sub-intervenciones de la RIAMP (Preconcepcional, IVE, Prenatal, Parto, Puerperio, Recién Nacido, Complicaciones del Recién Nacido) con la granularidad y protocolos detallados en la Resolución 3280 (Secciones 4.1 a 4.11).
+            *   **Acciones Clave:**
+                *   **Modelado de Datos:** Crear/ajustar modelos Pydantic y tablas de base de datos para cada sub-intervención, capturando todos los campos de anamnesis, examen físico, paraclínicos, escalas, medicamentos, procedimientos y planes de cuidado específicos.
+                *   **Lógica de Negocio:** Implementar la lógica de negocio para cada sub-intervención, incluyendo validaciones, flujos de derivación, manejo de emergencias, y adherencia a los tiempos y protocolos definidos en la resolución.
+                *   **Endpoints API:** Desarrollar endpoints específicos para cada sub-intervención, asegurando la correcta vinculación polimórfica con la tabla `atenciones` general.
+                *   **Pruebas:** Desarrollar un conjunto exhaustivo de pruebas unitarias y de integración para cada sub-intervención.
 
 2.  **Fase 2: Consolidación de Intervenciones Colectivas**
     *   **Objetivo:** Desarrollar completamente el soporte para intervenciones dirigidas a grupos y comunidades.
-    *   **Avance Actual:** Modelo `IntervencionColectiva`, tabla y rutas básicas implementadas.
+    *   **Avance Actual:** Modelo `IntervencionColectiva`, tabla y rutas básicas implementadas y CRUD expandido.
     *   **Próximos Pasos:**
-        *   Expandir el CRUD para `IntervencionColectiva` (obtener por filtros, actualizar, eliminar).
-        *   Considerar la necesidad de especializar `IntervencionColectiva` si surgen tipos muy distintos (ej. `JornadaSaludComunitaria` vs. `CampañaVacunacion`).
+        *   Considerar la necesidad de especializar `IntervencionColectiva` si surgen tipos muy distintos (ej. `JornadaSaludComunitaria` vs. `CampañaVacunacion`), basándose en la sección 3.2 de la Resolución 3280.
 
 3.  **Fase 3: Integración y Análisis Transversal de Datos**
     *   **Objetivo:** Asegurar que todos los datos (individuales y colectivos) puedan ser consultados y analizados de forma coherente para generar los indicadores de la resolución.
-    *   **Próximos Pasos:**
-        *   Refinar el manejo de `entornos` (ej. crear una tabla `Entornos` con tipos predefinidos y una FK).
-        *   Diseñar una estrategia para vincular las atenciones especializadas a la tabla `atenciones` genérica (ej. `atenciones` como tabla polimórfica o de registro de eventos).
-        *   Desarrollar módulos de reporte y consulta que utilicen los datos estructurados para generar los indicadores de la Resolución 3280.
+    *   **Tareas:**
+        *   **3.1. Refinar manejo de `entornos`:** (ej. crear una tabla `Entornos` con tipos predefinidos y una FK).
+        *   **3.2. Implementación Detallada de `Educación y Comunicación para la Salud` (Sección 16 de la Resolución):**
+            *   **Descripción:** Modelar los contenidos educativos por momento de curso de vida y tipo de intervención, permitiendo el registro de la participación en sesiones individuales, grupales y colectivas.
+            *   **Acciones:** Crear modelos para contenidos educativos, registro de asistencia, y seguimiento de capacidades desarrolladas.
+        *   **3.3. Implementación Detallada de `Atención a la Familia` (Sección 15 de la Resolución):**
+            *   **Descripción:** Modelar la valoración familiar (Familiograma, APGAR familiar, Ecomapa, Zarit Scale) y las atenciones de orientación y educación familiar.
+            *   **Acciones:** Crear modelos para la valoración familiar y los registros de las intervenciones.
+        *   **3.4. Desarrollo de Módulos de Monitoreo y Evaluación (Capítulo 6 de la Resolución):**
+            *   **Descripción:** Implementar la recolección de datos para todos los **Indicadores de Resultado** e **Indicadores de Proceso** de la RPMS y RIAMP, según las tablas detalladas en la resolución.
+            *   **Acciones:** Asegurar que los modelos de datos de todas las RIAS contengan los campos necesarios para calcular estos indicadores. Desarrollar lógica para la agregación y reporte de estos indicadores.
+        *   **3.5. Consideraciones de Adaptabilidad (Capítulo 7 de la Resolución):**
+            *   **Descripción:** Asegurar que el diseño del sistema permita la adaptabilidad a diferentes contextos poblacionales y territoriales (etnia, discapacidad, género, ruralidad).
+            *   **Acciones:** Identificar campos en los modelos que permitan registrar estas particularidades y, si es necesario, diseñar mecanismos para la configuración de reglas de negocio o flujos de trabajo diferenciados.
 
 ### 3.2. Recomendación Arquitectónica de Alto Nivel
 
-**Nota de Priorización (2025-09-09):** Por decisión del equipo, se priorizará el inicio de la **Fase 3 (Integración y Análisis Transversal de Datos)**, específicamente la implementación de la arquitectura polimórfica para las atenciones individuales. Esta decisión se basa en que dicha arquitectura es el pilar técnico fundamental para la futura generación de indicadores y reportes, siendo el cambio de mayor impacto estratégico para el proyecto. Las tareas restantes de la Fase 2, como la especialización de `IntervencionColectiva`, se posponen para una futura intervención.
-
-Como equipo experto en bases de datos y arquitectura de software, nuestra recomendación de mayor nivel para la persistencia de datos y la articulación con la Resolución 3280 es la siguiente:
-
 **Principio Arquitectónico Central: Evolución de la Tabla `atenciones` hacia un Registro de Eventos Polimórfico.**
 
-En lugar de intentar que la tabla `atenciones` contenga *todos* los campos posibles para *todos* los tipos de atención (lo que la haría enorme y llena de nulos), recomendamos que `atenciones` se convierta en una tabla de **registro de eventos de alto nivel**.
-
--   **`atenciones` (Tabla Principal):** Contendrá los campos comunes a *todas* las atenciones (ej. `id`, `paciente_id`, `medico_id`, `fecha_atencion`, `entorno`, `creado_en`, `updated_at`). Además, tendrá una columna `tipo_atencion` (ej. "Valoración Primera Infancia", "Tamizaje Oncológico", "Consulta General") y una columna `detalle_id` que será una clave foránea a la tabla específica de detalles.
--   **Tablas de Detalle Especializadas:** Crearemos tablas separadas para cada tipo de atención especializada (ej. `atencion_primera_infancia_detalles`, `atencion_oncologica_detalles`). Estas tablas contendrán los campos específicos y estructurados que exige la resolución para ese tipo de atención.
+-   **`atenciones` (Tabla Principal):** Contendrá los campos comunes a *todas* las atenciones (ej. `id`, `paciente_id`, `medico_id`, `fecha_atencion`, `entorno`, `creado_en`, `updated_at`). Además, tendrá una columna `tipo_atencion` (ej. "Valoración Primera Infancia", "Tamizaje Oncológico", "Control Cronicidad - Hipertensión", "IVE") y una columna `detalle_id` que será una clave foránea a la tabla específica de detalles.
+-   **Tablas de Detalle Especializadas:** Crearemos tablas separadas para cada tipo de atención especializada (ej. `atencion_primera_infancia_detalles`, `atencion_oncologica_cuello_uterino_detalles`, `control_hipertension_detalles`, `ive_detalles`). Estas tablas contendrán los campos específicos y estructurados que exige la resolución para ese tipo de atención.
 
 **Ventajas de este enfoque:**
 -   **Claridad y Organización:** Cada tipo de atención tiene su propio esquema claro.
@@ -96,61 +116,63 @@ Este documento sirve como una guía viva para el progreso del proyecto, aseguran
 
 **Estado General:** En progreso.
 
-### 4.1. Fase 1: Especialización de Atenciones Individuales Clave
+### 4.1. Fase 1: Consolidación de RIAS Individuales Clave
 
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
 | Definir e implementar `AtencionPrimeraInfancia` | **Completado** | Modelo Pydantic, tabla DB, rutas API y pruebas implementadas y pasando. | `models/atencion_primera_infancia_model.py`, `routes/atencion_primera_infancia.py`, `tests/test_atencion_primera_infancia.py` | 2025-09-08 |
-| Definir e implementar `AtencionMaternoPerinatal` | **Completado** | Modelo Pydantic, tabla DB, rutas API y pruebas implementadas y pasando. | `models/atencion_materno_perinatal_model.py`, `routes/atencion_materno_perinatal.py`, `tests/test_atencion_materno_perinatal.py` | 2025-09-08 |
-| Definir e implementar `TamizajeOncologico` | Pendiente | Análisis inicial de requisitos de la Resolución 3280. | N/A | 2025-09-08 |
-| Definir e implementar `ControlCronicidad` | Pendiente | Análisis inicial de requisitos de la Resolución 3280. | N/A | 2025-09-08 |
-| **Otras Atenciones Individuales** | Pendiente | Identificación de otros tipos de atención individual que requieran especialización. | N/A | 2025-09-08 |
+| Definir e implementar `AtencionMaternoPerinatal` (Básico) | **Completado** | Modelo Pydantic, tabla DB, rutas API y pruebas implementadas y pasando para la estructura básica. | `models/atencion_materno_perinatal_model.py`, `routes/atencion_materno_perinatal.py`, `tests/test_atencion_materno_perinatal.py` | 2025-09-08 |
+| **Implementación Completa de `ControlCronicidad`** | **En Progreso (Refactorización Necesaria)** | Modelos de detalle (`control_hipertension_model.py`, `control_diabetes_model.py`, `control_erc_model.py`, `control_dislipidemia_model.py`) existen. La ruta `routes/control_cronicidad.py` necesita refactorización para implementar el flujo polimórfico correcto (creación de detalle específico -> `control_cronicidad` -> `atenciones`). | `models/control_cronicidad_model.py`, `models/control_hipertension_model.py`, `models/control_diabetes_model.py`, `models/control_erc_model.py`, `models/control_dislipidemia_model.py`, `routes/control_cronicidad.py` | 2025-09-10 |
+| **Implementación Completa de `TamizajeOncologico`** | **Pendiente (Refactorización de Modelado Potencial)** | Modelo general (`tamizaje_oncologico_model.py`) y ruta (`routes/tamizaje_oncologico.py`) existen. Se requiere evaluar la creación de modelos de detalle específicos para cada tipo de cáncer (cuello uterino, mama, próstata, colon y recto) para una implementación polimórfica completa. | `models/tamizaje_oncologico_model.py`, `routes/tamizaje_oncologico.py` | 2025-09-10 |
+| **Implementación Detallada de la Ruta Materno Perinatal (RIAMP)** | **Pendiente (Gran Alcance)** | La `resolucion_3280_de_2018_limpio.md` detalla extensamente sub-intervenciones como Preconcepcional, IVE, Prenatal, Parto, Puerperio, Recién Nacido y Complicaciones del Recién Nacido. Esto representa un gran volumen de trabajo pendiente para modelado de datos, lógica de negocio y endpoints API. | `models/atencion_materno_perinatal_model.py`, `routes/atencion_materno_perinatal.py`, `resolucion_3280_de_2018_limpio.md` (Secciones 4.1 a 4.11) | 2025-09-10 |
+| **Otras Atenciones Individuales** | Pendiente | Identificación de otros tipos de atención individual que requieran especialización, según la Resolución 3280. | N/A | 2025-09-10 |
 
 ### 4.2. Fase 2: Consolidación de Intervenciones Colectivas
 
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
-| Definir e implementar `IntervencionColectiva` | **Completado** | Modelo Pydantic, tabla DB, rutas API básicas y pruebas implementadas y pasando. | `models/intervencion_colectiva_model.py`, `routes/intervenciones_colectivas.py`, `tests/test_intervenciones_colectivas.py` | 2025-09-08 |
-| Expandir CRUD para `IntervencionColectiva` | **Completado** | Implementados endpoints GET (todos, por ID, por filtro), POST, PUT y DELETE. | `routes/intervenciones_colectivas.py`, `tests/test_intervenciones_colectivas.py` | 2025-09-09 |
-| Especializar tipos de `IntervencionColectiva` | Pendiente | Análisis inicial de la necesidad de especialización. | N/A | 2025-09-08 |
+| Definir e implementar `IntervencionColectiva` | **Completado** | Modelo Pydantic, tabla DB, rutas API básicas y pruebas implementadas y pasando. CRUD expandido. | `models/intervencion_colectiva_model.py`, `routes/intervenciones_colectivas.py`, `tests/test_intervenciones_colectivas.py` | 2025-09-09 |
+| Especializar tipos de `IntervencionColectiva` | Pendiente | Análisis inicial de la necesidad de especialización, según la sección 3.2 de la Resolución 3280. | N/A | 2025-09-10 |
 
 ### 4.3. Fase 3: Integración y Análisis Transversal de Datos
 
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
-| Refinar manejo de `entornos` | Pendiente | `entorno` añadido como campo `TEXT` en `atenciones`. | `models/atencion_model.py` | 2025-09-08 |
-| Diseñar estrategia de vinculación `atenciones` (polimórfica) | Pendiente | Propuesta arquitectónica definida. | `docs/recomendaciones_equipo_asesor_externo.md` | 2025-09-08 |
-| Desarrollar módulos de reporte y consulta | Pendiente | Análisis de requisitos de indicadores de la Resolución 3280. | N/A | 2025-09-08 |
+| Refinar manejo de `entornos` | Pendiente | `entorno` añadido como campo `TEXT` en `atenciones`. Se requiere definir una tabla `Entornos` con tipos predefinidos y una FK. | `models/atencion_model.py` | 2025-09-10 |
+| **Implementación Detallada de `Educación y Comunicación para la Salud`** | **Pendiente** | Requiere modelado de datos para contenidos educativos, registro de asistencia y seguimiento de capacidades desarrolladas, según la Sección 16 de la Resolución 3280. | N/A | 2025-09-10 |
+| **Implementación Detallada de `Atención a la Familia`** | **Pendiente** | Requiere modelado de datos para la valoración familiar (Familiograma, APGAR familiar, Ecomapa, Zarit Scale) y las atenciones de orientación y educación familiar, según la Sección 15 de la Resolución 3280. | N/A | 2025-09-10 |
+| **Desarrollo de Módulos de Monitoreo y Evaluación** | **Pendiente** | Requiere asegurar que los modelos de datos de todas las RIAS contengan los campos necesarios para calcular los **Indicadores de Resultado** e **Indicadores de Proceso** (Capítulo 6 de la Resolución 3280). Desarrollar lógica para la agregación y reporte. | N/A | 2025-09-10 |
+| **Consideraciones de Adaptabilidad** | **Pendiente** | Requiere identificar campos en los modelos que permitan registrar particularidades poblacionales y territoriales (etnia, discapacidad, género, ruralidad) y diseñar mecanismos para la configuración de reglas de negocio o flujos de trabajo diferenciados (Capítulo 7 de la Resolución 3280). | N/A | 2025-09-10 |
 
 ### 4.4. Fase 4: Lógica de Negocio y Reglas
 
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
-| Implementar validaciones específicas de la Resolución 3280 | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
-| Implementar flujos de trabajo y lógica de remisión | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
-| Implementar lógica de cálculo de indicadores | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
-| Implementar gestión de "Plan de Cuidado" | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar validaciones específicas de la Resolución 3280 | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
+| Implementar flujos de trabajo y lógica de remisión | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
+| Implementar lógica de cálculo de indicadores | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
+| Implementar gestión de "Plan de Cuidado" | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
 
 ### 4.5. Fase 5: Reportes y Analíticas
 
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
-| Desarrollar servicios de agregación de datos | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
-| Implementar endpoints de reportes | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Desarrollar servicios de agregación de datos | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
+| Implementar endpoints de reportes | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
 
 ### 4.6. Fase 6: Seguridad
 
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
-| Implementar gestión de usuarios y roles | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
-| Implementar políticas RLS granulares | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
-| Implementar autorización en la API | Pendiente | Análisis de requisitos. | N/A | 2025-09-08 |
+| Implementar gestión de usuarios y roles | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
+| Implementar políticas RLS granulares | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
+| Implementar autorización en la API | Pendiente | Análisis de requisitos. | N/A | 2025-09-10 |
 
 ### 4.7. Fase 7: Interfaz de Usuario (UI)
 
 | Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
 | :--- | :--- | :--- | :--- | :--- |
-| Diseño e implementación de UI | Pendiente | N/A | N/A | 2025-09-08 |
+| Diseño e implementación de UI | Pendiente | N/A | N/A | 2025-09-10 |
 
 ## NOTA IMPORTANTE: Estrategia de Documentación y Colaboración (2025-09-10)
 

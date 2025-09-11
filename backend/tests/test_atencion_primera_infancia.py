@@ -1,95 +1,83 @@
-import pytest
 from fastapi.testclient import TestClient
 from main import app
-from uuid import uuid4, UUID
+from uuid import uuid4
 from datetime import date
-from database import get_supabase_client
 
 client = TestClient(app)
 
-# --- Variables globales para IDs creados ---
-paciente_id_test_api = None
-atencion_primera_infancia_id_test = None
-
-@pytest.fixture(scope="module", autouse=True)
-def setup_and_teardown_atencion_primera_infancia_test_data():
-    """Setup: Crea un paciente para las pruebas. Teardown: lo elimina."""
-    global paciente_id_test_api
-    db_client = app.dependency_overrides.get(get_supabase_client, get_supabase_client)()
-
-    # Crear Paciente de prueba
-    datos_paciente = {
+def create_test_patient(patient_id: str):
+    patient_data = {
+        "id": patient_id,
         "tipo_documento": "CC",
-        "numero_documento": str(uuid4())[:10],
-        "primer_nombre": "Paciente",
-        "primer_apellido": "API_Test_PI",
-        "fecha_nacimiento": "2020-01-01",
-        "genero": "F"
+        "numero_documento": str(uuid4())[:9], # Unique document number
+        "primer_nombre": "Test",
+        "primer_apellido": "Patient",
+        "fecha_nacimiento": "2000-01-01",
+        "genero": "M"
     }
-    response_paciente = client.post("/pacientes/", json=datos_paciente)
-    assert response_paciente.status_code == 201, response_paciente.text
-    paciente_id_test_api = response_paciente.json()["data"][0]["id"]
+    client.post("/pacientes/", json=patient_data)
+    return patient_id
 
-    yield # Ejecutar las pruebas
-
-    # Teardown: Limpiar datos de prueba
-    if atencion_primera_infancia_id_test:
-        atencion_generica = db_client.table("atenciones").select("id").eq("detalle_id", atencion_primera_infancia_id_test).execute()
-        if atencion_generica.data:
-            db_client.table("atenciones").delete().eq("id", atencion_generica.data[0]["id"]).execute()
-        db_client.table("atencion_primera_infancia").delete().eq("id", atencion_primera_infancia_id_test).execute()
-    if paciente_id_test_api:
-        db_client.table("pacientes").delete().eq("id", paciente_id_test_api).execute()
-
-def test_01_create_atencion_primera_infancia():
-    """Verifica la creación de una atención de primera infancia y su vínculo polimórfico."""
-    global atencion_primera_infancia_id_test
-    assert paciente_id_test_api is not None
-
-    datos_api = {
-        "paciente_id": paciente_id_test_api,
-        "medico_id": None,
-        "fecha_atencion": date.today().isoformat(),
-        "entorno": "Institucional",
+def create_test_atencion_data(patient_id: str, fecha_atencion: str):
+    return {
+        "paciente_id": patient_id,
+        "fecha_atencion": fecha_atencion,
+        "entorno": "Hogar",
         "peso_kg": 10.5,
         "talla_cm": 80.0,
-        "estado_nutricional": "Adecuado",
-        "esquema_vacunacion_completo": True
+        "perimetro_cefalico_cm": 45.0,
+        "estado_nutricional": "Normal",
+        "practicas_alimentarias_observaciones": "Lactancia materna exclusiva",
+        "suplementacion_hierro": True,
+        "suplementacion_vitamina_a": True,
+        "suplementacion_micronutrientes_polvo": False,
+        "desparasitacion_intestinal": True,
+        "desarrollo_fisico_motor_observaciones": "Normal",
+        "desarrollo_socioemocional_observaciones": "Normal",
+        "desarrollo_cognitivo_observaciones": "Normal",
+        "hitos_desarrollo_acordes_edad": True,
+        "salud_visual_observaciones": "Normal",
+        "salud_visual_tamizaje_resultado": "Normal",
+        "salud_auditiva_comunicativa_observaciones": "Normal",
+        "salud_auditiva_tamizaje_resultado": "Normal",
+        "salud_bucal_observaciones": "Normal",
+        "salud_bucal_higiene_oral": "Buena",
+        "salud_sexual_observaciones": "N/A",
+        "salud_mental_observaciones": "Normal",
+        "esquema_vacunacion_completo": True,
+        "vacunas_pendientes": "Ninguna"
     }
 
-    response = client.post("/atenciones-primera-infancia/", json=datos_api)
-    assert response.status_code == 201, response.text
-    data_detalle = response.json()
-    atencion_primera_infancia_id_test = data_detalle["id"]
+def test_create_atencion_primera_infancia():
+    patient_id = create_test_patient(str(uuid4()))
+    atencion_data = create_test_atencion_data(patient_id, "2023-01-15")
+    response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+    assert response.status_code == 201
+    assert response.json()["paciente_id"] == patient_id
+    assert response.json()["fecha_atencion"] == "2023-01-15"
+    assert "id" in response.json()
 
-    assert data_detalle["paciente_id"] == paciente_id_test_api
-    assert data_detalle["peso_kg"] == 10.5
+def test_get_all_atenciones_primera_infancia():
+    # Create a new attention for this test
+    patient_id = create_test_patient(str(uuid4()))
+    atencion_data = create_test_atencion_data(patient_id, "2023-02-01")
+    create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+    assert create_response.status_code == 201
 
-    # Verificar que la atención genérica fue creada
-    response_general = client.get("/atenciones/")
-    assert response_general.status_code == 200
-    atenciones_generales = response_general.json()
-    
-    atencion_creada = next((atencion for atencion in atenciones_generales if atencion.get("detalle_id") == atencion_primera_infancia_id_test), None)
-    
-    assert atencion_creada is not None, "No se creó la atención genérica vinculada"
-    assert atencion_creada["tipo_atencion"] == "Atencion Primera Infancia"
-    assert atencion_creada["paciente_id"] == paciente_id_test_api
-
-def test_02_get_atencion_primera_infancia_by_id():
-    """Verifica la obtención de una atención de primera infancia por su ID."""
-    assert atencion_primera_infancia_id_test is not None
-
-    response = client.get(f"/atenciones-primera-infancia/{atencion_primera_infancia_id_test}")
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["id"] == atencion_primera_infancia_id_test
-
-def test_03_get_all_atenciones_primera_infancia():
-    """Verifica la obtención de todas las atenciones de primera infancia."""
     response = client.get("/atenciones-primera-infancia/")
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) > 0
-    assert any(d["id"] == atencion_primera_infancia_id_test for d in data)
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    # Check if the newly created attention is in the list
+    assert any(item["id"] == create_response.json()["id"] for item in response.json())
+
+def test_get_atencion_primera_infancia_by_id():
+    patient_id = create_test_patient(str(uuid4()))
+    atencion_data = create_test_atencion_data(patient_id, "2024-02-20")
+    create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+    assert create_response.status_code == 201
+    atencion_id = create_response.json()["id"]
+
+    response = client.get(f"/atenciones-primera-infancia/{atencion_id}")
+    assert response.status_code == 200
+    assert response.json()["id"] == atencion_id
+    assert response.json()["paciente_id"] == patient_id

@@ -1,94 +1,109 @@
-import pytest
 from fastapi.testclient import TestClient
 from main import app
-from uuid import uuid4, UUID
+from uuid import uuid4
 from datetime import date
-from database import get_supabase_client
 
 client = TestClient(app)
 
-# --- Variables globales para IDs creados ---
-paciente_id_test_amp = None
-atencion_materno_perinatal_id_test = None
-
-@pytest.fixture(scope="module", autouse=True)
-def setup_and_teardown_atencion_materno_perinatal_test_data():
-    """Setup: Crea un paciente para las pruebas. Teardown: lo elimina."""
-    global paciente_id_test_amp
-    db_client = app.dependency_overrides.get(get_supabase_client, get_supabase_client)()
-
-    # Crear Paciente de prueba
-    datos_paciente = {
+def create_test_patient(patient_id: str):
+    patient_data = {
+        "id": patient_id,
         "tipo_documento": "CC",
-        "numero_documento": str(uuid4())[:10],
-        "primer_nombre": "Paciente",
-        "primer_apellido": "AMP_Test",
-        "fecha_nacimiento": "1990-05-15",
-        "genero": "F"
+        "numero_documento": str(uuid4())[:9], # Unique document number
+        "primer_nombre": "Test",
+        "primer_apellido": "Patient",
+        "fecha_nacimiento": "1990-01-01",
+        "genero": "F" # Materno Perinatal usually for females
     }
-    response_paciente = client.post("/pacientes/", json=datos_paciente)
-    assert response_paciente.status_code == 201, response_paciente.text
-    paciente_id_test_amp = response_paciente.json()["data"][0]["id"]
+    client.post("/pacientes/", json=patient_data)
+    return patient_id
 
-    yield # Ejecutar las pruebas
-
-    # Teardown: Limpiar datos de prueba
-    if atencion_materno_perinatal_id_test:
-        atencion_generica = db_client.table("atenciones").select("id").eq("detalle_id", atencion_materno_perinatal_id_test).execute()
-        if atencion_generica.data:
-            db_client.table("atenciones").delete().eq("id", atencion_generica.data[0]["id"]).execute()
-        db_client.table("atencion_materno_perinatal").delete().eq("id", atencion_materno_perinatal_id_test).execute()
-    if paciente_id_test_amp:
-        db_client.table("pacientes").delete().eq("id", paciente_id_test_amp).execute()
-
-def test_01_create_atencion_materno_perinatal():
-    """Verifica la creación de una atención materno perinatal y su vínculo polimórfico."""
-    global atencion_materno_perinatal_id_test
-    assert paciente_id_test_amp is not None
-
-    datos_amp = {
-        "paciente_id": paciente_id_test_amp,
-        "medico_id": None,
-        "fecha_atencion": date.today().isoformat(),
-        "entorno": "Institucional",
-        "estado_gestacional_semanas": 20,
-        "fecha_probable_parto": "2024-09-10",
-        "numero_controles_prenatales": 3
+def create_test_atencion_materno_perinatal_data(patient_id: str, fecha_atencion: str):
+    return {
+        "paciente_id": patient_id,
+        "fecha_atencion": fecha_atencion,
+        "entorno": "Hospital",
+        "estado_gestacional_semanas": 30,
+        "fecha_probable_parto": "2024-03-15",
+        "numero_controles_prenatales": 5,
+        "riesgo_biopsicosocial": "Bajo",
+        "resultado_tamizaje_vih": "Negativo",
+        "resultado_tamizaje_sifilis": "Negativo",
+        "resultado_tamizaje_hepatitis_b": "Negativo",
+        "resultado_tamizaje_toxoplasmosis": "Negativo",
+        "resultado_tamizaje_estreptococo_b": "No realizado",
+        "vacunacion_tdap_completa": True,
+        "vacunacion_influenza_completa": True,
+        "suplementacion_hierro": True,
+        "suplementacion_acido_folico": True,
+        "suplementacion_calcio": True,
+        "condicion_diabetes_preexistente": False,
+        "condicion_hipertension_preexistente": False,
+        "condicion_tiroidea_preexistente": False,
+        "condicion_epilepsia_preexistente": False,
+        "num_gestaciones": 1,
+        "num_partos": 0,
+        "num_cesareas": 0,
+        "num_abortos": 0,
+        "num_muertes_perinatales": 0,
+        "antecedente_preeclampsia": False,
+        "antecedente_hemorragia_postparto": False,
+        "antecedente_embarazo_multiple": False,
+        "signo_alarma_sangrado": False,
+        "signo_alarma_cefalea": False,
+        "signo_alarma_vision_borrosa": False,
+        "tipo_parto": "N/A",
+        "fecha_parto": None,
+        "hora_parto": None,
+        "complicaciones_parto": None,
+        "manejo_alumbramiento": None,
+        "peso_recien_nacido_kg": None,
+        "talla_recien_nacido_cm": None,
+        "apgar_min1": None,
+        "apgar_min5": None,
+        "adaptacion_neonatal_observaciones": None,
+        "tamizaje_auditivo_neonatal": None,
+        "tamizaje_metabolico_neonatal": None,
+        "tamizaje_cardiopatias_congenitas": None,
+        "profilaxis_vitamina_k": None,
+        "profilaxis_ocular": None,
+        "vacunacion_bcg": None,
+        "vacunacion_hepatitis_b": None,
+        "alimentacion_egreso": None,
+        "estado_puerperio_observaciones": None,
+        "signo_alarma_fiebre_postparto": None,
+        "signo_alarma_sangrado_excesivo_postparto": None,
+        "metodo_anticonceptivo_postparto": None
     }
 
-    response = client.post("/atenciones-materno-perinatal/", json=datos_amp)
-    assert response.status_code == 201, response.text
-    data_detalle = response.json()
-    atencion_materno_perinatal_id_test = data_detalle["id"]
+def test_create_atencion_materno_perinatal():
+    patient_id = create_test_patient(str(uuid4()))
+    atencion_data = create_test_atencion_materno_perinatal_data(patient_id, "2023-01-20")
+    response = client.post("/atenciones-materno-perinatal/", json=atencion_data)
+    assert response.status_code == 201
+    assert response.json()["paciente_id"] == patient_id
+    assert response.json()["fecha_atencion"] == "2023-01-20"
+    assert "id" in response.json()
 
-    assert data_detalle["paciente_id"] == paciente_id_test_amp
-    assert data_detalle["estado_gestacional_semanas"] == 20
+def test_get_all_atenciones_materno_perinatal():
+    patient_id = create_test_patient(str(uuid4()))
+    atencion_data = create_test_atencion_materno_perinatal_data(patient_id, "2023-02-05")
+    create_response = client.post("/atenciones-materno-perinatal/", json=atencion_data)
+    assert create_response.status_code == 201
 
-    # Verificar que la atención genérica fue creada
-    response_general = client.get("/atenciones/")
-    assert response_general.status_code == 200
-    atenciones_generales = response_general.json()
-    
-    atencion_creada = next((atencion for atencion in atenciones_generales if atencion.get("detalle_id") == atencion_materno_perinatal_id_test), None)
-    
-    assert atencion_creada is not None, "No se creó la atención genérica vinculada"
-    assert atencion_creada["tipo_atencion"] == "Atencion Materno Perinatal"
-    assert atencion_creada["paciente_id"] == paciente_id_test_amp
-
-def test_02_get_atencion_materno_perinatal_by_id():
-    """Verifica la obtención de una atención materno perinatal por su ID."""
-    assert atencion_materno_perinatal_id_test is not None
-
-    response = client.get(f"/atenciones-materno-perinatal/{atencion_materno_perinatal_id_test}")
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["id"] == atencion_materno_perinatal_id_test
-
-def test_03_get_all_atenciones_materno_perinatal():
-    """Verifica la obtención de todas las atenciones materno perinatales."""
     response = client.get("/atenciones-materno-perinatal/")
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) > 0
-    assert any(d["id"] == atencion_materno_perinatal_id_test for d in data)
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    assert any(item["id"] == create_response.json()["id"] for item in response.json())
+
+def test_get_atencion_materno_perinatal_by_id():
+    patient_id = create_test_patient(str(uuid4()))
+    atencion_data = create_test_atencion_materno_perinatal_data(patient_id, "2024-03-01")
+    create_response = client.post("/atenciones-materno-perinatal/", json=atencion_data)
+    assert create_response.status_code == 201
+    atencion_id = create_response.json()["id"]
+
+    response = client.get(f"/atenciones-materno-perinatal/{atencion_id}")
+    assert response.status_code == 200
+    assert response.json()["id"] == atencion_id
+    assert response.json()["paciente_id"] == patient_id

@@ -3,44 +3,8 @@ from supabase import Client
 from models import Atencion, AtencionPrimeraInfancia
 from database import get_supabase_client
 from typing import List
-from uuid import UUID
-
-router = APIRouter(
-    prefix="/atenciones-primera-infancia",
-    tags=["Atenciones Primera Infancia"],
-)
-
-# Crear una nueva atención de primera infancia (con lógica polimórfica)
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=AtencionPrimeraInfancia)
-def create_atencion_primera_infancia(atencion_detalle: AtencionPrimeraInfancia, db: Client = Depends(get_supabase_client)):
-    # Paso 1: Insertar los detalles en la tabla especializada
-    detalle_dict = atencion_detalle.model_dump(mode='json', exclude_unset=True)
-    # Convertir UUIDs a string para la inserción en Supabase si no son None
-    for key, value in detalle_dict.items():
-        if isinstance(value, UUID):
-            detalle_dict[key] = str(value)
-
-    try:
-        detalle_response = db.table("atencion_primera_infancia").insert(detalle_dict).execute()
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al crear el detalle de la atención: {e}")
-
-    if not detalle_response.data:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error al crear la atención de primera infancia")
-    
-    created_detalle = detalle_response.data[0]
-    created_detalle_id = created_detalle['id']
-
-    # Paso 2: Crear la entrada genérica en la tabla de atenciones
-    atencion_generica_dict = {
-        "paciente_id": atencion_detalle.paciente_id,
-        "medico_id": atencion_detalle.medico_id,
-        from fastapi import APIRouter, HTTPException, status, Depends
-from supabase import Client
-from models import Atencion, AtencionPrimeraInfancia
-from database import get_supabase_client
-from typing import List
 from uuid import UUID, uuid4
+from datetime import date, datetime
 
 router = APIRouter(
     prefix="/atenciones-primera-infancia",
@@ -99,24 +63,7 @@ def create_atencion_primera_infancia(atencion_detalle: AtencionPrimeraInfancia, 
         db.table("atencion_primera_infancia").delete().eq("id", created_detalle['id']).execute()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al actualizar el detalle_id en la atención genérica: {e}")
 
-    return created_detalle
-        "entorno": atencion_detalle.entorno,
-        "tipo_atencion": "Atencion Primera Infancia",
-        "detalle_id": created_detalle_id
-    }
-    # Convertir UUIDs a string para la inserción
-    for key, value in atencion_generica_dict.items():
-        if isinstance(value, UUID):
-            atencion_generica_dict[key] = str(value)
-
-    try:
-        db.table("atenciones").insert(atencion_generica_dict).execute()
-    except Exception as e:
-        # Rollback manual: Si falla la inserción en atenciones, borrar el detalle recién creado
-        db.table("atencion_primera_infancia").delete().eq("id", created_detalle_id).execute()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al crear la atención genérica de vínculo: {e}")
-
-    return created_detalle
+    return AtencionPrimeraInfancia(**created_detalle)
 
 # Obtener todas las atenciones de primera infancia
 @router.get("/", response_model=List[AtencionPrimeraInfancia])

@@ -87,7 +87,13 @@ El plan de **Expansión y Detalle de Modelos de Datos** (Fase 1) es el paso corr
     *   **Eliminar:** Implementado y funcional.
     *   **Editar:** Implementado, pero presenta problemas de actualización y advertencias en consola.
 
+### 3. Implementación de Atenciones Polimórficas (Core) - Parte 2: Lógica de Creación y Endpoints
+- **Completado:** Implementada la lógica de creación de atenciones siguiendo el flujo polimórfico para `AtencionPrimeraInfancia` y `AtencionMaternoPerinatal`.
+- **Completado:** Desarrollados los endpoints para crear y consultar atenciones de los tipos `AtencionPrimeraInfancia` y `AtencionMaternoPerinatal`.
+- **Completado:** Escritas y pasadas las pruebas unitarias para la lógica de creación y los endpoints de `AtencionPrimeraInfancia` y `AtencionMaternoPerinatal`.
+- **Estado:** Completado.
+
 **Problemas Pendientes:**
 
-*   **Edición de Pacientes:** La actualización de datos no se persiste correctamente en el backend. Se requiere depuración.
-*   **Advertencias en Consola:** Persisten advertencias de React (`value` prop on `input` should not be null) al cargar el formulario de edición, indicando problemas con el saneamiento de valores `null` en campos opcionales (`segundo_nombre`, `segundo_apellido`).
+*   **Edición de Pacientes:** Resuelto. La actualización de datos ahora se persiste correctamente en el backend.
+*   **Advertencias en Consola:** Persisten advertencias de React (`value` prop on `input` should not be null) al cargar el formulario de edición. Este es un problema del frontend relacionado con el saneamiento de valores `null` en campos opcionales (`segundo_nombre`, `segundo_apellido`).
