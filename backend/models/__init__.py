@@ -12,3 +12,26 @@ from .control_hipertension_model import ControlHipertensionDetalles
 from .control_diabetes_model import ControlDiabetesDetalles
 from .control_erc_model import ControlERCDetalles
 from .control_dislipidemia_model import ControlDislipidemiaDetalles
+
+# Modelos transversales con nomenclatura descriptiva en español para RAG/IA
+from .entorno_model import (
+    TipoEntornoSaludPublica,
+    ModeloEntornoIntegralSaludPublica,
+    RelacionPersonaEntornoSaludPublica,
+    IntervencionSaludPublicaEntorno
+)
+from .familia_model import (
+    TipoEstructuraFamiliarIntegral,
+    CicloVitalFamiliarEvolutivo,
+    ModeloFamiliaIntegralSaludPublica,
+    RelacionIntegranteFamiliaCompleta,
+    IntervencionSaludFamiliarIntegral
+)
+from .atencion_integral_model import (
+    TipoAbordajeAtencionIntegralSalud,
+    NivelComplejidadAtencionIntegralSalud,
+    ModeloAtencionIntegralTransversalSalud,
+    ComponenteAtencionIntegralEspecializada,
+    EvaluacionIntegralSeguimientoSalud,
+    VistaConsolidadaAtencionTransversalIntegral
+)
