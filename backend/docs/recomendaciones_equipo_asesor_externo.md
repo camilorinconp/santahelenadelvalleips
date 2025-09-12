@@ -69,7 +69,7 @@ La acción que se toma cuando una fila referenciada es eliminada (`ON DELETE`) e
             *   **Acciones Clave:**
                 *   **Modelado de Datos:** Crear/ajustar modelos Pydantic y tablas de base de datos para cada sub-intervención, capturando todos los campos de anamnesis, examen físico, paraclínicos, escalas, medicamentos, procedimientos y planes de cuidado específicos.
                 *   **Lógica de Negocio:** Implementar la lógica de negocio para cada sub-intervención, incluyendo validaciones, flujos de derivación, manejo de emergencias, y adherencia a los tiempos y protocolos definidos en la resolución.
-                *   **Endpoints API:** Desarrollar endpoints específicos para cada sub-intervención, asegurando la correcta vinculación polimórfica con la tabla `atenciones` general.
+                *   **Endpoints API:** Desarrollar/ajustar endpoints específicos para cada sub-intervención, asegurando la correcta vinculación polimórfica con la tabla `atenciones` general.
                 *   **Pruebas:** Desarrollar un conjunto exhaustivo de pruebas unitarias y de integración para cada sub-intervención.
 
 2.  **Fase 2: Consolidación de Intervenciones Colectivas**
@@ -94,55 +94,6 @@ La acción que se toma cuando una fila referenciada es eliminada (`ON DELETE`) e
         *   **3.5. Consideraciones de Adaptabilidad (Capítulo 7 de la Resolución):**
             *   **Descripción:** Asegurar que el diseño del sistema permita la adaptabilidad a diferentes contextos poblacionales y territoriales (etnia, discapacidad, género, ruralidad).
             *   **Acciones:** Identificar campos en los modelos que permitan registrar estas particularidades y, si es necesario, diseñar mecanismos para la configuración de reglas de negocio o flujos de trabajo diferenciados.
-
-### 3.2. Recomendación Arquitectónica de Alto Nivel
-
-**Principio Arquitectónico Central: Evolución de la Tabla `atenciones` hacia un Registro de Eventos Polimórfico.**
-
--   **`atenciones` (Tabla Principal):** Contendrá los campos comunes a *todas* las atenciones (ej. `id`, `paciente_id`, `medico_id`, `fecha_atencion`, `entorno`, `creado_en`, `updated_at`). Además, tendrá una columna `tipo_atencion` (ej. "Valoración Primera Infancia", "Tamizaje Oncológico", "Control Cronicidad - Hipertensión", "IVE") y una columna `detalle_id` que será una clave foránea a la tabla específica de detalles.
--   **Tablas de Detalle Especializadas:** Crearemos tablas separadas para cada tipo de atención especializada (ej. `atencion_primera_infancia_detalles`, `atencion_oncologica_cuello_uterino_detalles`, `control_hipertension_detalles`, `ive_detalles`). Estas tablas contendrán los campos específicos y estructurados que exige la resolución para ese tipo de atención.
-
-**Ventajas de este enfoque:**
--   **Claridad y Organización:** Cada tipo de atención tiene su propio esquema claro.
--   **Eficiencia:** La tabla principal `atenciones` se mantiene ligera, y las tablas de detalle solo almacenan los datos relevantes para su tipo.
--   **Escalabilidad:** Es fácil añadir nuevos tipos de atención sin modificar la tabla principal.
--   **Cumplimiento Normativo:** Permite capturar la granularidad de datos que la Resolución 3280 exige para sus indicadores.
-
-## 4. Seguimiento del Avance del Proyecto
-
-Este documento sirve como una guía viva para el progreso del proyecto, asegurando la trazabilidad y la claridad para cualquier miembro del equipo.
-
-**Objetivo:** Alcanzar el 100% de implementación de los requisitos de datos y reportes de la Resolución 3280.
-
-**Estado General:** En progreso.
-
-### 4.1. Fase 1: Consolidación de RIAS Individuales Clave
-
-| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
-| :--- | :--- | :--- | :--- | :--- |
-| Definir e implementar `AtencionPrimeraInfancia` | **Completado** | Modelo Pydantic, tabla DB, rutas API y pruebas implementadas y pasando. | `models/atencion_primera_infancia_model.py`, `routes/atencion_primera_infancia.py`, `tests/test_atencion_primera_infancia.py` | 2025-09-08 |
-| Definir e implementar `AtencionMaternoPerinatal` (Básico) | **Completado** | Modelo Pydantic, tabla DB, rutas API y pruebas implementadas y pasando para la estructura básica. | `models/atencion_materno_perinatal_model.py`, `routes/atencion_materno_perinatal.py`, `tests/test_atencion_materno_perinatal.py` | 2025-09-08 |
-| **Implementación Completa de `ControlCronicidad`** | **En Progreso (Refactorización Necesaria)** | Modelos de detalle (`control_hipertension_model.py`, `control_diabetes_model.py`, `control_erc_model.py`, `control_dislipidemia_model.py`) existen. La ruta `routes/control_cronicidad.py` necesita refactorización para implementar el flujo polimórfico correcto (creación de detalle específico -> `control_cronicidad` -> `atenciones`). | `models/control_cronicidad_model.py`, `models/control_hipertension_model.py`, `models/control_diabetes_model.py`, `models/control_erc_model.py`, `models/control_dislipidemia_model.py`, `routes/control_cronicidad.py` | 2025-09-10 |
-| **Implementación Completa de `TamizajeOncologico`** | **Pendiente (Refactorización de Modelado Potencial)** | Modelo general (`tamizaje_oncologico_model.py`) y ruta (`routes/tamizaje_oncologico.py`) existen. Se requiere evaluar la creación de modelos de detalle específicos para cada tipo de cáncer (cuello uterino, mama, próstata, colon y recto) para una implementación polimórfica completa. | `models/tamizaje_oncologico_model.py`, `routes/tamizaje_oncologico.py` | 2025-09-10 |
-| **Implementación Detallada de la Ruta Materno Perinatal (RIAMP)** | **Pendiente (Gran Alcance)** | La `resolucion_3280_de_2018_limpio.md` detalla extensamente sub-intervenciones como Preconcepcional, IVE, Prenatal, Parto, Puerperio, Recién Nacido y Complicaciones del Recién Nacido. Esto representa un gran volumen de trabajo pendiente para modelado de datos, lógica de negocio y endpoints API. | `models/atencion_materno_perinatal_model.py`, `routes/atencion_materno_perinatal.py`, `resolucion_3280_de_2018_limpio.md` (Secciones 4.1 a 4.11) | 2025-09-10 |
-| **Otras Atenciones Individuales** | Pendiente | Identificación de otros tipos de atención individual que requieran especialización, según la Resolución 3280. | N/A | 2025-09-10 |
-
-### 4.2. Fase 2: Consolidación de Intervenciones Colectivas
-
-| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
-| :--- | :--- | :--- | :--- | :--- |
-| Definir e implementar `IntervencionColectiva` | **Completado** | Modelo Pydantic, tabla DB, rutas API básicas y pruebas implementadas y pasando. CRUD expandido. | `models/intervencion_colectiva_model.py`, `routes/intervenciones_colectivas.py`, `tests/test_intervenciones_colectivas.py` | 2025-09-09 |
-| Especializar tipos de `IntervencionColectiva` | Pendiente | Análisis inicial de la necesidad de especialización, según la sección 3.2 de la Resolución 3280. | N/A | 2025-09-10 |
-
-### 4.3. Fase 3: Integración y Análisis Transversal de Datos
-
-| Tarea | Estado | Avance Actual | Archivos Clave | Fecha Última Actualización |
-| :--- | :--- | :--- | :--- | :--- |
-| Refinar manejo de `entornos` | Pendiente | `entorno` añadido como campo `TEXT` en `atenciones`. Se requiere definir una tabla `Entornos` con tipos predefinidos y una FK. | `models/atencion_model.py` | 2025-09-10 |
-| **Implementación Detallada de `Educación y Comunicación para la Salud`** | **Pendiente** | Requiere modelado de datos para contenidos educativos, registro de asistencia y seguimiento de capacidades desarrolladas, según la Sección 16 de la Resolución 3280. | N/A | 2025-09-10 |
-| **Implementación Detallada de `Atención a la Familia`** | **Pendiente** | Requiere modelado de datos para la valoración familiar (Familiograma, APGAR familiar, Ecomapa, Zarit Scale) y las atenciones de orientación y educación familiar, según la Sección 15 de la Resolución 3280. | N/A | 2025-09-10 |
-| **Desarrollo de Módulos de Monitoreo y Evaluación** | **Pendiente** | Requiere asegurar que los modelos de datos de todas las RIAS contengan los campos necesarios para calcular los **Indicadores de Resultado** e **Indicadores de Proceso** (Capítulo 6 de la Resolución 3280). Desarrollar lógica para la agregación y reporte. | N/A | 2025-09-10 |
-| **Consideraciones de Adaptabilidad** | **Pendiente** | Requiere identificar campos en los modelos que permitan registrar particularidades poblacionales y territoriales (etnia, discapacidad, género, ruralidad) y diseñar mecanismos para la configuración de reglas de negocio o flujos de trabajo diferenciados (Capítulo 7 de la Resolución 3280). | N/A | 2025-09-10 |
 
 ### 4.4. Fase 4: Lógica de Negocio y Reglas
 
@@ -200,3 +151,17 @@ Para optimizar nuestra colaboración y asegurar la máxima eficiencia en el proy
 Esta estructura asegura que su valiosa guía estratégica sea el pilar del proyecto, con un proceso claro para su incorporación y validación.
 
 Agradecemos su compromiso y colaboración para hacer de este proyecto un éxito.
+
+### 4.8. Resumen de Avances Recientes del Esquema
+
+Hemos completado la refactorización y el refinamiento de la Ruta Materno Perinatal, aplicando la estrategia de polimorfismo anidado y el tipado de datos.
+
+-   **Consolidación de directorios `supabase`:** Se unificaron las configuraciones y migraciones de Supabase en la raíz del proyecto.
+-   **Sincronización de la base de datos:** Se resolvió la inconsistencia entre el esquema local y el remoto, reconstruyendo la base de datos en la nube a partir de las migraciones locales.
+-   **Refactorización de `atencion_materno_perinatal`:** Implementación de polimorfismo anidado de primer nivel, creando tablas de sub-detalle (`detalle_control_prenatal`, `detalle_parto`, `detalle_recien_nacido`, `detalle_puerperio`).
+-   **Refinamiento de `detalle_control_prenatal`:** Se añadieron campos de granularidad y se tiparon con `ENUMs` y `JSONB` (incluyendo polimorfismo anidado de segundo nivel para `anamnesis`, `paraclinicos`, `antropometria`).
+-   **Refinamiento de `detalle_parto`:** Se añadieron campos de granularidad y se tiparon con `ENUMs` y `JSONB`.
+-   **Refinamiento de `detalle_recien_nacido`:** Se añadió polimorfismo anidado de segundo nivel (`detalle_rn_atencion_inmediata`) y se tiparon campos con `ENUMs` y `JSONB`.
+-   **Refinamiento de `detalle_puerperio`:** Se añadieron campos de granularidad y se tiparon con `ENUMs` y `JSONB`.
+-   **Creación de tablas de detalle faltantes para MP:** Se crearon `detalle_salud_bucal_mp`, `detalle_nutricion_mp`, `detalle_ive`, `detalle_curso_maternidad_paternidad`, `detalle_seguimiento_rn`.
+-   **Estrategia de Tipado de Datos:** Se formalizó el uso de Catálogos/ENUMs para estandarización, TEXT para narrativas y JSONB para datos semi-estructurados, validando la preparación para IA/RAG.

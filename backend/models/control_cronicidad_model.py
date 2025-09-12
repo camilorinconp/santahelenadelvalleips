@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Union
+from typing import Optional, Union, Literal
 from datetime import date, datetime
 from uuid import UUID # Importar UUID
 
@@ -29,29 +29,30 @@ class ControlCronicidadBase(BaseModel):
     updated_at: Optional[datetime] = None
 
 class ControlCronicidad(ControlCronicidadBase):
-    tipo_cronicidad: str = Field(..., discriminator='tipo_cronicidad')
+    # tipo_cronicidad ya no necesita el discriminator aquí
+    tipo_cronicidad: str
     detalle_cronicidad_id: Optional[UUID] = None # FK a la tabla de detalles específicos
 
 class ControlCronicidadHipertension(ControlCronicidad):
-    tipo_cronicidad: str = Field("Hipertension", Literal="Hipertension")
+    tipo_cronicidad: Literal["Hipertension"]
     detalles: ControlHipertensionDetalles
 
 class ControlCronicidadDiabetes(ControlCronicidad):
-    tipo_cronicidad: str = Field("Diabetes", Literal="Diabetes")
+    tipo_cronicidad: Literal["Diabetes"]
     detalles: ControlDiabetesDetalles
 
 class ControlCronicidadERC(ControlCronicidad):
-    tipo_cronicidad: str = Field("ERC", Literal="ERC")
+    tipo_cronicidad: Literal["ERC"]
     detalles: ControlERCDetalles
 
 class ControlCronicidadDislipidemia(ControlCronicidad):
-    tipo_cronicidad: str = Field("Dislipidemia", Literal="Dislipidemia")
+    tipo_cronicidad: Literal["Dislipidemia"]
     detalles: ControlDislipidemiaDetalles
 
+# La unión discriminada se define aquí, usando el campo 'tipo_cronicidad' como discriminador
 ControlCronicidadPolimorfica = Union[
     ControlCronicidadHipertension,
     ControlCronicidadDiabetes,
     ControlCronicidadERC,
     ControlCronicidadDislipidemia
 ]
-

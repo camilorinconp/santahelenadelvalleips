@@ -276,7 +276,7 @@ def test_create_atencion_materno_perinatal_and_sub_details(test_client):
         "entorno": "Comunitario",
         "sub_tipo_atencion": "CONTROL_PRENATAL" # Ejemplo de sub_tipo_atencion
     }
-    response_mp = test_test_client.post("/atenciones-materno-perinatal/", json=atencion_mp_data)
+    response_mp = test_client.post("/atenciones-materno-perinatal/", json=atencion_mp_data)
     if response_mp.status_code != 201:
         print(f"Error response: {response_mp.status_code} - {response_mp.text}")
     assert response_mp.status_code == 201
@@ -284,7 +284,7 @@ def test_create_atencion_materno_perinatal_and_sub_details(test_client):
     
     # 2. Crear DetalleControlPrenatal
     detalle_cp_data = create_detalle_control_prenatal_data(atencion_mp_id)
-    response_cp = test_test_client.post(f"/atenciones-materno-perinatal/{atencion_mp_id}/control-prenatal", json=detalle_cp_data)
+    response_cp = test_client.post(f"/atenciones-materno-perinatal/{atencion_mp_id}/control-prenatal", json=detalle_cp_data)
     if response_cp.status_code != 201:
         print(f"Control prenatal error: {response_cp.status_code} - {response_cp.text}")
     assert response_cp.status_code == 201
@@ -358,13 +358,13 @@ def test_get_atencion_materno_perinatal_with_details(test_client):
         "entorno": "Comunitario",
         "sub_tipo_atencion": "CONTROL_PRENATAL" # Ejemplo de sub_tipo_atencion
     }
-    response_mp = test_test_client.post("/atenciones-materno-perinatal/", json=atencion_mp_data)
+    response_mp = test_client.post("/atenciones-materno-perinatal/", json=atencion_mp_data)
     assert response_mp.status_code == 201
     atencion_mp_id = response_mp.json()["id"]
     
     # 2. Crear DetalleControlPrenatal
     detalle_cp_data = create_detalle_control_prenatal_data(atencion_mp_id)
-    response_cp = test_test_client.post(f"/atenciones-materno-perinatal/{atencion_mp_id}/control-prenatal", json=detalle_cp_data)
+    response_cp = test_client.post(f"/atenciones-materno-perinatal/{atencion_mp_id}/control-prenatal", json=detalle_cp_data)
     assert response_cp.status_code == 201
 
     # 3. Crear DetalleParto
