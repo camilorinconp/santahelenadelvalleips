@@ -74,7 +74,181 @@ def get_atenciones_primera_infancia(db: Client = Depends(get_supabase_client)):
 # Obtener una atención de primera infancia por ID
 @router.get("/{atencion_id}", response_model=AtencionPrimeraInfancia)
 def get_atencion_primera_infancia_by_id(atencion_id: UUID, db: Client = Depends(get_supabase_client)):
-    response = db.table("atencion_primera_infancia").select("*").eq("id", str(atencion_id)).single().execute()
-    if not response.data:
+    try:
+        response = db.table("atencion_primera_infancia").select("*").eq("id", str(atencion_id)).single().execute()
+        if not response.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+        return response.data
+    except Exception as e:
+        # Si hay error en la consulta (ej. ID inválido), devolver 404
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+
+# Obtener atenciones de primera infancia por paciente ID
+@router.get("/paciente/{paciente_id}", response_model=List[AtencionPrimeraInfancia])
+def get_atenciones_primera_infancia_by_paciente(paciente_id: UUID, db: Client = Depends(get_supabase_client)):
+    response = db.table("atencion_primera_infancia").select("*").eq("paciente_id", str(paciente_id)).execute()
     return response.data
+
+# Actualizar una atención de primera infancia
+@router.put("/{atencion_id}", response_model=AtencionPrimeraInfancia)
+def update_atencion_primera_infancia(
+    atencion_id: UUID, 
+    atencion_update: AtencionPrimeraInfancia, 
+    db: Client = Depends(get_supabase_client)
+):
+    # Verificar que la atención existe
+    try:
+        existing_response = db.table("atencion_primera_infancia").select("*").eq("id", str(atencion_id)).single().execute()
+        if not existing_response.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+    
+    # Preparar datos para actualización
+    update_dict = atencion_update.model_dump(mode='json', exclude_unset=True, exclude={'id'})
+    for key, value in update_dict.items():
+        if isinstance(value, UUID):
+            update_dict[key] = str(value)
+        elif isinstance(value, date):
+            update_dict[key] = value.isoformat()
+        elif isinstance(value, datetime):
+            update_dict[key] = value.isoformat()
+
+    try:
+        # Actualizar la atención de primera infancia
+        response = db.table("atencion_primera_infancia").update(update_dict).eq("id", str(atencion_id)).execute()
+        if not response.data:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error al actualizar la atención de primera infancia")
+        
+        updated_atencion = response.data[0]
+        
+        # También actualizar la atención genérica si hay campos relacionados
+        if any(field in update_dict for field in ['fecha_atencion', 'entorno', 'medico_id']):
+            atencion_generica_update = {}
+            if 'fecha_atencion' in update_dict:
+                atencion_generica_update['fecha_atencion'] = update_dict['fecha_atencion']
+            if 'entorno' in update_dict:
+                atencion_generica_update['entorno'] = update_dict['entorno']
+            if 'medico_id' in update_dict:
+                atencion_generica_update['medico_id'] = update_dict['medico_id']
+            
+            if atencion_generica_update:
+                db.table("atenciones").update(atencion_generica_update).eq("detalle_id", str(atencion_id)).execute()
+        
+        return AtencionPrimeraInfancia(**updated_atencion)
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al actualizar la atención: {e}")
+
+# Actualización parcial de una atención de primera infancia (PATCH)
+@router.patch("/{atencion_id}", response_model=AtencionPrimeraInfancia)
+def patch_atencion_primera_infancia(
+    atencion_id: UUID, 
+    atencion_patch: dict, 
+    db: Client = Depends(get_supabase_client)
+):
+    # Verificar que la atención existe
+    try:
+        existing_response = db.table("atencion_primera_infancia").select("*").eq("id", str(atencion_id)).single().execute()
+        if not existing_response.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+    
+    # Limpiar campos que no deben actualizarse
+    update_dict = {k: v for k, v in atencion_patch.items() if k != 'id' and v is not None}
+    
+    # Convertir tipos si es necesario
+    for key, value in update_dict.items():
+        if isinstance(value, str) and key.endswith('_id'):
+            # Intentar convertir strings de UUID
+            try:
+                UUID(value)  # Validar formato UUID
+                update_dict[key] = value
+            except ValueError:
+                pass
+        elif isinstance(value, str) and 'fecha' in key:
+            # Mantener fechas como string ISO
+            update_dict[key] = value
+
+    try:
+        # Actualizar campos específicos
+        response = db.table("atencion_primera_infancia").update(update_dict).eq("id", str(atencion_id)).execute()
+        if not response.data:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error al actualizar la atención de primera infancia")
+        
+        updated_atencion = response.data[0]
+        
+        # Sincronizar con tabla atenciones si es necesario
+        if any(field in update_dict for field in ['fecha_atencion', 'entorno', 'medico_id']):
+            atencion_generica_update = {}
+            if 'fecha_atencion' in update_dict:
+                atencion_generica_update['fecha_atencion'] = update_dict['fecha_atencion']
+            if 'entorno' in update_dict:
+                atencion_generica_update['entorno'] = update_dict['entorno']
+            if 'medico_id' in update_dict:
+                atencion_generica_update['medico_id'] = update_dict['medico_id']
+            
+            if atencion_generica_update:
+                db.table("atenciones").update(atencion_generica_update).eq("detalle_id", str(atencion_id)).execute()
+        
+        return AtencionPrimeraInfancia(**updated_atencion)
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al actualizar la atención: {e}")
+
+# Eliminar una atención de primera infancia
+@router.delete("/{atencion_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_atencion_primera_infancia(atencion_id: UUID, db: Client = Depends(get_supabase_client)):
+    # Verificar que la atención existe
+    try:
+        existing_response = db.table("atencion_primera_infancia").select("*").eq("id", str(atencion_id)).single().execute()
+        if not existing_response.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Atención de primera infancia no encontrada")
+    
+    try:
+        # Eliminar la atención específica
+        response = db.table("atencion_primera_infancia").delete().eq("id", str(atencion_id)).execute()
+        
+        # Eliminar también de la tabla atenciones genérica
+        db.table("atenciones").delete().eq("detalle_id", str(atencion_id)).execute()
+        
+        return None
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al eliminar la atención: {e}")
+
+# Obtener estadísticas básicas de Primera Infancia
+@router.get("/stats/general", response_model=dict)
+def get_primera_infancia_stats(db: Client = Depends(get_supabase_client)):
+    try:
+        # Contar total de atenciones
+        total_response = db.table("atencion_primera_infancia").select("id", count="exact").execute()
+        total_atenciones = total_response.count if total_response.count else 0
+        
+        # Contar por estado nutricional
+        nutricional_response = db.table("atencion_primera_infancia").select("estado_nutricional").execute()
+        estados_nutricionales = {}
+        for record in nutricional_response.data:
+            estado = record.get('estado_nutricional', 'Sin especificar')
+            estados_nutricionales[estado] = estados_nutricionales.get(estado, 0) + 1
+        
+        # Contar vacunación completa
+        vacunas_response = db.table("atencion_primera_infancia").select("esquema_vacunacion_completo").execute()
+        vacunacion_completa = sum(1 for record in vacunas_response.data if record.get('esquema_vacunacion_completo') == True)
+        vacunacion_incompleta = sum(1 for record in vacunas_response.data if record.get('esquema_vacunacion_completo') == False)
+        
+        return {
+            "total_atenciones": total_atenciones,
+            "estados_nutricionales": estados_nutricionales,
+            "vacunacion": {
+                "completa": vacunacion_completa,
+                "incompleta": vacunacion_incompleta,
+                "sin_especificar": total_atenciones - vacunacion_completa - vacunacion_incompleta
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al obtener estadísticas: {e}")
