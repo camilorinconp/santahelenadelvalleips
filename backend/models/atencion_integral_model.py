@@ -1,216 +1,285 @@
-from pydantic import BaseModel
+# =============================================================================
+# Modelo de Atención Integral Transversal de Salud - Arquitectura Transversal 
+# Resolución 3280 de 2018 - Rutas Integrales de Atención en Salud (RIAS)
+# =============================================================================
+
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
-from datetime import datetime, date
-from uuid import UUID
 from enum import Enum
+from datetime import datetime
+from uuid import UUID
+
+# =============================================================================
+# ENUMS - Alineados con la tabla de Supabase
+# =============================================================================
 
 class TipoAbordajeAtencionIntegralSalud(str, Enum):
-    """Tipos de abordaje para atención integral de salud según enfoque Resolución 3280"""
-    ABORDAJE_INDIVIDUAL_PERSONALIZADO = "ABORDAJE_INDIVIDUAL_PERSONALIZADO"
-    ABORDAJE_FAMILIAR_NUCLEO_DOMESTICO = "ABORDAJE_FAMILIAR_NUCLEO_DOMESTICO" 
-    ABORDAJE_COLECTIVO_GRUPAL_COMUNITARIO = "ABORDAJE_COLECTIVO_GRUPAL_COMUNITARIO"
-    ABORDAJE_COMUNITARIO_TERRITORIAL = "ABORDAJE_COMUNITARIO_TERRITORIAL"
-    ABORDAJE_POBLACIONAL_MASIVO_EPIDEMIOLOGICO = "ABORDAJE_POBLACIONAL_MASIVO_EPIDEMIOLOGICO"
+    """
+    Enum para tipos de abordaje de atención integral.
+    Alineado con la tabla atencion_integral_transversal_salud en Supabase.
+    """
+    INDIVIDUAL_PERSONALIZADO = "INDIVIDUAL_PERSONALIZADO"
+    FAMILIAR_GRUPAL = "FAMILIAR_GRUPAL"
+    COMUNITARIO_COLECTIVO = "COMUNITARIO_COLECTIVO"
+    POBLACIONAL_MASIVO = "POBLACIONAL_MASIVO"
+    INTERSECTORIAL_COORDINADO = "INTERSECTORIAL_COORDINADO"
 
-class NivelComplejidadAtencionIntegralSalud(str, Enum):
-    """Nivel de complejidad para atención integral de salud según capacidad resolutiva"""
-    COMPLEJIDAD_BAJA_PROMOCION_PREVENCION = "COMPLEJIDAD_BAJA_PROMOCION_PREVENCION"  # Promoción y prevención básica primaria
-    COMPLEJIDAD_MEDIA_INTERVENCIONES_ESPECIFICAS = "COMPLEJIDAD_MEDIA_INTERVENCIONES_ESPECIFICAS"  # Intervenciones específicas especializadas
-    COMPLEJIDAD_ALTA_CASOS_COMPLEJOS_ESPECIALIZADOS = "COMPLEJIDAD_ALTA_CASOS_COMPLEJOS_ESPECIALIZADOS"  # Manejo de casos complejos especializados
-    COMPLEJIDAD_MUY_ALTA_VULNERABILIDAD_CRITICA = "COMPLEJIDAD_MUY_ALTA_VULNERABILIDAD_CRITICA"  # Casos de alta vulnerabilidad y riesgo crítico
 
-class ModeloAtencionIntegralTransversalSalud(BaseModel):
+class ModalidadAtencionIntegral(str, Enum):
     """
-    Modelo para atención integral transversal de salud pública
-    Art. 2570: 'de manera integrada e integral en los entornos de salud'
-    Art. 32: 'integral de los principales riesgos en salud poblacional'
+    Enum para modalidades de atención integral.
     """
-    id: Optional[UUID] = None
-    
-    # Sujeto de atención integral (individual o familiar)
-    paciente_persona_individual_id: Optional[UUID] = None
-    familia_nucleo_familiar_id: Optional[UUID] = None
-    
-    # Identificación y cronograma de la atención integral
-    codigo_identificacion_atencion_integral: Optional[str] = None
-    fecha_inicio_atencion_integral: date
-    fecha_finalizacion_estimada_planificada: Optional[date] = None
-    fecha_finalizacion_real_ejecutada: Optional[date] = None
-    
-    # Características metodológicas de la atención integral
-    tipo_abordaje_atencion_integral: TipoAbordajeAtencionIntegralSalud
-    nivel_complejidad_atencion_integral: NivelComplejidadAtencionIntegralSalud
-    
-    # Contexto integral multidimensional (Art. 1367)
-    contexto_dinamicas_familiares: Optional[Dict[str, Any]] = None  # JSONB con dinámicas del núcleo familiar
-    contexto_social_comunitario_territorial: Optional[Dict[str, Any]] = None  # JSONB con contexto social y territorial
-    entornos_salud_publica_involucrados: Optional[List[UUID]] = None  # IDs de entornos de salud pública
-    
-    # Valoración y diagnóstico integral inicial
-    motivo_consulta_atencion_integral: Optional[str] = None
-    problemas_salud_identificados_priorizados: Optional[Dict[str, Any]] = None  # JSONB con problemas de salud identificados
-    necesidades_salud_priorizadas_identificadas: Optional[List[str]] = None
-    
-    # Enfoque de riesgo integral y determinantes sociales
-    factores_riesgo_salud_identificados: Optional[Dict[str, Any]] = None  # JSONB con factores de riesgo en salud
-    factores_protectores_salud_identificados: Optional[Dict[str, Any]] = None  # JSONB con factores protectores en salud
-    vulnerabilidades_sociales_sanitarias: Optional[Dict[str, Any]] = None  # JSONB con vulnerabilidades socio-sanitarias
-    
-    # Plan de atención integral estructurado
-    objetivos_atencion_integral_especificos: Optional[List[str]] = None
-    intervenciones_salud_programadas_planificadas: Optional[Dict[str, Any]] = None  # JSONB con intervenciones planificadas
-    profesionales_equipo_interdisciplinario: Optional[List[UUID]] = None  # IDs de profesionales del equipo
-    instituciones_salud_involucradas: Optional[List[str]] = None
-    
-    # Coordinación y articulación intersectorial
-    profesional_coordinador_caso_responsable: Optional[UUID] = None  # ID del profesional coordinador principal
-    plan_coordinacion_intersectorial: Optional[Dict[str, Any]] = None  # JSONB con estrategias de coordinación
-    reuniones_equipo_interdisciplinario: Optional[List[Dict[str, Any]]] = None  # JSONB con registro de reuniones
-    
-    # Resultados esperados e indicadores de impacto
-    indicadores_seguimiento_evaluacion: Optional[Dict[str, Any]] = None  # JSONB con indicadores de proceso y resultado
-    metas_salud_corto_plazo_trimestre: Optional[List[str]] = None
-    metas_salud_mediano_plazo_ano: Optional[List[str]] = None
-    metas_salud_largo_plazo_plurianual: Optional[List[str]] = None
-    
-    # Estado y seguimiento continuo
-    estado_actual_atencion_integral: str = "ATENCION_ACTIVA_VIGENTE"  # ATENCION_ACTIVA_VIGENTE, ATENCION_SUSPENDIDA_TEMPORAL, ATENCION_COMPLETADA_FINALIZADA, ATENCION_CANCELADA_TERMINADA
-    porcentaje_cumplimiento_objetivos: Optional[int] = None  # Escala 0-100 porcentaje
-    fecha_ultima_evaluacion_seguimiento: Optional[date] = None
-    fecha_proxima_evaluacion_programada: Optional[date] = None
-    
-    # Metadatos de registro y auditoria
-    atencion_integral_activa: bool = True
-    fecha_hora_creacion_atencion_integral: Optional[datetime] = None
-    fecha_hora_ultima_actualizacion_atencion: Optional[datetime] = None
-    profesional_creador_atencion_integral_id: Optional[UUID] = None
+    PRESENCIAL_DIRECTA = "PRESENCIAL_DIRECTA"
+    VIRTUAL_REMOTA = "VIRTUAL_REMOTA"
+    MIXTA_HIBRIDA = "MIXTA_HIBRIDA"
+    DOMICILIARIA_TERRENO = "DOMICILIARIA_TERRENO"
+    INSTITUCIONAL_AMBULATORIA = "INSTITUCIONAL_AMBULATORIA"
 
-class ComponenteAtencionIntegralEspecializada(BaseModel):
-    """
-    Componentes especializados que conforman la atención integral de salud
-    Vincula las atenciones específicas con el plan de atención integral transversal
-    """
-    id: Optional[UUID] = None
-    atencion_integral_principal_id: UUID  # ID de la atención integral principal
-    
-    # Vinculación con atenciones especializadas específicas
-    atencion_especializada_especifica_id: Optional[UUID] = None  # ID de atención especializada
-    tipo_atencion_especializada: str  # "atencion_primera_infancia", "atencion_materno_perinatal", "atencion_cronicidad_control", etc.
-    
-    # Características del componente especializado
-    nombre_descriptivo_componente: str
-    descripcion_detallada_componente: Optional[str] = None
-    momento_curso_vida_aplicable: Optional[str] = None  # Momento del curso de vida si aplica
-    
-    # Planificación del componente
-    fecha_programada_componente: Optional[date] = None
-    nivel_prioridad_componente: Optional[str] = None  # "prioridad_alta_urgente", "prioridad_media_importante", "prioridad_baja_rutinaria"
-    componente_urgente_inmediato: bool = False
-    
-    # Ejecución del componente
-    fecha_realizacion_ejecucion_componente: Optional[date] = None
-    profesional_responsable_ejecucion: Optional[UUID] = None
-    duracion_minutos_ejecucion: Optional[int] = None
-    modalidad_atencion_componente: Optional[str] = None  # "atencion_presencial_consultorio", "atencion_virtual_telematica", "atencion_domiciliaria_hogar"
-    
-    # Resultados específicos del componente
-    objetivos_componente_especificos: Optional[List[str]] = None
-    resultados_salud_obtenidos_componente: Optional[Dict[str, Any]] = None  # JSONB con resultados del componente
-    observaciones_clinicas_componente: Optional[str] = None
-    
-    # Articulación con otros componentes especializados
-    componentes_relacionados_articulados: Optional[List[UUID]] = None  # IDs de otros componentes relacionados
-    requiere_seguimiento_posterior: Optional[bool] = False
-    fecha_seguimiento_programado: Optional[date] = None
-    
-    # Estado del componente
-    estado_actual_componente: str = "COMPONENTE_PROGRAMADO_PENDIENTE"  # COMPONENTE_PROGRAMADO_PENDIENTE, COMPONENTE_EN_EJECUCION_ACTIVO, COMPONENTE_COMPLETADO_FINALIZADO, COMPONENTE_CANCELADO_SUSPENDIDO
-    componente_activo_vigente: bool = True
-    fecha_hora_creacion_componente: Optional[datetime] = None
-    fecha_hora_ultima_actualizacion_componente: Optional[datetime] = None
 
-class EvaluacionIntegralSeguimientoSalud(BaseModel):
+class NivelComplejidadAtencionIntegral(str, Enum):
     """
-    Evaluaciones periódicas integrales de seguimiento en salud
-    Para monitoreo del progreso y ajuste de intervenciones de salud
+    Enum para niveles de complejidad de atención integral.
     """
-    id: Optional[UUID] = None
-    atencion_integral_evaluada_id: UUID  # ID de la atención integral a evaluar
-    
-    # Información de la evaluación integral
-    fecha_evaluacion_integral: date
-    tipo_evaluacion_seguimiento: str  # "evaluacion_inicial_basal", "evaluacion_seguimiento_periodico", "evaluacion_final_cierre", "evaluacion_extraordinaria_especial"
-    profesional_responsable_evaluacion: UUID  # ID del profesional evaluador
-    
-    # Evaluación del progreso y avances
-    avance_objetivos_atencion_integral: Optional[Dict[str, Any]] = None  # JSONB con progreso de objetivos
-    indicadores_cumplimiento_metas: Optional[Dict[str, Any]] = None  # JSONB con indicadores de cumplimiento
-    cambios_salud_observados: Optional[str] = None
-    
-    # Evaluación de componentes
-    componentes_evaluados: Optional[List[UUID]] = None  # IDs de componentes
-    efectividad_componentes: Optional[Dict[str, Any]] = None  # JSONB
-    
-    # Evaluación del contexto
-    cambios_contexto_familiar: Optional[str] = None
-    cambios_contexto_comunitario: Optional[str] = None
-    nuevos_factores_riesgo: Optional[Dict[str, Any]] = None  # JSONB
-    
-    # Satisfacción y percepción
-    satisfaccion_paciente: Optional[int] = None  # Escala 1-5
-    satisfaccion_familia: Optional[int] = None  # Escala 1-5
-    percepcion_cambios: Optional[str] = None
-    
-    # Recomendaciones y ajustes
-    recomendaciones: Optional[str] = None
-    ajustes_plan: Optional[Dict[str, Any]] = None  # JSONB
-    nuevos_componentes_sugeridos: Optional[List[str]] = None
-    componentes_suspender: Optional[List[UUID]] = None
-    
-    # Próximos pasos
-    proxima_evaluacion: Optional[date] = None
-    acciones_inmediatas: Optional[List[str]] = None
-    
-    # Metadatos
-    activo: bool = True
-    creado_en: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    BASICO_PROMOCION_PREVENCION = "BASICO_PROMOCION_PREVENCION"
+    INTERMEDIO_DETECCION_TEMPRANA = "INTERMEDIO_DETECCION_TEMPRANA"
+    AVANZADO_INTERVENCION_ESPECIALIZADA = "AVANZADO_INTERVENCION_ESPECIALIZADA"
+    ALTA_COMPLEJIDAD_MULTIDISCIPLINARIA = "ALTA_COMPLEJIDAD_MULTIDISCIPLINARIA"
 
-class VistaConsolidadaAtencionTransversalIntegral(BaseModel):
+
+class EstadoAtencionIntegral(str, Enum):
     """
-    Vista consolidada para análisis transversal integral de atención en salud
-    Modelo para respuestas API que integran información multidimensional de salud
+    Enum para estados de atención integral.
     """
-    # Información básica del paciente
-    paciente_persona_id: UUID
-    nombre_completo_paciente_persona: Optional[str] = None
-    documento_identificacion_paciente: Optional[str] = None
-    edad_anos_actual: Optional[int] = None
-    momento_curso_vida_actual: Optional[str] = None
+    EN_PROCESO = "EN_PROCESO"
+    COMPLETADA = "COMPLETADA"
+    SUSPENDIDA = "SUSPENDIDA"
+    CANCELADA = "CANCELADA"
+
+# =============================================================================
+# MODELOS PRINCIPALES - Alineados con tabla Supabase
+# =============================================================================
+
+class ModeloAtencionIntegralTransversalSaludCompleto(BaseModel):
+    """
+    Modelo completo para atención integral transversal de salud.
+    Corresponde exactamente con la tabla atencion_integral_transversal_salud en Supabase.
     
-    # Información familiar
-    familia_id: Optional[UUID] = None
-    tipo_familia: Optional[str] = None
-    funcionamiento_familiar: Optional[str] = None
+    Artículo 1364-1370 Resolución 3280: Atención integral como eje transversal de las RIAS.
+    """
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        validate_assignment=True,
+        use_enum_values=True
+    )
+
+    # Campos principales (requeridos)
+    codigo_atencion_integral_unico: str = Field(
+        ..., 
+        min_length=3, 
+        max_length=50,
+        description="Código único identificador de la atención integral (ej: AIT-001-2025)"
+    )
     
-    # Entornos activos
-    entornos_paciente: Optional[List[Dict[str, Any]]] = None  # Lista de entornos
+    tipo_abordaje_atencion: TipoAbordajeAtencionIntegralSalud = Field(
+        ...,
+        description="Tipo de abordaje de la atención integral"
+    )
     
-    # Atenciones recibidas (últimos 12 meses)
-    atenciones_primera_infancia: Optional[List[Dict[str, Any]]] = None
-    atenciones_materno_perinatal: Optional[List[Dict[str, Any]]] = None
-    atenciones_cronicidad: Optional[List[Dict[str, Any]]] = None
-    intervenciones_colectivas: Optional[List[Dict[str, Any]]] = None
+    modalidad_atencion: ModalidadAtencionIntegral = Field(
+        ...,
+        description="Modalidad de prestación de la atención integral"
+    )
     
-    # Atención integral actual
-    atencion_integral_activa: Optional[Dict[str, Any]] = None
-    componentes_activos: Optional[List[Dict[str, Any]]] = None
+    nivel_complejidad_atencion: NivelComplejidadAtencionIntegral = Field(
+        ...,
+        description="Nivel de complejidad de la atención integral"
+    )
     
-    # Indicadores transversales
-    riesgos_identificados: Optional[Dict[str, Any]] = None
-    factores_proteccion: Optional[Dict[str, Any]] = None
-    adherencia_tratamientos: Optional[Dict[str, Any]] = None
+    fecha_inicio_atencion_integral: datetime = Field(
+        ...,
+        description="Fecha y hora de inicio de la atención integral"
+    )
     
-    # Última actualización
-    ultima_atencion: Optional[datetime] = None
-    proxima_cita_programada: Optional[datetime] = None
+    objetivos_atencion_integral: Dict[str, Any] = Field(
+        ...,
+        description="Objetivos específicos de la atención integral (JSONB)"
+    )
+
+    # Referencias a otras entidades (opcionales)
+    sujeto_atencion_individual_id: Optional[UUID] = Field(
+        None,
+        description="ID del paciente individual (si es atención individual)"
+    )
+    
+    familia_integral_id: Optional[UUID] = Field(
+        None,
+        description="ID de la familia integral asociada"
+    )
+    
+    entorno_asociado_id: Optional[UUID] = Field(
+        None,
+        description="ID del entorno de salud pública asociado"
+    )
+
+    # Fechas de planificación
+    fecha_finalizacion_prevista: Optional[datetime] = Field(
+        None,
+        description="Fecha prevista para finalización de la atención"
+    )
+    
+    fecha_finalizacion_real: Optional[datetime] = Field(
+        None,
+        description="Fecha real de finalización de la atención"
+    )
+
+    # Profesionales involucrados
+    profesional_coordinador_id: Optional[UUID] = Field(
+        None,
+        description="ID del profesional coordinador de la atención"
+    )
+    
+    equipo_interdisciplinario_ids: Optional[Dict[str, Any]] = Field(
+        None,
+        description="IDs del equipo interdisciplinario participante (JSONB)"
+    )
+
+    # Planificación y seguimiento
+    plan_intervencion_detallado: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Plan detallado de intervenciones (JSONB)"
+    )
+    
+    actividades_realizadas_log: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Log de actividades realizadas (JSONB)"
+    )
+    
+    resultados_obtenidos_medicion: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Resultados obtenidos y mediciones (JSONB)"
+    )
+    
+    indicadores_proceso_seguimiento: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Indicadores de proceso y seguimiento (JSONB)"
+    )
+
+    # Barreras y facilitadores
+    barreras_dificultades_encontradas: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Barreras y dificultades encontradas (JSONB)"
+    )
+    
+    facilitadores_recursos_utilizados: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Facilitadores y recursos utilizados (JSONB)"
+    )
+
+    # Evaluación y satisfacción
+    evaluacion_satisfaccion_usuario: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Evaluación de satisfacción del usuario (JSONB)"
+    )
+    
+    recomendaciones_seguimiento: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Recomendaciones para seguimiento (JSONB)"
+    )
+    
+    articulacion_otros_servicios: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Articulación con otros servicios (JSONB)"
+    )
+
+    # Estado y fechas de seguimiento
+    estado_atencion_integral: Optional[str] = Field(
+        "EN_PROCESO",
+        max_length=50,
+        description="Estado actual de la atención integral"
+    )
+    
+    fecha_ultima_evaluacion: Optional[datetime] = Field(
+        None,
+        description="Fecha de la última evaluación realizada"
+    )
+    
+    proxima_fecha_seguimiento: Optional[datetime] = Field(
+        None,
+        description="Fecha programada para próximo seguimiento"
+    )
+
+    # Observaciones adicionales
+    observaciones_adicionales_atencion: Optional[str] = Field(
+        None,
+        max_length=2000,
+        description="Observaciones adicionales sobre la atención"
+    )
+
+    # Metadatos del sistema (solo lectura en respuestas)
+    id: Optional[UUID] = Field(None, description="ID único del registro")
+    creado_en: Optional[datetime] = Field(None, description="Fecha de creación del registro")
+    updated_at: Optional[datetime] = Field(None, description="Fecha de última actualización")
+    creado_por: Optional[UUID] = Field(None, description="ID del usuario que creó el registro")
+    actualizado_por: Optional[UUID] = Field(None, description="ID del usuario que actualizó el registro")
+
+
+# =============================================================================
+# MODELOS DE ENTRADA Y SALIDA
+# =============================================================================
+
+class ModeloAtencionIntegralTransversalSaludCrear(BaseModel):
+    """Modelo para crear una nueva atención integral - solo campos requeridos y opcionales de entrada"""
+    
+    codigo_atencion_integral_unico: str = Field(..., min_length=3, max_length=50)
+    tipo_abordaje_atencion: TipoAbordajeAtencionIntegralSalud
+    modalidad_atencion: ModalidadAtencionIntegral
+    nivel_complejidad_atencion: NivelComplejidadAtencionIntegral
+    fecha_inicio_atencion_integral: datetime
+    objetivos_atencion_integral: Dict[str, Any]
+    
+    # Campos opcionales para creación
+    sujeto_atencion_individual_id: Optional[UUID] = None
+    familia_integral_id: Optional[UUID] = None
+    entorno_asociado_id: Optional[UUID] = None
+    fecha_finalizacion_prevista: Optional[datetime] = None
+    profesional_coordinador_id: Optional[UUID] = None
+    equipo_interdisciplinario_ids: Optional[Dict[str, Any]] = None
+    plan_intervencion_detallado: Optional[Dict[str, Any]] = None
+    estado_atencion_integral: Optional[str] = "EN_PROCESO"
+    observaciones_adicionales_atencion: Optional[str] = None
+
+
+class ModeloAtencionIntegralTransversalSaludRespuesta(ModeloAtencionIntegralTransversalSaludCompleto):
+    """Modelo de respuesta - incluye todos los campos incluyendo metadatos del sistema"""
+    id: UUID = Field(..., description="ID único del registro")
+    creado_en: datetime = Field(..., description="Fecha de creación")
+    updated_at: datetime = Field(..., description="Fecha de última actualización")
+
+
+class ModeloAtencionIntegralTransversalSaludActualizar(BaseModel):
+    """Modelo para actualizar atención integral - todos los campos opcionales"""
+    
+    tipo_abordaje_atencion: Optional[TipoAbordajeAtencionIntegralSalud] = None
+    modalidad_atencion: Optional[ModalidadAtencionIntegral] = None
+    nivel_complejidad_atencion: Optional[NivelComplejidadAtencionIntegral] = None
+    sujeto_atencion_individual_id: Optional[UUID] = None
+    familia_integral_id: Optional[UUID] = None
+    entorno_asociado_id: Optional[UUID] = None
+    fecha_finalizacion_prevista: Optional[datetime] = None
+    fecha_finalizacion_real: Optional[datetime] = None
+    profesional_coordinador_id: Optional[UUID] = None
+    equipo_interdisciplinario_ids: Optional[Dict[str, Any]] = None
+    objetivos_atencion_integral: Optional[Dict[str, Any]] = None
+    plan_intervencion_detallado: Optional[Dict[str, Any]] = None
+    actividades_realizadas_log: Optional[Dict[str, Any]] = None
+    resultados_obtenidos_medicion: Optional[Dict[str, Any]] = None
+    indicadores_proceso_seguimiento: Optional[Dict[str, Any]] = None
+    barreras_dificultades_encontradas: Optional[Dict[str, Any]] = None
+    facilitadores_recursos_utilizados: Optional[Dict[str, Any]] = None
+    evaluacion_satisfaccion_usuario: Optional[Dict[str, Any]] = None
+    recomendaciones_seguimiento: Optional[Dict[str, Any]] = None
+    articulacion_otros_servicios: Optional[Dict[str, Any]] = None
+    estado_atencion_integral: Optional[str] = None
+    fecha_ultima_evaluacion: Optional[datetime] = None
+    proxima_fecha_seguimiento: Optional[datetime] = None
+    observaciones_adicionales_atencion: Optional[str] = None

@@ -16,9 +16,15 @@ from .control_dislipidemia_model import ControlDislipidemiaDetalles
 # Modelos transversales con nomenclatura descriptiva en español para RAG/IA
 from .entorno_model import (
     TipoEntornoSaludPublica,
-    ModeloEntornoIntegralSaludPublica,
-    RelacionPersonaEntornoSaludPublica,
-    IntervencionSaludPublicaEntorno
+    NivelComplejidadIntervencionEntorno,
+    EstadoActivacionEntorno,
+    ModeloEntornoSaludPublicaIntegralCompleto,
+    ModeloEntornoSaludPublicaCrear,
+    ModeloEntornoSaludPublicaActualizar,
+    ModeloEntornoSaludPublicaRespuesta,
+    ModeloListaEntornosSaludPublica,
+    ModeloFiltrosEntornoSaludPublica,
+    ModeloEstadisticasEntornoSaludPublica
 )
 from .familia_model import (
     TipoEstructuraFamiliarIntegral,
@@ -29,9 +35,11 @@ from .familia_model import (
 )
 from .atencion_integral_model import (
     TipoAbordajeAtencionIntegralSalud,
-    NivelComplejidadAtencionIntegralSalud,
-    ModeloAtencionIntegralTransversalSalud,
-    ComponenteAtencionIntegralEspecializada,
-    EvaluacionIntegralSeguimientoSalud,
-    VistaConsolidadaAtencionTransversalIntegral
+    ModalidadAtencionIntegral,
+    NivelComplejidadAtencionIntegral,
+    EstadoAtencionIntegral,
+    ModeloAtencionIntegralTransversalSaludCompleto,
+    ModeloAtencionIntegralTransversalSaludCrear,
+    ModeloAtencionIntegralTransversalSaludRespuesta,
+    ModeloAtencionIntegralTransversalSaludActualizar
 )
