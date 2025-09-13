@@ -1,0 +1,94 @@
+;;;;;;;;Documentos: Lineamentos técnicos para el reporte de Novedades de la Resolución 202 de 2021;;;;;;
+;;;;;;;;Dirección de Epidemiologia y Demografia;;;;;;
+;;;;;;;;Versión 10;;;;;;
+;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;
+VARIABLES DEL REPORTE ANTERIOR;;;VARIABLES DEL REPORTE MODIFICADO;;;;;;;VALIDACIONES REALIZADAS DURANTE EL CARGUE ;;;;
+No.;NOMBRE DE LA VARIABLE;VALORES PERMITIDOS;No.;GRUPO;NOMBRE DE LA VARIABLE;LONGITUD;TIPO;VALORES PERMITIDOS;USO DE VALORES PERMITIDOS;VALIDACIONES;Código del error o warning;Descripción del error o warning;Variables relacionadas;
+0;Tipo de registro;"2: valor que significa que el registro es
+de detalle ";0;Tipo de registro;Tipo de registro;1;N;2;;;;;;
+1;Consecutivo de registro;Número consecutivo de registros de detalle dentro del archivo. Inicia en 1 para el primer registro de detalle y va incrementando de 1 en 1, hasta el final del archivo. ;1;Identificación;Consecutivo de registro;8;N;Número consecutivo de registros de detalle dentro del archivo. Inicia en 1 para el primer registro de detalle y va incrementando de 1 en 1, hasta el final del archivo. ;;;;;;
+2;Tipo de identificación del usuario;"RC- Registro Civil
+TI- Tarjeta De Identidad
+CE- Cedula De Extranjería
+CC- Cedula De Ciudadanía
+PA- Pasaporte
+MS- Menor Sin Identificación
+AS- Adulto Sin Identificación
+NV-Certificado nacido vivo, solo para
+menores con 2 meses de nacido
+calculado entre la fecha de nacimiento
+y la fecha de la prestación del servicio
+Perteneciente al usuario ya reportado
+al sistema del MSPS
+";2;Identificación;Tipo de identificación del usuario;2;A;Ver tabla de referencia SGDTipoID publicada en web.sispro.gov.co, donde se encuentran los valores permitidos;"Las opciones MS, AS Y CN son tipos de identificación transitorios no definitivos.
+
+Se actualizó NV a CN.
+
+Se agregaron las opciones PE, SC y DE, de acuerdo a lo establecido en la Circular 029 de 2019.
+
+
+
+"; Valida que tipo y numero de documento de  identidad se encuentre en BDUA o BDEX;;;;
+3;Número de identificación del usuario;Número del documento de identificación, de acuerdo con el tipo de identificación del campo anterior;3;Identificación;Número de identificación del usuario;18;A;"Número del documento de identificación, de acuerdo con el tipo de identificación del campo anterior
+Pertenece al usuario ya reportado en el anexo técnico 1";"Se permite el registro de los siguientes caracteres:
+*Números entre 0 a 9.
+*Letras de la A a la Z, excluyendo Ñ."; Valida que tipo y numero de documento de  identidad se encuentre en BDUA o BDEX;;;;
+;;;;;;;;;;;;;;
+4;Primer apellido del usuario;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes;4;Identificación;Primer apellido del usuario;30;A;"Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes
+Pertenece al usuario ya reportado en el anexo técnico 1";;Registro repetido en el archivo  ;Error019 ;;;
+5;Segundo apellido del usuario ;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. En caso que el usuario no tenga segundo apellido o no se tenga este dato Registre  NONE, en mayúscula sostenida. ;5;Identificación;Segundo apellido del usuario ;30;A;"Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. Si el usuario no tiene segundo apellido o no se tiene este dato, Registre NONE en mayúscula sostenida
+Pertenece al usuario ya reportado en el anexo técnico 1 ";;Registro repetido en el archivo  ;Error019 ;;;
+6;Primer nombre del usuario ;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes.;6;Identificación;Primer nombre del usuario ;30;A;"Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes
+Pertenece al usuario ya reportado en el anexo técnico 1";;Registro repetido en el archivo  ;Error019 ;;;
+7;Segundo nombre del usuario ;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. En caso que el usuario no tenga segundo apellido o no se tenga este dato Registre  NONE, en mayúscula sostenida;7;Identificación;Segundo nombre del usuario ;30;A;"Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. Si el usuario no tiene segundo apellido o no se tiene este dato, Registre NONE en mayúscula sostenida
+Pertenece al usuario ya reportado en el anexo técnico 1";;Registro repetido en el archivo  ;Error019 ;;;
+8;Tipo de novedad;"1- Novedad de actualización del tipo de 
+documento de identificación
+2- Novedad de actualización del número de 
+documento de identificación 
+3- Novedad de actualización del tipo y número 
+de documento de identificación
+4- Novedad de actualización eliminar de la 
+base de datos por corrección luego de 
+auditoría interna o de la visita. Causa que se 
+elimina de la Base de Datos la persona y las 
+actividades reportadas de dicha persona en 
+los períodos de la EPS
+5- Novedad de actualización paciente 
+imposible de ubicar
+6- Novedad de actualización desafiliado al cual 
+se le siguen prestando servicios porque no 
+ha pasado a otra entidad (sentencia T760, 
+continuidad en tratamiento).
+7- Novedad cambio de IPS al interior de la EPS";8;Novedad;Tipo de novedad;1;N;"Ver tabla SGDNovedad publicada en Web.Sispro.gov.co, donde se encuentran los valores permitido:
+1 - Actualización del tipo de documento de identificación
+2 - Actualización del número de documento de identificación
+3 - Actualización del tipo y  número de documento de identificación
+4- Actualización eliminar de la base de datos por corrección luego de auditoría interna o de la visita
+";;"Los tipos de novedad 1, 2 y 3 son excluyentes. Si necesita reportar 1 y 2 reporta 3 contiene a 1 y 2, si reporta 3 NO debe reportar 1 y/o 2
+
+";Error023 ;;;
+;;;;;;;;;;La novedad ya se reportó para el actual periodo; Error020;;;
+;;;;;;;;;; El registro no se reportó en el Anexo SGD280RPED para el periodo anterior; Error021 ;;;
+9;Tipo de identificación modificado;"RC- Registro Civil
+TI- Tarjeta De Identidad
+CE- Cedula De Extranjería
+CC- Cedula De Ciudadanía
+PA- Pasaporte
+";A;Identificación;Tipo de identificación modificado;2;A;Ver tabla de referencia SGDTipoID publicada en web.sispro.gov.co, donde se encuentran los valores permitidos;;"Cruzar las variables 3 y 4 con BDUA o BDEX para 
+validar la correspondencia con los datos de las 
+variables 5, 6,7 y 8.
+Cruzar las variables 3 y 4 con BDUA o BDEX para 
+inferir los siguientes datos:
+1. Fecha de Afiliación.
+2. Estado de Afiliación.
+3. Geografía de Residencia.
+Cruzar las variables 3 y 4 con BDUA o BDEX para 
+validar la correspondencia de la variable 9.
+Cruzar las variables 3 y 4 con BDUA o BDEX para 
+validar la correspondencia de la variable 10";;;;
+10;Número de identificación modificado;"Perteneciente al usuario ya reportado
+al sistema del MSPS
+";A;Identificación;Número de identificación modificado;18;A;"Número del documento de identificación, de acuerdo con el tipo de identificación del campo anterior
+Pertenece al usuario ya reportado en el anexo técnico 1";;;;;;

@@ -1,0 +1,626 @@
+;;;;Documentos: Lineamentos técnicos para el reporte de la Resolución 202 de 2021;;;
+;;;;Dirección de Epidemiologia y Demografia;;;
+;;;;Versión 10;;;
+;;;;;;;
+;;;;;;;
+No.;NOMBRE DE LA VARIABLE;LONGITUD;TIPO;VALORES PERMITIDOS;REQUERIDO;;
+0;Tipo de registro;1;N;2;SI;;
+1;Consecutivo de registro;8;N;Número consecutivo de registros de detalle dentro del archivo. Inicia en 1 para el primer registro de detalle y va incrementando de 1 en 1, hasta el final del archivo. ;SI;;
+2;Código de habilitación IPS primaria;12;N;"Tabla REPS (Registro Especial de Prestadores de Servicios de Salud) 
+Si es desconocido registrar 999.";SI;;
+3;Tipo de identificación del usuario;2;A;Ver tabla de referencia SGDTipoID publicada en web.sispro.gov.co, donde se encuentran los valores permitidos;SI;;
+4;Número de identificación del usuario;18;A;Número del documento de identificación, de acuerdo con el tipo de identificación del campo anterior;SI;;
+5;Primer apellido del usuario;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes;SI;;
+6;Segundo apellido del usuario ;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. Si el usuario no tiene segundo apellido o no se tiene este dato, Registre NONE en mayúscula sostenida ;SI;;
+7;Primer nombre del usuario ;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes.;SI;;
+8;Segundo nombre del usuario ;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. Si el usuario no tiene segundo apellido o no se tiene este dato, Registre NONE en mayúscula sostenida;SI;;
+9;Fecha de Nacimiento;10;F;AAAA-MM-DD;SI;;
+10;Sexo;1;A;Ver tabla de referencia PSRGSEXO publicada en web.sispro.gov.co, donde se encuentran los valores permitidos.;SI;;
+11;Código pertenencia étnica ;1;N;Tabla GrupoEtnico publicada en web.sispro.gov.co, donde se encuentran los valores permitidos.;SI;;
+12;Código de ocupación (toda la población);4;N;"Ver tabla de referencia SGDCIUO publicada en web.sispro.gov.co, donde se encuentran los valores permitidos, de acuerdo a la Clasificación Internacional Uniforme de Ocupaciones (CIUO) en su última versión vigente.
+
+· En los casos en que no se tiene esta información
+  registrar (9999).
+· En el caso que no aplique registrar (9998).";SI;;
+13;Código de nivel educativo (toda la población);2;N;Ver tabla de referencia SGDNivEducativo en web.sispro.gov.com, donde se encuentran los valores permitidos.;SI;;
+14;Gestante;2;N;"0 -No aplica
+1 -Sí
+2 -No
+21-Riesgo no evaluado";SI;;
+15;Sífilis Gestacional o congénita;2;N;0 -No aplica;SI;;
+16;Resultado de la prueba  mini - mental state;2;N;"0 -No aplica
+4 -Sospecha de deterioro cognoscitivo
+5 -Normal
+21-Riesgo no evaluado";SI;;
+17;Hipotiroidismo Congénito;2;N;0 -No aplica;SI;;
+18;Sintomático respiratorio (toda la población);2;N;"1 -Sí
+2 -No
+21-Riesgo no evaluado";SI;;
+19;Consumo de tabaco;2;N;"Reporte el resultado del Índice de paquetes año (IPA) en número entero entre 0 y 95.
+96-Si el resultado del IPA es 96 o mayor
+97-Exfumador
+98-No aplica
+99-Riesgo no evaluado";SI;;
+20;Lepra;2;N;21-Riesgo no evaluado;SI;;
+21;Obesidad o Desnutrición Proteico Calórica;2;N;21-Riesgo no evaluado;SI;;
+22;Resultado del tacto rectal;2;N;"0 -No aplica
+4 -Próstata anormal
+5 -Próstata normal
+21-Riesgo no evaluado";SI;;
+23;Acido fólico preconcepcional;2;N;"0 -No aplica
+1 -Sí
+2 -No
+21-Registro no evaluado";SI;;
+24;Resultado de la prueba sangre oculta en materia fecal (tamizaje Ca de colon);2;N;"0 -No aplica
+4 -Positivo
+5 -Negativo
+6 -No es posible determinar el resultado
+21-Riesgo no evaluado 
+";SI;;
+25;Enfermedad Mental;2;N;21-Riesgo no evaluado;SI;;
+26;Cáncer de Cérvix;2;N;0 - No aplica;SI;;
+27;Agudeza visual lejana ojo izquierdo ;2;N;"0 -No aplica
+3 -Menor o igual a 20/20 normal 
+4 -Entre 20/25 y 20/40
+5 -Mayor o igual de 20/50 hasta 1200 anormal
+6 -Cuenta dedos 
+7 -Percepción de bultos 
+8 -Proyección y percepción de luz 
+9 -No percibe luz
+21-Riesgo no evaluado";SI;;
+28;Agudeza visual lejana ojo derecho ;2;N;"0 -No aplica
+3 -Menor o igual a 20/20 normal 
+4 -Entre 20/25 y 20/40
+5 -Mayor o igual de 20/50 hasta 1200 anormal
+6 -Cuenta dedos 
+7 -Percepción de bultos 
+8 -Proyección y percepción de luz 
+9 -No percibe luz
+21-Riesgo no evaluado";SI;;
+29;"Fecha del peso 
+(Toda la población)";10;F;"AAAA-MM-DD
+Si no se toma registrar 1800-01-01 ";SI;;
+30;"Peso en Kilogramos 
+(Toda la población)";5;D;"Se registra el dato obtenido de la medición.
+Si no se toma registrar 999";SI;;
+31;"Fecha de la talla 
+(Toda la población)";10;F;"AAAA-MM-DD
+Si no se toma registrar 1800-01-01 ";SI;;
+32;"Talla en centímetros 
+(Toda la población)";3;N;"Se registra el dato obtenido de la medición.
+Si no se toma registrar 999";SI;;
+33;Fecha probable de parto;10;F;"AAAA-MM-DD
+Si no se tiene el dato registrar 1800-01-01 
+Si no aplica registrar 1845-01-01";SI;;
+34;Código país;3;N;"Ver tabla de referencia PAIS1 publicada en web.sispro.gov.co, donde se encuentran los valores permitidos, de acuerdo a la norma internacional ISO3166-1. 
+Registre el código numérico. 
+Registre 999 para aquellas personas a las cuales no se les conoce la nacionalidad";SI;;
+35;Clasificación del riesgo gestacional;2;N;"0 -No aplica
+4 -Alto riesgo
+5 -Bajo riesgo
+21-Riesgo no evaluado";SI;;
+36;Resultado de colonoscopia tamizaje;2;N;"0 -No aplica
+2 -Hallazgos compatibles con pólipos hiperplásicos
+3 -Hallazgos sugestivos de proceso preneoplásico
+4 -Hallazgos sugestivos de proceso neoplásico
+5 -Colonoscopia normal
+6 -Otros hallazgos
+21-Riesgo no evaluado";SI;;
+37;Resultado de tamizaje auditivo neonatal;2;N;"0 -No aplica
+4 -No pasó
+5 -Pasó
+21-Riesgo no evaluado";SI;;
+38;Resultado de tamizaje visual neonatal;2;N;"0 -No aplica
+4 -Alterado
+5 -Normal
+21-Riesgo no evaluado";SI;;
+39;DPT menores de 5 años;2;N;0 - No aplica;SI;;
+40;Resultado de tamizaje VALE;2;N;"0 -No aplica
+4 -Falla
+5 -Pasa
+21-Riesgo no evaluado";SI;;
+41;Neumococo;2;N;0 -No aplica;SI;;
+42;Resultado de tamizaje para hepatitis C;2;N;"0 -No aplica
+4 -Reactivo
+5 -No reactivo
+21-Riesgo no evaluado";SI;;
+43;Resultado de escala abreviada de desarrollo área de motricidad gruesa;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";SI;;
+44;Resultado de escala abreviada de desarrollo área de motricidad finoadaptativa;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";SI;;
+45;Resultado de escala abreviada de desarrollo área personal social;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";SI;;
+46;Resultado de escala abreviada de desarrollo área de motricidad audición lenguaje;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";SI;;
+47;Tratamiento ablativo o de escisión posterior a la realización de la técnica de inspección visual (Crioterapia o LETZ);2;N;"0 -No aplica
+6 -Sí, se realizó tratamiento ablativo
+7 -Sí, se realizó tratamiento de escisión
+8 -Sí, se realizó tratamiento homologable a ablativo o de escisión
+9 -No se realizó ablación, escisión, ni tratamiento homologable, se requiere de otro procedimiento
+10-No se realizó ablación ni escisión por otras razones
+21-Registro no evaluado";SI;;
+48;Resultado de tamización con oximetría pre y post ductal;2;N;"0 -No aplica
+4 -Alterado
+5 -Normal
+21-Riesgo no evaluado";SI;;
+49;Fecha de atención parto o cesárea;10;F;"AAAA-MM-DD
+Si no se tiene el dato registrar 1800-01-01
+Si no aplica registrar 1845-01-01";SI;;
+50;Fecha de salida de atención parto o cesárea;10;F;"AAAA-MM-DD
+Si no se tiene el dato registrar 1800-01-01
+Si no aplica registrar 1845-01-01";SI;;
+51;Fecha de atención en salud para la promoción y apoyo de la lactancia materna;10;F;"AAAA-MM-DD
+· Si no se tiene el dato registrar 1800-01-01 
+· Si no se realiza por una tradición registrar 1805-01-01
+· Si no se realiza por una condición de salud registrar 1810-01-01
+· Si no se realiza por negación del usuario registrar 1825-01-01
+· Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830 -01-01
+· Si no se realiza por otras razones registrar 1835-01-01
+· Si no aplica registrar 1845-01-01";SI;;
+52;Fecha de consulta de valoración integral;10;F;"AAAA-MM-DD
+· Si no se tiene el dato registrar 1800-01-01 
+· Si no se realiza por una tradición registrar 1805-01-01
+· Si no se realiza por una condición de salud registrar 1810-01-01
+· Si no se realiza por negación del usuario registrar 1825-01-01
+· Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+· Si no se realiza por otras razones registrar 1835-01-01
+· Si no aplica registrar 1845-01-01";SI;;
+53;"Fecha de atención en salud para la asesoría en anticoncepción
+";10;F;"AAAA-MM-DD
+· Si no se tiene el dato registrar 1800-01-01 
+· Si no se realiza por una tradición registrar 1805-01-01
+· Si no se realiza por una condición de salud registrar 1810-01-01
+· Si no se realiza por negación del usuario registrar 1825-01-01
+· Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830 -01-01
+· Si no se realiza por otras razones registrar 1835-01-01
+· Si no aplica registrar 1845-01-01";SI;;
+54;Suministro de método anticonceptivo;2;N;"0 -No aplica
+1 -Dispositivo intrauterino
+2 -Dispositivo intrauterino y preservativo
+3 -Implante subdérmico
+4 -Implante subdérmico y preservativo
+5 -Oral
+6 -Oral y preservativo
+7 -Inyectable mensual
+8 -Inyectable mensual y preservativo 
+9 -Inyectable trimestral
+10-Inyectable trimestral y preservativo
+11-Emergencia
+12-Emergencia y preservativo
+13-Esterilización
+14-Esterilización y preservativo
+15-Preservativo
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";SI;;
+55;Fecha de suministro de método anticonceptivo;10;F;"AAAA-MM-DD
+· Si no se tiene el dato registrar 1800-01-01 
+· Si no se realiza por una tradición registrar 1805-01-01
+· Si no se realiza por una condición de salud registrar 1810-01-01
+· Si no se realiza por negación del usuario registrar 1825-01-01
+· Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830 -01-01
+· Si no se realiza por otras razones registrar 1835-01-01
+· Si no aplica registrar 1845-01-01";SI;;
+56;Fecha de primera consulta prenatal;10;F;"AAAA-MM-DD
+· Si no se tiene el dato registrar 1800-01-01 
+· Si no se realiza por una tradición registrar 1805-01-01
+· Si no se realiza por una condición de salud registrar 1810-01-01
+· Si no se realiza por negación del usuario registrar 1825-01-01
+· Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830 -01-01
+· Si no se realiza por otras razones registrar 1835-01-01
+· Si no aplica registrar 1845-01-01";SI;;
+57;Resultado de glicemia basal;3;N;"Registre el dato reportado por el laboratorio sin decimales.
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.
+";SI;;
+58;Fecha de último control prenatal de seguimiento;10;F;"AAAA-MM-DD
+Si no se tiene el dato registrar 1800-01-01
+Si no aplica registrar 1845-01-01";SI;;
+59;Suministro de ácido fólico en el control prenatal durante el periodo reportado;2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";SI;;
+60;Suministro de sulfato ferroso en el control prenatal durante el periodo reportado;2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";SI;;
+61;Suministro de carbonato de calcio en el control prenatal durante el periodo reportado;2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";SI;;
+62;Fecha de valoración agudeza visual;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+63;Fecha de tamizaje VALE;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+64;Fecha del tacto rectal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+65;Fecha de tamización con oximetría pre y post ductal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+66;Fecha de realización colonoscopia tamizaje;10  ;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+67;Fecha de la prueba sangre oculta en materia fecal (tamizaje Ca de colon);10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+68;Consulta de Psicología;10;F;Registrar 1845-01-01;SI;;
+69;Fecha de tamizaje auditivo neonatal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+70;Suministro de  fortificación casera en la primera infancia (6 a 23 meses);2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";SI;;
+71;Suministro de vitamina A en la primera infancia (24 a 60 meses);2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";SI;;
+72;Fecha de toma LDL;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+73;Fecha de toma PSA;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+74;Preservativos entregados a pacientes con ITS;3;N;0-No aplica;SI;;
+75;Fecha de tamizaje visual neonatal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+76;Fecha de atención en salud bucal por profesional en odontología;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+77;Suministro de hierro en la primera Infancia (24 a 59 meses);2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";SI;;
+78;Fecha de antígeno de superficie hepatitis B (Toda la población);10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+79;Resultado de antígeno de superficie hepatitis B (Toda la población);2;N;"0 -No aplica
+4 -Reactivo
+5 -No reactivo
+21-Riesgo no evaluado";SI;;
+80;Fecha de toma de prueba tamizaje para sífilis;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+81;Resultado de prueba tamizaje para sífilis;2;N;"0 -No aplica
+4 -Positivo
+5 -Negativo
+21-Riesgo no evaluado";SI;;
+82;Fecha de toma de prueba para VIH;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+83;Resultado de prueba para VIH;2;N;"0 -No aplica
+4 -Reactivo
+5 -No reactivo
+21-Riesgo no evaluado";SI;;
+84;Fecha de TSH neonatal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+85;Resultado de TSH neonatal;2;N;"0 -No aplica
+4 -Alterado
+5 -Normal
+21-Riesgo no evaluado";SI;;
+86;Tamizaje del cáncer de cuello uterino ;2;N;"0 -No aplica
+1 -Citología cérvico uterina 
+2 -Prueba ADN – VPH
+3 -Técnica de inspección visual
+4 -Prueba ADN-VPH y citología cérvico uterina
+16-No se realiza por una tradición
+17-No se realiza por una condición de salud 
+18-No se realiza por negación de la usuaria 
+19-No se realiza por tener datos de contacto de la usuaria no actualizados
+20-No se realiza por otras razones
+21-Riesgo no evaluado";SI;;
+87;Fecha de tamizaje cáncer de cuello uterino;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+88;Resultado tamizaje cáncer de cuello uterino;3;N;"Resultado citología cérvico uterina
+Escamosas:
+1  - ASC-US (células escamosas atípicas de significado indeterminado)
+2  - ASC-H (células escamosas atípicas, de significado indeterminado sugestivo de LEI de alto grado)
+3  - Lesión intraepitelial escamosa (LEI) de bajo grado- HPV (NIC I) (LEI BG)
+4  - Lesión intraepitelial escamosa (LEI) de alto grado (NIC II-III CA INSITU) (LEI AG)
+5  - Lesión intraepitelial escamosa de alto grado sospechosa de infiltración.
+6  - Carcinoma de células escamosas (Escamocelular)
+Glandulares:
+7  - Células endocervicales atípicas sin ningún otro significado.
+8  - Células endometriales atípicas sin ningún otro significado.
+9  - Células glandulares atípicas sin ningún otro significado.
+10 - Células endocervicales atípicas sospechosas de neoplasia.
+11 - Células endometriales atípicas sospechosas de neoplasia.
+12 - Células glandulares atípicas sospechosas de neoplasia.
+13 - Adenocarcinoma endocervical in situ.
+14 - Adenocarcinoma endocervical.
+15 - Adenocarcinoma endometrial.
+16 - Otras neoplasias
+17 - Negativa para lesión intraepitelial o neoplasia.
+18 - Inadecuada para lectura.
+
+Resultado para prueba AND-VPH o inspección visual
+19 - Positivo 
+20 - Negativo
+
+21 -Riesgo no evaluado
+0  -No aplica";SI;;
+89;Calidad en la muestra de citología cervicouterina;3;N;"0 -No aplica
+1 -Satisfactoria Zona de Transformación Presente.
+2 -Satisfactoria Zona de Transformación Ausente
+3 -Insatisfactoria
+4 -Rechazada
+Si no tiene el dato registrar 999.";SI;;
+90;Código de habilitación IPS donde se realiza  tamizaje cáncer de cuello uterino;12;N;"Tabla REPS (Registro Especial de Prestadores de Servicios de Salud). 
+Si no tiene el dato registrar 999.
+Si no aplica registrar 0.";SI;;
+91;Fecha de colposcopia;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una Tradición registrar 1805 -01-01
+·Si no se realiza por una Condición de Salud registrar 1810-01-01
+·Si no se realiza por Negación del usuario
+registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+92;Resultado de LDL;12;N;"Registre el dato reportado por el laboratorio sin decimales.
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";SI;;
+93;Fecha de biopsia cervicouterina;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+94;Resultado de biopsia cervicouterina;3;N;"0 -No aplica
+1 -Negativo para neoplasia 
+3 -NIC de bajo grado (NIC I)
+4 -NIC de alto grado: (NIC II - NIC III) 
+5 -Neoplasia micro infiltrante: escamocelular o adenocarcinoma
+6 -Neoplasia Infiltrante: escamocelular o adenocarcinoma
+21-Riesgo no evaluado";SI;;
+95;Resultado de HDL;12;N;"Registre el dato reportado por el laboratorio sin decimales.
+Riesgo no evaluado registrar 998.
+Si no aplica registre 0.";SI;;
+96;Fecha de toma de mamografía;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+97;Resultado de mamografía;3;N;"Registre el resultado según la clasificación BIRADS:
+0 -No aplica
+1 -BIRADS 0: necesidad de nuevo estudio imagenológico o mamograma previo para evaluación
+2 -BIRADS 1: negativo
+3 -BIRADS 2: hallazgos benignos
+4 -BIRADS 3: probablemente benigno
+5 -BIRADS 4: anormalidad sospechosa
+6 -BIRADS 5: altamente sospechoso de malignidad
+7 -BIRADS 6: malignidad por biopsia conocida
+21-Riesgo no evaluado";SI;;
+98;Resultado de triglicéridos;12;N;"Registre el dato reportado por el laboratorio sin decimales.
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";SI;;
+99;Fecha de toma biopsia de mama;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+100;Fecha de resultado biopsia de mama;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+101;Resultado de biopsia de mama;3;N;"0 -No aplica
+1 -Benigna
+2 -Atípica (Indeterminada)
+3 -Malignidad sospechosa/probable
+4 -Maligna
+5 -No satisfactoria
+21-Riesgo no evaluado";SI;;
+102;COP por persona;12;N;"Se debe reportar en consulta de primera vez de odontología.
+Debe registrarse una sola variable con longitud de 12 dígitos,  donde los dos primeros dígitos corresponden a sanos, los dos siguientes dígitos corresponden a caries no cavitacional, los siguientes dos a caries cavitacional, los dos siguientes a obturados por caries, los dos siguientes dígitos a perdidos por caries y los dos últimos al total de dientes presentes al momento de la valoración. Por ejemplo, el valor 180204030127 se construyó así:
+
+21-Riesgo no evaluado.
+0 -No aplica.";SI;;
+103;Fecha de toma hemoglobina;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+104;Resultado de hemoglobina;4;D;"Registre el dato reportado por el laboratorio.
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";SI;;
+105;Fecha de toma glicemia basal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+106;Fecha de toma creatinina;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+107;Resultado de creatinina;4;D;"Registre el dato reportado por el laboratorio.
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";SI;;
+108;Preservativos entregados a pacientes con ITS;10;F;Registrar 1845-01-01;SI;;
+109;Resultado de PSA;4;D;"Registre el dato reportado por el laboratorio.
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";SI;;
+110;Fecha de toma  de tamizaje hepatitis C;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+111;Fecha de toma HDL;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+112;Fecha de toma de baciloscopia diagnóstico;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;
+113;Resultado de baciloscopia diagnóstico;2;N;"1 -Negativa
+2 -Positiva
+3 -En proceso
+4 -No
+21-Riesgo no evaluado";SI;;
+114;Clasificación del riesgo cardiovascular;2;N;"0 -No aplica
+4 -Alto
+5 -Bajo
+6 -Moderado
+21-Riesgo no evaluado
+";SI;;
+115;Tratamiento para sífilis gestacional;2;N;0-No aplica;SI;;
+116;Tratamiento para Sífilis Congénita;2;N;0-No aplica;SI;;
+117;Clasificación del riesgo metabólico;2;N;"0 - No aplica
+4 -Alto
+5 -Bajo
+6 -Moderado
+21-Riesgo no evaluado";SI;;
+118;Fecha de toma triglicéridos;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";SI;;

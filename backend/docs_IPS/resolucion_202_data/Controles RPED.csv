@@ -1,0 +1,1327 @@
+;;;;;Documentos: Lineamentos técnicos para el reporte de la Resolución 202 de 2021;;;;;;
+;;;;;Dirección de Epidemiologia y Demografia;;;;;;
+;;;;;Versión 10;;;;;;
+;;;;;;;;;;;
+;;;;;;;;;;;
+VARIABLES DEL REPORTE MODIFICADO;;;;;;;VALIDACIONES REALIZADAS DURANTE EL CARGUE ;;;;
+No.;GRUPO;NOMBRE DE LA VARIABLE;LONGITUD;TIPO;VALORES PERMITIDOS;USO DE VALORES PERMITIDOS;VALIDACIONES;Código del error o warning;Descripción del error o warning;Variables relacionadas;
+0;Tipo de registro;Tipo de registro;1;N;2;;;;;;
+1;Identificación;Consecutivo de registro;8;N;Número consecutivo de registros de detalle dentro del archivo. Inicia en 1 para el primer registro de detalle y va incrementando de 1 en 1, hasta el final del archivo. ;;;;;;
+2;Identificación;Código de habilitación IPS primaria;12;N;"Tabla REPS (Registro Especial de Prestadores de Servicios de Salud) 
+Si es desconocido registrar 999.";La opción 999 se usa cuando no se tiene el dato o el código de la IPS aún no se encuentra actualizado en el REPS.;Validar que el código registrado en la variable 2 se encuentre en el REPS del MSPS;Error021;La IPS primaria no existe;Variable 2, tabla REPS;
+3;Identificación;Tipo de identificación del usuario;2;A;Ver tabla de referencia SGDTipoID publicada en web.sispro.gov.co, donde se encuentran los valores permitidos;"Las opciones MS, AS Y CN son tipos de identificación transitorios no definitivos.
+
+Se actualizó NV a CN.
+
+Se agregaron las opciones PE, SC y DE, de acuerdo a lo establecido en la Circular 029 de 2019.
+
+
+
+";"Cruzar las variables 3 y 4 con BDUA y BDEX para validar la correspondencia con los datos de las variables 5, 6,7, 8, 9 y 10.
+Cruzar las variables 3 y 4 con BDUA y BDEX para consultar los siguientes datos: 
+· Fecha de Afiliación
+· Estado de Afiliación
+· Geografía de Residencia.";;;;
+4;Identificación;Número de identificación del usuario;18;A;Número del documento de identificación, de acuerdo con el tipo de identificación del campo anterior;"Se permite el registro de los siguientes caracteres:
+*Números entre 0 a 9.
+*Letras de la A a la Z, excluyendo Ñ.";Validar caracteres permitidos;Error220;Número de identificación con caracteres no permitidos;Variable 4;
+;;;;;;;Generar error cuando (la variable 3 = CC Y longitud de la variable 4 > 10) o (la variable 3 = TI Y longitud de la variable 4 > 11) o (la variable 3 = CE Y (longitud de la variable 4 < 3 o longitud de la variable 4 > 7)) o (la variable 3 = CD Y longitud de la variable 4 > 11) o (la variable 3 = PA Y (longitud de la variable 4 < 3 o longitud de la variable 4 > 16)) o (la variable 3 = SC Y longitud de la variable 4 > 9) o (la variable 3 = PE Y (longitud de la variable 4 < 3 o longitud de la variable 4 > 15));Error676;La longitud del número de identificación no corresponde con el tipo de identificación;Variables 3, 4;
+5;Identificación;Primer apellido del usuario;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes;;;;;;
+6;Identificación;Segundo apellido del usuario ;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. Si el usuario no tiene segundo apellido o no se tiene este dato, Registre NONE en mayúscula sostenida ;;;;;;
+7;Identificación;Primer nombre del usuario ;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes;;;;;;
+8;Identificación;Segundo nombre del usuario ;30;A;Los datos deben ser en letras MAYÚSCULAS, sin caracteres especiales y sin tildes. Si el usuario no tiene segundo apellido o no se tiene este dato, Registre NONE en mayúscula sostenida;;;;;;
+9;Identificación;Fecha de Nacimiento;10;F;AAAA-MM-DD;;La variable 9 no debe ser nula;Error020;La fecha de nacimiento es requerida;Variable 9;
+;;;;;;;Validar contenido de fecha en la variable 9;Error421;contenido en el campo FechaNacimiento  no válido;Variable 9;
+;;;;;;;Validar comodines: de manera excepcional en esta variable se genera error si se registró algún comodín, o una fecha menor a 1900-01-01;Error677;No se permite el registro de estos comodines en Fecha Nacimiento;Variable 9;
+;;;1;N;;;La fecha registrada en la variable 9 debe ser menor a la fecha de corte del reporte;Error120;Fecha Nacimiento es mayor a la fecha de corte;Variable 9 y Fecha de corte;
+10;Identificación;Sexo;1;A;Ver tabla de referencia PSRGSEXO publicada en web.sispro.gov.co, donde se encuentran los valores permitidos.;;;;;;
+11;Identificación;Código pertenencia étnica ;1;N;Tabla GrupoEtnico publicada en web.sispro.gov.co, donde se encuentran los valores permitidos.;;;;;;
+12;Identificación;Código de ocupación (toda la población);4;N;"Ver tabla de referencia SGDCIUO publicada en web.sispro.gov.co, donde se encuentran los valores permitidos, de acuerdo a la Clasificación Internacional Uniforme de Ocupaciones (CIUO) en su última versión vigente.
+
+· En los casos en que no se tiene esta información
+  registrar (9999).
+· En el caso que no aplique registrar (9998).";Registre la opción 9998 (No Aplica) en caso de tener una ocupación que no hace parte del CIUO. Ejemplo: ama de casa, dedicación al hogar,  menor de edad, estudiante.;;;;;
+13;Identificación;Código de nivel educativo (toda la población);2;N;Ver tabla de referencia SGDNivEducativo en web.sispro.gov.com, donde se encuentran los valores permitidos.;"Registre siempre la educación culminada.
+
+La opción ""Ninguno"" se registra cuando se desconoce la respuesta o la persona reportada es analfabeta.";;;;;
+14;Gestación;Gestante;2;N;"0 -No aplica
+1 -Sí
+2 -No
+21-Riesgo no evaluado";"La opción 0 se usa cuando reporta población de sexo masculino o población de sexo femenino con edad menor de 10 años o mayor o igual de 60 años.
+
+La opción 21 se usa cuando no se indaga, ni se tiene información con respecto a la identificación de este riesgo.";Validar que si la variable 14 = 1 ó 2 ó 21, la variable 10 debe registrar F;Error030;Si registra 1, 2 ó 21 en la variable Gestante, el sexo debe ser F;Variables 10, 14;
+;;;;N;;;Generar error si la edad calculada < 10 años ó >=60 años Y la variable 14 <> 0 ;Error222;Si la edad es menor de 10 años o mayor o igual de 60 años, Gestación No aplica;Variables 14, Edad calculada;
+;;;;N;;;Generar error cuando la variable 14 = 0 Y la variable 10 = F Y edad calculada >=10 años y <60 años;Error223;Si el sexo es Femenino y la edad está entre 10 años hasta 59 años, debe registrar un valor diferente de 0-no aplica en Gestante.;Variable 10, 14, Edad calculada;
+;;;;N;;;Generar error si variable 14 <> 1 Y (variable 23 ó 35 ó 59 ó 60 ó 61 <> 0 ó variable 33 ó 56 ó 58 <> 1845-01-01);Error244;"Si no es gestante, las variables relacionadas con la gestación deben registrar el valor equivalente a ""No aplica""";Variables 14, 23, 33, 35, 56, 58, 59, 60, 61;
+;;;;N;;;Generar error si variable 14 = 1 Y (variable 23 ó 35 ó 59 ó 60 ó 61 = 0 ó variable 33 ó 56 ó 58 = 1845-01-01);Error379;"Si es gestante, las variables relacionadas con la gestación deben registrar un dato diferente a ""No aplica""";Variables 14, 23, 33, 35, 56, 58, 59, 60, 61;
+15;No aplica para el reporte;Sífilis Gestacional o congénita;2;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 15 <> 0;Error500;Error en valores permitidos -Sífilis Gestacional o congénita;Variable 15;
+16;Test vejez (>=60 años);Resultado de prueba mini-mental state;2;N;"0 -No aplica
+4 -Sospecha de deterioro cognoscitivo
+5 -Normal
+21-Riesgo no evaluado";"La opción 0 se usa en población menor de 60 años.
+
+La opción 21 se usa cuando reporta población mayor o igual a 60 años, pero:
+-No está reportando una fecha de valoración integral (variable 52).
+-No se realizó o no se tiene información con respecto a la aplicación del test.";Generar error cuando la variable 16 = (4 ó 5) y la variable 52 < 1900-01-01;Error503;Si registra Resultado prueba mini-mental state, debe registrar una Fecha de consulta de valoración integral válida;Variables 16, 52;
+;;;;;;;Generar error si la variable 16 <> 0, 4, 5 ó 21;Error504;Error en valores permitidos -Resultado del test minimental state;Variable 16;
+;;;;;;;Generar error cuando (la variable 16 = 4 ó 5 ó 21 Y la edad calculada < 60 años) O (la variable 16 = 0 Y la edad calculada >= 60 años);Error227;El valor del Resultado prueba mini-mental state registrado no es acorde al rango de edad ;Variable 16, Edad calculada;
+17;No aplica para el reporte;Hipotiroidismo Congénito;2;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 17 <> 0;Error505;Error en valores permitidos - Hipotiroidismo Congénito;Variable 17;
+18;Tuberculosis;Sintomático respiratorio (toda la población);2;N;"1 -Sí
+2 -No
+21-Riesgo no evaluado";La opción 21 se usa cuando no se indaga, ni se tiene información con respecto a la identificación de este riesgo.;Generar el error cuando la variable 18 = 1 Y (la variable 113 = 4 ó la variable 112 =1845-01-01).;Error232;Si es sintomático respiratorio, el resultado de baciloscopia diagnóstica debe ser diferente a 4 y registrar fecha válida o comodín de no realización;Variables 18, 112, 113;
+;;;;;;;Generar error si la variable 18 = 2 Y (la variable 113  <> 4 ó la variable 112 <> 1845-01-01;Error506;Si no es Sintomático respiratorio, registre no en el  Resultado de baciloscopia de diagnóstico y registre no aplica en la Fecha de toma;Variables 18, 112, 113;
+;;;;;;;Generar error si la variable 18 = 21 Y (la variable 113  <> 21 ó la variable 112 <> 1800-01-01;Error507;Riesgo no evaluado en Sintomático respiratorio, registre riesgo no evaluado en resultado baciloscopia y sin dato en fecha baciloscopia;Variables 18, 112, 113;
+19;Riesgo cardiovascular y metabólico;Consumo de tabaco;2;N;"Reporte el resultado del Índice de paquetes año (IPA) en número entero entre 0 y 95.
+96-Si el resultado del IPA es 96 o mayor
+97-Exfumador
+98-No aplica
+99-Riesgo no evaluado";"Si el resultado del índice contiene decimales, redondee a la unidad correspondiente y reporte un número entero.
+
+La opción 98 se usa para personas reportadas que nunca han fumado o menores de 12 años de edad.
+
+La opción 99 se usa en las personas reportadas a las que no se indagó el riesgo de consumo de tabaco, o para las que siendo fumadoras no se aplicó el IPA.";Generar error si la edad calculada < 12 años Y la variable 19 <>98;Error508;Si la edad es menor a 12 años, el registro de Consumo de tabaco no aplica.;Variable 19, Edad calculada;
+20;No aplica para el reporte;Lepra;2;N;21-Riesgo no evaluado;Se debe registrar la opción 21 a todas las personas reportadas;Generar error si la variable 20 <> 21;Error509;Error en valores permitidos -Lepra;Variable 20;
+21;No aplica para el reporte;Obesidad o Desnutrición Proteico Calórica;2;N;21-Riesgo no evaluado;Se debe registrar la opción 21 a todas las personas reportadas;Generar error si la variable 21 <> 21;Error510;Error en valores permitidos -Obesidad o Desnutrición Proteico Calórica;Variables 21;
+22;;Resultado del tacto rectal;2;N;"0 -No aplica
+4 -Próstata anormal
+5 -Próstata normal
+21-Riesgo no evaluado";"La opción 0 se usa cuando reporta población no sujeto de la actividad: sexo femenino, hombres menores de 40 años y hombres entre 40 y 49 años sin factores de riesgo.
+
+La opción 21 se usa cuando reporta población sujeto a los que no se realizó el tamizaje o cuando se sabe de la realización, pero se desconce la fecha.
+Próstata anormal"" y por la variable: ""Antígeno Prostático Especifico (PSA)"", cuyos valores sean superiores a: 
+Hombres de 40 a 49 años: 2,5 ng/mL
+Hombres de 50 a 59 años: 3,5 ng/mL
+Hombres de 60 a 69 años: 4,5 ng/mL
+Hombres de 70 a 79 años: 6,5 ng/mL ";Generar error si la variable 22 = (4 ó 5 ó 21) Y la variable 10 <> M. ;Error037;Si registra 4, 5 o 21 en Resultado del tacto rectal, el sexo debe ser M;Variables 10, 22;
+;;;;;;;Generar error si la edad calculada < 40 años Y la variable 10 = M Y (la variable 22 <> 0  ó la variable 64 <> 1845-01-01).;Error038;Si es hombre menor de 40 años, debe registrar  no aplica en el resultado y la fecha del tacto rectal;Variables 10, 22, 64 Edad calculada;
+;;;;;;;Generar error si la variable 64 >1900-01-01 Y (la variable 22 <> 4, ó la variable 22 <> 5, ó la variable 10  <> M, ó la edad calculada < 40 años);Error237;Si registra fecha del tacto rectal, debe registrar el resultado del tacto rectal, el sexo debe ser M y la edad mayor o igual a 40 años;Variables 10, 22, 64 Edad calculada;
+;;;;;;;Generar error si la variable 22 = 21 Y (la variable 64 <> 1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01.;Error512;Si Resultado de tacto rectal es riesgo no evaluado, en la fecha debe registrar alguno de los comodines que indican no realización o sin dato;Variables 22, 64;
+;;;;;;;Generar error si la variable 10 = F Y (la variable 22 <> 0, ó la variable 64 <> 1845-01-01);Error513;Si es sexo F, debe registrar no aplica en la fecha y el resultado de tacto rectal;Variables 22, 64;
+;;;;;;;Generar error si la variable 22 registra valor <> 0, 4, 5 ó 21;Error514;Error en valores permitidos - Resultado tacto rectal;Variables 22;
+23;Gestación;Acido fólico preconcepcional;2;N;"0 -No aplica
+1 -Sí
+2 -No
+21-Registro no evaluado";"La opción 0 se usa en población NO gestante y sexo masculino (cuando la variable 14 registra 0, 2 o 21)
+
+La opción 1 se usa cuando hubo suministro efectivo de ácido fólico o se suministraron multivitamínicos NO POS.
+
+La opción 21 se usa cuando es gestante, pero se desconoce el suministro.";Generar error si la variable 23 registra valor <> 0, 1, 2, 21;Error515;Error en valores permitidos - Acido fólico preconcepcional;Variable 23;
+24;Ca de colon;Resultado de la prueba de sangre oculta en materia fecal (tamizaje Ca de colon);2;N;"0 -No aplica
+4 -Positivo
+5 -Negativo
+6 -No es posible determinar el resultado
+21-Riesgo no evaluado 
+";"Registre fecha del test realizado a población a partir de los 50 hasta los 75 años. Registro opcional para el resto de la población.
+
+La opción 21 se usa cuando no se indaga o no se tiene información con respecto a la realización del test o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 0 se usa en personas reportadas que no son sujeto de la actividad.";Generar error si la variable 67 > 1900-01-01 Y la variable 24  <>  (4, 5 ó 6);Error516;Si registró Fecha de la prueba sangre oculta en materia fecal válida, debe registrar Resultado de la prueba sangre oculta en materia fecal;Variables 24, 67;
+;;;;;;;Generar error si la variable 67 = 1800-01-01, 1805-01-01,  1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01 Y (edad calculada < 50 años ó edad calculada > 76 años ó variable 24 <> 21);Error517;Si registró comodín de no realización o sin dato en Fecha prueba sangre oculta en materia fecal, la edad debe ser entre 50-75 y el Resultado debe ser 21;Variables 24, 67, Edad calculada;
+;;;;;;;Generar error si la variable 67 = 1845-01-01 Y ( la variable 24 <> 0, ó la edad calculada se encuentra entre los 50 a 75 años);Error518;Registre no aplica en Fecha de prueba sangre oculta en materia fecal, a los menores de 50 años ó mayores de 75 años sin riesgo identificado;Variables 24, 67, Edad calculada;
+;;;;;;;Generar error si la variable 24 registra valor <> 0, 4, 5, 6 ó 21;Error519;Error en valores permitidos - Resultado test de sangre oculta en materia fecal;Variable 24;
+25;No aplica para el reporte;Enfermedad Mental;2;N;21-Riesgo no evaluado;Se debe registrar la opción 21 a todas las personas reportadas;Generar error si la variable 25 <> 21;Error520;Error en valores permitidos -Enfermedad mental;Variable 25;
+26;No aplica para el reporte;Cáncer de Cérvix;2;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 26 <> 0;Error521;Error en valores permitidos -Cáncer de Cérvix;Variables 26;
+27;Agudeza visual;Agudeza visual lejana ojo izquierdo ;2;N;"0 -No aplica
+3 -Menor o igual a 20/20 normal 
+4 -Entre 20/25 y 20/40
+5 -Mayor o igual de 20/50 hasta 1200 anormal
+6 -Cuenta dedos 
+7 -Percepción de bultos 
+8 -Proyección y percepción de luz 
+9 -No percibe luz
+21-Riesgo no evaluado";"La opción 0 se usa en personas reportadas que no son objeto de la actividad.
+
+La opción 21 se usa cuando no se indaga ni se tiene información con respecto a la identificación de este riesgo ó se usa cuando se sabe del resultado de la prueba pero se desconoce la fecha.";Generar error si la variable 27 = (3, ó 4, ó 5, ó 6, ó 7, ó 8 ó 9), Y la variable 62 <= 1900-01-01;Error524;Si registra Agudeza visual lejana ojo izquierdo, debe registrar Fecha de agudeza visual válida;Variable 27;
+;;;;;;;Generar error si la variable 62 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 27 <> 21;Error525;Si registró un comodín que indica no realización o sin dato en Fecha de agudeza visual, registre 21 en Agudeza visual lejana ojo izquierdo;Variables 27, 62;
+;;;;;;;Generar error si la edad calculada < 3 años Y (la variable 27 <> 0 ó la variable 62 <> 1845-01-01;Error526;Si es menor a 3 años, debe registrar no aplica en las variables de agudeza visual lejana ojo izquierdo y fecha de agudeza visual;Variables 27, 62, Edad calculada;
+;;;;;;;Generar error si la variable 27 registra valor <> 0, 3, 4, 5, 6, 7, 8, 9, 21;Error527;Error en valores permitidos - Agudeza visual lejana ojo izquierdo ;Variable 27;
+28;Agudeza visual;Agudeza visual lejana ojo derecho ;2;N;"0 -No aplica
+3 -Menor o igual a 20/20 normal 
+4 -Entre 20/25 y 20/40
+5 -Mayor o igual de 20/50 hasta 1200 anormal
+6 -Cuenta dedos 
+7 -Percepción de bultos 
+8 -Proyección y percepción de luz 
+9 -No percibe luz
+21-Riesgo no evaluado";"La opción 0 se usa en personas reportadas que no son objeto de la actividad.
+
+La opción 21 se usa cuando no se indaga ni se tiene información con respecto a la identificación de este riesgo.";Generar error si variable 28 = (3 ó 4 ó 5 ó 6 ó 7 ó 8 ó 9) Y la variable 62 <= 1900-01-01;Error528;Si registra Agudeza visual lejana ojo derecho, debe registrar Fecha de agudeza visual válida;Variable 28;
+;;;;;;;Generar error si la variable 62 = (1800-01-01, ó 1805-01-01, ó 1810-01-01, ó 1825-01-01, ó 1830-01-01 ó 1835-01-01) Y la variable 28 <> 21;Error529;Si registró un comodín que indica no realización o sin dato en Fecha de agudeza visual, registre 21 en Agudeza visual lejana ojo derecho;Variables 28, 62;
+;;;;;;;Generar error si la edad calculada < 3 años Y ( variable 28  <> 0 ó la variable 62 <> 1845-01-01);Error530;Si es menor a 3 años, debe registrar no aplica en las variables de agudeza visual lejana ojo derecho y fecha de agudeza visual;Variables 28, 62, Edad calculada;
+;;;;;;;Generar error si la variable 28 registra valor <> 0, 3, 4, 5, 6, 7, 8, 9, 21;Error531;Error en valores permitidos - Agudeza visual lejana ojo derecho ;Variable 28;
+29;Toda la población;"Fecha del peso 
+(Toda la población)";10;F;"AAAA-MM-DD
+Si no se toma registrar la opción 1800-01-01";"Se debe registrar la fecha de toma del peso más cercana a la fecha de corte del reporte (Última toma). 
+Se espera el registro de una fecha válida en este campo, teniendo en cuenta que si reporta una actividad, debió tomar el peso de la persona.";Gerenar error cuando variable 29 > Fecha de corte;Error121;Fecha peso es mayor a la fecha de corte;Variable 29, Fecha corte;
+;;;;;;;Validar que si la fecha registrada en la variable 29  <> 1800-01-01, esa fecha debe ser mayor a la fecha registrada en la variable 9;Error171;Fecha peso es menor a la fecha de nacimiento;Variables 9, 29;
+;;;;;;;Validar comodines: de manera excepcional en esta variable se genera warning si se registró el comodín 1800-01-01.;Warning674;Verifique el comodín 1800-01-01, registre una fecha válida.;Variable 29;
+;;;;;;;Validar contenido de fecha en la variable 29;Error422;contenido en el campo FechaPeso  no válido;Variable 29;
+;;;;;;;Validar comodines: de manera excepcional en esta variable solo se permite el registro del comodín 1800-01-01. Los demás comodines no son válidos;Error381;No se permite el registro de estos comodines en Fecha peso;Variable 29;
+30;Toda la población;"Peso en Kilogramos 
+(Toda la población)";5;N;"Se registra el dato obtenido de la medición.
+Si no se toma registrar 999";"Registrar el dato más cercano a la fecha de corte del reporte (Ultima toma).
+La longitud máxima es 5 para permitir el registro de decimales. Debe usar el punto (.) como separador de decimal.";Validar que si la variable 30 registra 999, la variable 29 debe registrar 1800-01-01;Error041;Si no registra el peso de la persona no debe registrar fecha de medición;Variables 29, 30;
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de peso v29, es menor 2 años y la variable 30 es menor a 1 o mayor a 15;Error680;El peso de los niños menores de 2 años debe ser mayor o igual a 1 kg y menor o igual a 15 kg;;*
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de peso v29, es mayor o igual a 2 años y menor de 5 años y la variable 30 es menor a 3 y mayor a 25;Error681;El peso de los niños de 2 a 4 años debe ser mayor o igual a 3 kg y menor o igual a 25 kg;;*
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de peso v29, es mayor o igual a 5 años y menor de 13 años y la variable 30 es menor a 9 y mayor a 80;Error682;El peso de los niños de 5 a 12 años debe ser mayor o igual a 9 kg y menor o igual a 80 kg;;*
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de peso v29, es mayor o igual a 13 años y menor de 18 años y la variable 30 es menor a 30 y mayor a 80;Error683;El peso de los adolescentes de 13 a 17 años debe ser mayor o igual a 30 kg y menor o igual a 80 kg;;*
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de peso v29, es mayor o igual a 18 años y la variable 30 es menor a 35 y mayor a 250;Error684;El peso de los adyltos matores de 18 años debe ser mayor o igual a 36 kg y menor o igual a 250 kg;;*
+31;Toda la población;"Fecha de la talla 
+(Toda la población)";10;F;"AAAA-MM-DD
+Si no se toma registrar la opción 1800-01-01";"Se debe registrar la fecha de toma  de talla más cercana a la fecha de corte del reporte (Última toma).
+Se espera el registro de una fecha válida en este campo, teniendo en cuenta que si reporta una actividad, debió tomar la talla de la persona";La fecha registrada en la variable 31 debe ser menor o igual a la fecha de corte del reporte;Error122;Fecha talla es mayor a la fecha de corte;Variable 31, Fecha corte;
+;;;1;N;;;Validar que si la fecha registrada en la variable 31  <> 1800-01-01, esa fecha debe ser mayor a la fecha registrada en la variable 9;Error172;Fecha talla es menor a la fecha de nacimiento;Variables 9, 31;
+;;;;;;;Validar comodines: de manera excepcional en esta variable se genera warning si se registró el comodín 1800-01-01.;Warning675;Verifique el comodín 1800-01-01, registre una fecha válida.;Variable 31;
+;;;;;;;Validar contenido de fecha en la variable 31;Error423;contenido en el campo FechaTalla  no válido;Variable 31;
+;;;;;;;Validar comodines: de manera excepcional en esta variable solo se permite el registro del comodín 1800-01-01. Los demás comodines no son válidos;Error382;No se permite el registro de estos comodines en Fecha de la talla;Variable 31;
+32;Toda la población;"Talla en centímetros 
+(Toda la población)";3;N;"Se registra el dato obtenido de la medición.
+Si no se toma registrar 999";"Registrar el dato más cercano a la fecha de corte del reporte (Ultima toma).
+La longitud máxima es 3 porque solo se permiten números enteros.";Validar que si la variable 32 registra 999, la variable 31 debe registrar 1800-01-01;Error043;Si no registra la talla de la persona no debe registrar fecha de medición;Variables 31, 32;
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de talla v31, es menor 2 años y la variable 32 es menor a 40 o mayor a 100;Error685;La talla de los niños menores de 2 años debe ser mayor o igual a 40 cm y menor o igual a 100 cm;;
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de talla v31, es mayor o igual a 2 años y menor de 5 años y la variable 32 es menor a 70 o mayor a 110;Error686;La talla de los niños de 2 a 4 años debe ser mayor o igual a 70 cm y menor o igual a 110 cm;;
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de talla v31, es mayor o igual a 5 años y menor de 13 años y la variable 32 es menor a 80 o mayor a 225;Error687;La talla de los niños de 5 a 12 años debe ser mayor o igual a 80 cm y menor o igual a 225 cm;;
+;;;;;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de talla v31, es mayor o igual a 13 años y menor de 18 años y la variable 32 es menor a 130 o mayor a 225;Error688;La talla de los adolescentes de 13 a 17 años debe ser mayor o igual a 130 cm y menor o igual a 225 cm;;
+;;;;N;;;Si La edad Calculada entre la f.nacimiento v9 y fecha de talla v31, es mayor o igual a 18 años  y la variable 32 es menor a 130 o mayor a 225;Error689;La talla de los adultos mayores a 18 años debe ser mayor o igual a 130 cm y menor o igual a 225 cm;;
+33;Gestación;Fecha probable de parto;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01 
+·Si no aplica registrar 1845-01-01";"La opción 1845-01-01 se usa en población NO gestante (cuando la variable 14 registra 0, 2 o 21) y en poblacion de sexo masculino.
+
+Nota: si reporta una gestante con pérdida del producto, antes de la semana 20 (aborto), registre 1845-01-01.";La fecha registrada en la variable 33 debe ser mayor a la fecha registrada en la variable 9;Error170;Fecha probable parto es menor a la fecha de nacimiento;Variables 9, 33;
+;;;1;N;;;La fecha registrada en la variable 33 debe ser <= fecha de corte + 280 días;Error242;Si registra fecha probable de parto no debe ser mayor a la fecha de corte más 280 días;Variable 33, Fecha de corte;
+;;;1;N;;;Generar error si la variable 33  > 1900-01-01 Y la variable 56 > 1900-01-01 Y la variable 33 <= a la variable 56.;Error243;Fecha probable de parto es menor o igual a fecha de primera consulta prenatal;Variable 33, 56;
+;;;;;;;Validar contenido de fecha en variable 33;Error424;contenido en el campo FechaProbableParto no válido;Variable 33;
+;;;1;N;;;Validar comodines: en esta variable de manera excepcional solo se permite registrar comodines 1800-01-01 y 1845-01-01.;Error380;Comodín inválido - Fecha probable parto;Variable 33;
+34;Identificación;Código país;3;N;"Ver tabla de referencia PAIS1 publicada en web.sispro.gov.co, donde se encuentran los valores permitidos, de acuerdo a la norma internacional ISO3166-1. 
+Registre el código numérico.
+Registre 999 para aquellas personas a las cuales no se les conoce la nacionalidad,sin embargo, es importante que la entidad inicie los respectivos procesos para ajustar sus sistemas de información y poder realizar la recolección del dato";"Registre el código numérico del país de procedencia del extranjero, de acuerdo a la norma internacional ISO3166-1.
+
+-Registre 170 cuando el usuario reportado es un colombiano identificado con tipo y número de identificación válido para nacionales colombianos o para colombianos con tipo de identificación MS, AS, CN.";Generar error si la variable 34 = 170 Y la variable 3 = (CE, PA, CD, PE, SC ó DE);Error532;El código país no es coherente con el tipo de identificación;Variables 3, 34;
+35;Gestación;Clasificación del riesgo gestacional;2;N;"0 -No aplica
+4 -Alto riesgo
+5 -Bajo riesgo
+21-Riesgo no evaluado";"Registre la clasificación de riesgo biopsicosocial, como está descrito en la normatividad vigente:
+- La opción 0 se usa en población NO gestante y sexo masculino (cuando la variable 14 registra 0, 2 o 21).
+-La opción 21 se usa cuando es gestante, pero no se le ha clasificado el riesgo.
+";Generar error si la variable 35 registra valor <> 0, 4, 5 ó 21;Error533;Error en valores permitidos - Clasificación del riesgo gestacional;Variable 35;
+;;;;;;;Generar error si la variable 35 = (4 ó 5) Y la variable 56 < 1900-01-01 Y la variable 58 < 1900-01-01 ;Error534;Si registró clasificación de riesgo gestac., registre una fecha válida en la primera consulta prenatal o en el último control prenatal de seguimiento;Variables 35, 56, 58;
+36;Ca de colon;Resultado de colonoscopia tamizaje;2;N;"0 -No aplica
+2 -Hallazgos compatibles con pólipos hiperplásicos
+3 -Hallazgos sugestivos de proceso preneoplásico
+4 -Hallazgos sugestivos de proceso neoplásico
+5 -Colonoscopia normal
+6 -Otros hallazgos
+21-Riesgo no evaluado";"Registre el resultado del tamizaje realizado a población a partir de los 50 hasta los 75 años. Registro opcional para el resto de la población.
+
+La opción 21 se usa cuando no se indaga o no se tiene información con respecto a la realización del test o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 0 se usa en personas reportadas que no son sujeto de la actividad.";Generar error si la variable 66 > 1900-01-01 Y la variable 36 = (0 ó 21);Error535;Si registra Fecha de colonoscopia válida, registre el resultado de colonoscopia de tamizaje;Variables 36, 66;
+;;;;;;;Generar error si la variable 66 = (1800-01-01, ó 1805-01-01 ó  1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01) Y ((la edad calculada < 50 ó la edad calculada > 75 años) ó la variable 36 <> 21);Error536;Si registró comodín de no realización o sin dato en Fecha de colonoscopia, la edad debe estar entre 50 y 75 y resultado de colonoscopia debe ser 21;Variables 36, 66, Edad calculada;
+;;;;;;;Generar error si la variable 66 = 1845-01-01 Y ( la variable 36 <> 0 ó la edad calculada se encuentra en el rango entre 50 hasta 75 años);Error537;Si registró comodín de no aplica en Fecha de colonoscopia, el resultado de colonoscopia debe ser 0 y la edad debe ser <= 50 ó > 75 años ;Variables 36, 66, Edad calculada;
+;;;;;;;Generar error si la variable 36 registra valor <> 0, 2, 3, 4, 5, 6 ó 21;Error538;Error en valores permitidos - Resultado colonoscopia de tamizaje;Variable 36;
+37;Recién nacido;Resultado de tamizaje auditivo neonatal;2;N;"0 -No aplica
+4 -No pasó
+5 -Pasó
+21-Riesgo no evaluado";"La opción 0 se usa en población no sujeto de la actividad.
+
+La opción 21 se usa cuando reporta un recién nacido al que no se le ha realizado el tamizaje o cuando se sabe de la realización, pero no se tiene exactitud de la fecha.";Generar error si la variable 37 = 4 ó 5 Y la variable 69  <= 1900-01-01;Error539;Si registra Resultado de tamizaje auditivo neonatal, debe registrar fecha de tamizaje;Variables 37, 69;
+;;;;;;;Generar error si la variable 37 registra valor <> 0, 4, 5 ó 21;Error540;Error en valores permitidos - Resultado de tamizaje auditivo neonatal;Variable 37;
+;;;;;;;Generar warning cuando la variable 69 > 1900-01-01 Y la edad calculada > 30 días Y la variable 37 = 4 ó 5.;Warning541;Verifique la actividad -resultado tamizaje auditivo neonatal- reportada en población mayor a 30 días;Variables 37, 69, Edad calculada;
+;;;;;;;Generar error si la variable 37 = 21 Y (la variable 69 <>  (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01);Error542;Si Resultado de tamizaje auditivo neonatal es 21, debe registrar un comodín que indique no realización o sin dato en fecha de tamizaje;Variables 37, 69;
+38;Recién nacido;Resultado de tamizaje visual neonatal;2;N;"0 -No aplica
+4 -Alterado
+5 -Normal
+21-Riesgo no evaluado";"La opción 0 se usa en población no sujeto de la actividad.
+
+La opción 21 se usa cuando reporta un recién nacido al que no se le ha realizado el tamizaje o cuando se sabe de la realización, pero no se tiene exactitud de la fecha.";Generar error si la variable 38 = 4 ó 5 Y la variable 75  <= 1900-01-01;Error543;Si registra Resultado de tamizaje visual neonatal, debe registrar fecha de tamizaje;Variables 38, 75;
+;;;;;;;Generar error si la variable 38 registra valor <> 0, 4, 5 ó 21;Error544;Error en valores permitidos - Resultado de tamizaje visual neonatal;Variable 38;
+;;;;;;;Generar warning cuando la variable 75 > 1900-01-01 Y la edad calculada > 30 días Y la variable 38 = 4 ó 5.;Warning545;Verifique la actividad -resultado de tamizaje visual neonatal- reportada en población mayor a 30 días;Variables 38, 75, Edad calculada;
+;;;;;;;Generar error si la variable 38 = 21 Y la variable 75 <> (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01);Error546;Si Resultado de tamizaje visual neonatal es riesgo no evaluado, debe registrar un comodín que indique no realización o sin dato en fecha del tamizaje;Variables 38, 75;
+39;No aplica para el reporte;DPT menores de 5 años;2;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 39 <> 0;Error574;Error en valores permitidos - DPT menores de 5 años;Variable 39;
+40;Test 0 a 12 años;Resultado de tamizaje VALE;2;N;"0 -No aplica
+4 -Falla
+5 -Pasa
+21-Riesgo no evaluado
+";"La opción 0 se usa cuando reporta población mayor o igual a 13 años.
+
+La opción 21 se usa cuando reporta población menor o igual a 12 años (desde 0 hasta 12 años 11 meses y 29 días), pero:
+-No se realizó o no se tiene información con respecto a la aplicación del test.
+-No está reportando una fecha de tamizaje VALE. En ese caso, debe reportar un comodín que indique la no realización o sin dato en Fecha de tamizaje VALE.";Generar error si la variable 40 = 4 ó 5 Y (la edad calculada >= 13 años ó la variable 63 <= 1900-01-01);Error548;Si registra Resultado de tamizaje VALE, debe registrar Fecha de tamizaje VALE y ser menor a 13 años (hasta 12 años, 11 meses y 29 días);Variables 40, 63, Edad calculada;
+;;;;;;;Generar error si la variable 40 registra valor <> 0, 4, 5, 21;Error549;Error en valores permitidos - Resultado de tamizaje VALE;Variable 40;
+;;;;;;;Generar error si la variable 40 = 0 Y (la edad < 13 años ó la variable 63 <> 1845-01-01);Error550;Si Resultado de tamizaje VALE no aplica, debe registrar Fecha de tamizaje VALE  no aplica y ser mayor de 12 años;Variables 40, 63, Edad calculada;
+;;;;;;;Generar error si la variable 40 = 21 Y ( la edad calculada >= 13 años ó la variable 63  <> ( 1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01));Error551;Si Resultado de tamizaje VALE es 21, debe ser menor a 13 años y registrar comodín que indique no realización o sin dato en fecha del tamizaje;Variables 40, 63, Edad calculada;
+41;No aplica para el reporte;Neumococo;2;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 41 <> 0;Error552;Error en valores permitidos -Neumococo;Variable 41;
+42;Toda la población;Resultado de tamizaje para hepatitis C;2;N;"0 -No aplica
+4 -Reactivo
+5 -No reactivo
+21-Riesgo no evaluado
+";"Registre el resultado del tamizaje realizado a: personas mayores de 50 años o población general identificada con trasfusión de sangre antes de 1996.
+
+·La opción 21 se usa en población sujeto a la que no se está reportando la realización de la prueba o cuando se sabe de la realización de la prueba, pero se desconoce la fecha.";"Generar error si variable 110 > 1900-01-01 Y  variable 42 = 0 ó 21
+";Error553;Si registrar Fecha de tamizaje de hepatitis C, debe registrar un resultado de tamizaje para hepatitis C;Variables 42, 110;
+;;;;;;;Generar error si la variable 110 = (1800-01-01 ó 1805-01-01 ó  1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01) Y la variable 42 <> 21;Error554;Si registra un comodín que indique no realización o sin dato en Fecha de tamizaje, registre 21 en Resultado de tamizaje para hepatitis C;Variables 42, 110;
+;;;;;;;Generar error si el año de nacimiento >1996 Y (la variable 42 <> 0 ó la variable 110 <> 1845-01-01);Warning555;Verifique la actividad -Resultado de tamizaje para hepatitis C- reportada en población nacida después de 1996;Variables 9, 42, 110;
+;;;;;;;Generar error si la variable 110 = 1845-01-01 Y  la variable 42 <> 0;Error556;Si Fecha de tamizaje de Hepatitis C no aplica, Resultado de tamizaje no aplica.;Variables 42, 110;
+;;;;;;;Generar error si la variable 42 registra valor <> 0, 4, 5, 21;Error557;Error en valores permitidos - Resultado de tamizaje para hepatitis C;Variable 42;
+43;Test 0 a 7 años;Resultado de escala abreviada de desarrollo área de motricidad gruesa;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";"La opción 0 se usa cuando reporta población mayor o igual a 8 años.
+
+La opción 21 se usa cuando reporta población menor o igual a 7 años (desde 0 hasta 7 años 11 meses y 29 días), pero:
+-No se realizó o no se tiene información con respecto a la aplicación del test.
+-Aunque está reportando una fecha de valoración integral, no se aplicó la escala de desarrollo abreviado durante la valoración.";Generar error si la variable 43 = 3 ó 4 ó 5 Y la variable 52  <= 1900-01-01;Error558;Si registra Resultado de escala abreviada de desarrollo área de motricidad gruesa, debe registrar una fecha de consulta de valoración integral válida;Variables 43, 52;
+;;;;;;;Generar error si la variable 43 registra valor <> 0, 3, 4, 5 ó 21.;Error559;Error en valores permitidos -Resultado de escala abreviada de desarrollo área de motricidad gruesa;Variable 43;
+;;;;;;;Generar error cuando (la variable 43 = 3, 4, 5 ó 21 Y la edad calculada >= 8 años) O (la variable 43 = 0 Y la edad calculada <8 años) ;Error560;Verifique el resultado de escala abreviada de desarrollo área de motricidad gruesa, de acuerdo a la edad;Variable 43, Edad calculada;
+;;;;;;;Generar error si la variable 52 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 43 = 21 Y la edad calculada < 8 años ;Warning561;Se reportó fecha consulta de valoración integral al niño de 0 a 7 años, sin reporte de Resultado escala abreviada desarrollo área motricidad gruesa;Variables 43, 52, Edad calculada;
+44;Test 0 a 7 años;Resultado de escala abreviada de desarrollo área de motricidad finoadaptativa;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";"La opción 0 se usa cuando reporta población mayor o igual a 8 años.
+
+La opción 21 se usa cuando reporta población menor o igual a 7 años (desde 0 hasta 7 años 11 meses y 29 días), pero:
+-No se realizó o no se tiene información con respecto a la aplicación del test.
+-Aunque está reportando una fecha de valoración integral, no se aplicó la escala de desarrollo abreviado durante la valoración.";Generar error si la variable 44 = (3 ó 4 ó 5) Y la variable 52  <= 1900-01-01;Error562;Si registra Resultado escala abreviada desarrollo área motricidad finoadaptativa, debe registrar una fecha de consulta de valoración integral válida;Variables 44, 52;
+;;;;;;;Generar error si la variable 44 registra valor <> 0, 3, 4, 5 ó 21.;Error563;Error en valores permitidos -Resultado de escala abreviada de desarrollo área de motricidad finoadaptativa;Variable 44;
+;;;;;;;Generar error cuando (la variable 44 = 3, 4, 5 ó 21 Y la edad calculada >= 8 años) O (la variable 44 = 0 Y la edad calculada < 8 años) ;Error564;Verifique el resultado de escala abreviada de desarrollo área de motricidad finoadaptativa, de acuerdo a la edad;Variable 44, Edad calculada;
+;;;;;;;Generar error si la variable 52 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 44 = 21 Y la edad calculada < 8 años ;Warning565;Se reportó fecha consulta de valoración integral a niño de 0 a 7 años, sin reporte de Resultado escala abreviada desarrollo motricidad finoadaptativa ;Variables 44, 52, Edad calculada;
+45;Test 0 a 7 años;Resultado de escala abreviada de desarrollo área personal social;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";"La opción 0 se usa cuando reporta población mayor o igual a 8 años.
+
+La opción 21 se usa cuando reporta población menor o igual a 7 años (desde 0 hasta 7 años 11 meses y 29 días), pero:
+-No se realizó o no se tiene información con respecto a la aplicación del test.
+-Aunque está reportando una fecha de valoración integral, no se aplicó la escala de desarrollo abreviado durante la valoración.";Generar error si la variable 45 = (3 ó 4 ó 5) Y la variable 52  <= 1900-01-01;Error566;Si registra Resultado de escala abreviada de desarrollo área personal social, debe registrar una fecha de consulta de valoración integral válida;Variables 45, 52;
+;;;;;;;Generar error si la variable 45 registra valor <> 0, 3, 4, 5 ó 21.;Error567;Error en valores permitidos -Resultado de escala abreviada de desarrollo área personal social;Variable 45;
+;;;;;;;Generar error cuando (la variable 45 = 3, 4, 5 ó 21 Y la edad calculada >=8 años) O (la variable 45 = 0 Y la edad calculada < 8 años) ;Error568;Verifique el resultado de escala abreviada de desarrollo área personal social, de acuerdo con la edad;Variable 45, Edad calculada;
+;;;;;;;Generar error si la variable 52 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 45 = 21 Y la edad calculada < 8 años ;Warning569;Se reportó fecha consulta de valoración integral a niño de 0 a 7 años, sin reporte de Resultado de escala abreviada de desarrollo área personal social;Variable 45, 52, Edad calculada;
+46;Test 0 a 7 años;Resultado de escala abreviada de desarrollo área de motricidad audición lenguaje;2;N;"0 -No aplica
+3 -Sospecha de problemas de desarrollo
+4 -Riesgo de problemas de desarrollo
+5 -Desarrollo esperado para la edad
+21-Riesgo no evaluado";"La opción 0 se usa cuando reporta población mayor o igual a 8 años.
+
+La opción 21 se usa cuando reporta población menor o igual a 7 años (desde 0 hasta 7 años 11 meses y 29 días), pero:
+-No se realizó o no se tiene información con respecto a la aplicación del test.
+-Aunque está reportando una fecha de valoración integral, no se aplicó la escala de desarrollo abreviado durante la valoración.";Generar error si la variable 46 = 3 ó 4 ó 5 Y la variable 52  <= 1900-01-01;Error570;Si registra Resultado escala abreviada de desarrollo área motricidad audición lenguaje, registre una fecha de consulta de valoración integral válida;Variables 46, 52;
+;;;;;;;Generar error si la variable 46 registra valor <> 0, 3, 4, 5 ó 21.;Error571;Error en valores permitidos -Resultado de escala abreviada de desarrollo área de motricidad audición lenguaje;Variable 46;
+;;;;;;;Generar error cuando (la variable 46 = 3, 4, 5 ó 21 Y la edad calculada >=8 años) O (la variable 46 = 0 Y la edad calculada < 8 años) ;Error572;Verifique el resultado de escala abreviada de desarrollo área de motricidad audición lenguaje, de acuerdo a la edad;Variable 46, Edad calculada;
+;;;;;;;Generar error si la variable 52 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 46 = 21 Y la edad calculada < 8 años ;Warning573;Se reportó fecha consulta de valoración integral a niño de 0 a 7 años, sin Resultado de escala abreviada de desarrollo área motricidad audic. lenguaje;Variable 46, 52, Edad calculada;
+47;Ca cervix;Tratamiento ablativo o de escisión posterior a la realización de la técnica de inspección visual (Crioterapia o LETZ);2;N;"0 -No aplica
+6 -Sí, se realizó tratamiento ablativo
+7 -Sí, se realizó tratamiento de escisión
+8 -Sí, se realizó tratamiento homologable a ablativo o de escisión
+9 -No se realizó ablación, escisión, ni tratamiento homologable, se requiere de otro procedimiento
+10-No se realizó ablación ni escisión por otras razones
+21-Registro no evaluado";"Registre el tipo de tratamiento cuando haya realizado tamizaje de cáncer de cuello uterino usando técnica de inspección visual y el resultado fue positivo.
+ 
+La opción 0 se usa en las personas no objeto de la actividad: sexo masculino, mujeres menores de 10 años o mujeres mayores de 10 años a las que no se realizó tamizaje de cáncer de cuello uterino o a las que se realizó usando técnica diferente a la inspección visual.
+
+La opción 9 se usa si la mujer requiere otro procedimiento o fue remitida al especialista.
+
+La opción 21 se usa cuando se sabe del resultado positivo en la técnica de inspección visual pero no se sabe el tratamiento.";Validar que si la variable 86=3 y  variable 88 = 19, la variable 47 debe registrar valor = 0;Error673;Si el resultado de la técnica de inspección visual es positivo, debe registrar tratamiento.;Variables 47, 88;
+;;;;;;;Generar error si la variable 88 <>  19 Y la variable 47 <>  0;Error575;Si el resultado de la técnica de inspección visual es negativo o usó otra técnica, debe registrar no aplica en tratamiento ablativo o escisión.;Variables 47, 88;
+;;;;;;;Generar error cuando la variable 47 <> 0 Y la variable 10 <>  F;Error047;Si reporta Tratamiento ablativo o de escisión posterior a la realización técnica de inspección visual (Crioterapia o LETZ) , el sexo debe ser F;Variables 10, 47;
+;;;;;;;Generar error si la variable 47 registra valor <> 0, 6, 7, 8, 9, 10 ó 21.;Error576;Error en valores permitidos -Tratamiento ablativo o de escisión posterior a la realización técnica de inspección visual (Crioterapia o LETZ);Variable 47;
+48;Recién nacido;Resultado de tamización con oximetría pre y post ductal;2;N;"0 -No aplica
+4 -Alterado
+5 -Normal
+21-Riesgo no evaluado";"La opción 0 se usa en población no sujeto de la actividad.
+
+La opción 21 se usa cuando reporta un recién nacido al que no se le ha realizado el tamizaje o cuando se sabe de la realización, pero no se tiene exactitud de la fecha.";Generar error si la variable 48 = 4 ó 5 Y la variable 65  <= 1900-01-01;Error578;Si registra Resultado de tamización con oximetría pre y post ductal, debe registrar la fecha del tamizaje;Variables 48, 65;
+;;;;;;;Generar error si la variable 48 registra valor <> 0, 4, 5 ó 21;Error579;Error en valores permitidos - Resultado de tamización con oximetría pre y post ductal;Variable 48;
+;;;;;;;Generar warning cuando la variable 65 > 1900-01-01 Y la edad calculada > 30 días Y la variable 48 = 4 ó 5.;Warning580;Verifique la actividad -resultado de tamizaje visual neonatal- reportada en población mayor a 30 días;Variables 48, 65, Edad calculada;
+;;;;;;;Generar error si la variable 48 = 21  Y la variable 65  <>  (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01);Error581;Si Resultado de tamización con oximetría pre y pos ductual es 21, registre un comodín que indique no realización o sin dato en la fecha del tamizaje;Variables 48, 65;
+49;Gestación;Fecha de atención parto o cesárea;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01 
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización de la actividad o cuando se sabe que hubo atención, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población NO gestante (cuando la variable 14 registra 0, 2 o 21) y sexo masculino. También se usa cuando siendo gestante aún no ha tenido el parto
+
+Nota: si durante el periodo a reportar realizó actividades correspondientes al último trimestre de gestación y además se atendió el parto/cesárea y ya tuvo salida, registre la opción 1 en la variable de gestación, reporte las variables relacionadas con las actividades durante la gestación y reporte la fecha de la atención y salida del parto ó cesarea. Si reporta únicamente la atención del parto ó cesárea y la salida, registre la opción 2 en la variable Gestación.";Generar error cuando la variable 49 <> 1845-01-01 Y la variable 10 <>  F;Error049;Si registra Fecha de atención parto o cesárea, el sexo debe ser F;Variables 10, 49;
+;;;1;N;;;Gerenar error cuando variable 49 > Fecha de corte;Error123;Fecha atención parto o cesárea es mayor a la fecha de corte del reporte;Variable 49, Fecha de corte;
+;;;1;N;;;La fecha registrada en la variable 49 debe ser > fecha de la variable 9;Error173;Fecha atención parto o cesárea es menor a la fecha de nacimiento;Variables 9, 49;
+;;;1;N;;;Validar que si la variable 49 <> 1845-01-01, la edad calculada debe ser >= 10 años y < 60 años;Error294;Si registra Fecha de atención parto ó cesárea, debe ser mayor o igual de 10 años y menor de 60 años;Variables 49, Edad calculada;
+;;;1;N;;;Validar que si la fecha en la variable 49 <> 1845-01-01, la variable 50 debe registrar fecha <> 1845-01-01;Error296;Si registra fecha de atención parto ó cesárea, debe registrar fecha de salida de atención parto o cesárea;Variables 49, 50;
+;;;;;;;Validar contenido de fecha en la variable 49;Error425;contenido en el campo FechaPartoCesarea no válido;Variable 49;
+;;;1;N;;;Validar comodines: en esta variable excepcionalmente solo se permite registrar comodines 1800-01-01 y 1845-01-01.;Error383;Comodín inválido - Fecha atención parto o cesárea;Variable 49;
+50;Gestación;Fecha de salida de atención parto o cesárea;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01 
+·Si no aplica registrar 1845-01-01";"Registre la fecha de salida de la institución, sin importar si corresponde a la misma fecha de la atención del parto.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización de la actividad o cuando se sabe que hubo atención, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población NO gestante y sexo masculino (cuando la variable 14 registra 0, 2 o 21). También se usa cuando siendo gestante aún no ha tenido el parto.";Validar que si la variable 50 <> 1845-01-01, la variable 10 debe registrar F;Error050;Si registra fecha de salida de atención de parto el sexo debe ser F;Varliables 10, 50;
+;;;;;;;Gerenar error cuando variable 50 > Fecha de corte;Error124; Fecha salida del parto o cesárea es mayor a la fecha de corte;Variable 50, Fecha de corte;
+;;;;;;;La fecha registrada en la variable 50 debe ser > fecha de la variable 9;Error174;Fecha salida del parto o cesárea es menor a la fecha de nacimiento;Variables 9, 50;
+;;;;;;;Validar que si la variable 50 <> 1845-01-01, la edad calculada debe ser >= 10 años y < 60 años;Error299;Si registra Fecha de salida de atención parto o cesárea, debe ser mayor o igual de 10 años y menor de 60 años;Variable 50, Edad calculada;
+;;;;;;;Validar que si las variables 49 y 50 registran una fecha > 1900-01-01, la fecha registrada en la variable 49 debe ser <= la fecha registrada en la variable 50;Error300;Fecha de salida de parto es menor a fecha de atención del parto;Variables 49, 50;
+;;;;;;;Generar error si la variable 50 <> (1845-01-01 ó 1800-01-01) Y (la variable 49 = 1845-01-01 ó la variable 49 = 1800-01-01;Error301;Si registra Fecha de salida de atención parto o cesárea, debe registrar Fecha de atención parto o cesárea;Variables 49, 50;
+;;;;;;;Validar contenido de fecha en la variable 50;Error426;contenido en el campo FechaSalidaPartoCesarea  no válido;Variable 50;
+;;;;;;;Validar comodines: en esta variable de manera excepcional solo se permite registrar comodines 1800-01-01 y 1845-01-01.;Error384;Comodín inválido - Fecha salida del parto o cesárea;Variable 50;
+51;Gestación y hasta menos de 7 meses;Fecha de atención en salud para la promoción y apoyo de la lactancia materna;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la atención realizada a:
+-Gestantes sin importar si se realiza en el control prenatal o intraparto.
+-Niños hasta los 6 meses de edad cuando se realiza de manera efectiva a la mujer en periodo de lactancia y/o a las personas significativas.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización de la actividad o cuando se sabe que hubo atención, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población >= 7 meses de edad, excepto población gestante.
+
+";Generar error si la variable 51 <> 1845-01-01 Y la variable 10 = M Y  la edad calculada >=7 meses;Error051;Registre Fecha atención en salud para la promoción y apoyo de la lactancia materna no aplica a personas de sexo M con edad mayor a 7 meses;Variables 10, 51, Edad calculada;
+;;;1;N;;;Gerenar error cuando variable 51 > Fecha de corte;Error125;Fecha atención en salud para la promoción y apoyo de la lactancia materna es mayor a la fecha de corte del reporte;Variable 51, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 51 <= la fecha registrada en la variable 9 (excepto comodines);Error175;Fecha atención en salud para la promoción y apoyo de la lactancia materna es menor a la fecha de nacimiento;Variables 9, 51;
+;;;1;N;;;Validar comodines;Error385;Comodín inválido - Fecha atención en salud para la promoción y apoyo de la lactancia materna;Variable 51;
+;;;;;;;Validar contenido de fecha en la variable 51;Error427;contenido en el campo fecha de atención para la consejería en lactancia materna  no válido;Variable 51;
+;;;1;N;;;Generar error si la variable 14 <> 1 Y la edad calculada >= 7 meses Y la variable 51 <> 1845-01-01;Error583;La atención en salud para la promoción y apoyo de la lactancia materna no aplica para la edad de la persona porque no es gestante;Variables 14, 51, Edad calculada;
+52;Toda la población;Fecha de consulta de valoración integral;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha de la intervención de valoración integral para la atención en salud por medicina general, medicina familiar, pediatría o enfermería, de acuerdo al momento de curso de vida.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la atención o cuando se sabe de su realización, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población que no es sujeto de la atención.";Gerenar error cuando variable 52 > Fecha de corte;Error126;Fecha de consulta de valoración integral es mayor a la fecha de corte;Variable 52, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 52 <= la fecha registrada en la variable 9 (excepto comodines);Error176;Fecha de consulta de valoración integral es menor a la fecha de nacimiento;Variables 9, 52;
+;;;;;;;Validar contenido de fecha en la variable 52;Error447;contenido en el campo Consulta de valoración integral no válido;Variable 52;
+;;;1;N;;;Validar comodines;Error386;Comodín inválido - Fecha de consulta de valoración integral;Variable 52;
+53;Anticoncepción 10 a 60 años;"Fecha de atención en salud para la asesoría en anticoncepción
+";10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"El reporte de esta actividad aplica para hombres y mujeres.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la atención o cuando se sabe que hubo atención, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población que no es objeto de la actividad
+
+";Generar error si la variable 53 <> 1845-01-01 Y la edad calculada < 10  años;Error304;Verifique la actividad Fecha de Atención en salud para la asesoría en anticoncepción reportada en población menor de 10 años;Variable 53, Edad calculada;
+;;;1;N;;;Generar error si la variable 53 = 1845-01-01 Y la edad calculada > = 10  años;Error305;"Verifique la Fecha de Atención en salud para la asesoría en anticoncepción con reporte ""no aplica"" en población mayor o igual de 10 años";Variable 53, Edad calculada;
+;;;1;N;;;Gerenar error cuando variable 53 > Fecha de corte;Error127;La fecha de la Atención en salud para la asesoría en anticoncepción es mayor a la fecha de corte;Variable 53, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 53 <= la fecha registrada en la variable 9 (excepto comodines);Error177;La fecha de la Atención en salud para la asesoría en anticoncepción es menor a la fecha de nacimiento;Variables 9, 53;
+;;;;;;;Validar contenido de fecha en la variable 53;Error448;contenido en el campo Fecha de atención para la asesoría en anticoncepción no válido;Variable 53;
+;;;1;N;;;Validar comodines;Error387;Comodín inválido - Atención en salud para la asesoría en anticoncepción;Variable 53;
+54;Anticoncepción 10 a 60 años;Suministro de método anticonceptivo;2;N;"0 -No aplica
+1 -Dispositivo intrauterino
+2 -Dispositivo intrauterino y preservativo
+3 -Implante subdérmico
+4 -Implante subdérmico y preservativo
+5 -Oral
+6 -Oral y preservativo
+7 -Inyectable mensual
+8 -Inyectable mensual y preservativo 
+9 -Inyectable trimestral
+10-Inyectable trimestral y preservativo
+11-Emergencia
+12-Emergencia y preservativo
+13-Esterilización
+14-Esterilización y preservativo
+15-Preservativo
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";"Debe registrar el método anticonceptivo que se entrega al usuario según la elección realizada por él.
+
+La opción 0 (No aplica) se usa para las personas reportadas que tienen edad < 10 años ó edad >= 60 años.
+
+La opción 17 se usa para el caso de las mujeres con histerectomía a las cuales no se suministra método.
+
+Si reporta una persona con método de planificación definitivo, registre la opción 13 o 14 en la variable 54, según sea el caso, y en la variable 55 registre la fecha de realización si la conoce.";"Validar que si la variable 55 <> 1845-01-01, la variable 54 debe ser <> 0
+";Error309;Si registra fecha de suministro de método anticonceptivo, debe registra un dato diferente a 0 en el suministro;Variables 54, 55;
+;;;;;;;Generar error si la variable 54 <> 0 Y la variable 55 >1900-01-01 Y( la edad calculada < 10 años ó la edad calculada >=  60 años);Warning307;Si registra suministro de método, debe ser mayor o igual de 10 años y menor de 60 años;Variables 54, 55, Edad calculada;
+;;;;;;;Generar error  si la variable 54 = 0 Y la edad calculada está en el rango entre 10 hasta 59 años;Error308;No es válido registrar no aplica en suministro de método anticonceptivo si la edad está entre 10 y 59 años ;Variables 54,  Edad calculada;
+55;Anticoncepción 10 a 60 años;Fecha de suministro de método anticonceptivo;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Esta actividad aplica para hombres y mujeres. Se debe registrar la fecha en que se realiza la entrega efectiva del método.
+Para la entrega de métodos mensuales registrar la fecha de la ultima entrega efectiva
+
+La opción 1800-01-01 se usa cuando se sabe del suministro de método anticonceptivo, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa para las personas reportadas que tienen edad < 10 años ó edad >= 60 años.
+
+Para el caso de los métodos de planificación definitiva en que no se tenga la fecha exacta se puede registrar de la siguiente manera:
+• Si solo se tiene el año se coloca el día 01 del mes 01 y el dato del año que se tiene.
+• Si se tiene el mes y el año se coloca el día 01 del mes y el año que se tiene.";"Validar que si la variable 55 = 1845-01-01, la variable 54 debe ser = 0
+";Error306;Si resgistró no aplica (1845-01-01) en la fecha de suministro de método, debe registrar no aplica (0) en el método anticonceptivo suministrado. ;Variables 54, 55;
+;;;;;;;Gerenar error cuando variable 55 > Fecha de corte;Error128;Fecha suministro método anticonceptivo es mayor a la fecha de corte del reporte;Variable 55, Fecha de corte;
+;;;;;;;La fecha registrada en la variable 55 debe ser > a la fecha registrada en la variable 9 (excepto comodines);Error178;Fecha suministro método anticonceptivo es menor a la fecha de nacimiento;Variables 9, 55;
+;;;;;;;Validar contenido de fecha en la variable 55;Error428;contenido en el campo FechaSuministroMetodoAnticonceptivo no válido;Variable 55;
+;;;;;;;Validar comodines;Error388;Comodín inválido - Fecha suministro método anticonceptivo;Variable 55;
+56;Gestación;Fecha de primera consulta prenatal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando no se tiene información con respecto a la atención o cuando se sabe de su realización, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población NO gestante (cuando la variable 14 registra 0, 2 o 21) y sexo masculino.
+";Generar error si las variables 56 y 58 registran fecha > 1900-01-01 Y la fecha de la variable 56  >  a la fecha de la variable 58;Error318;Fecha de ultimo control prenatal de seguimiento es menor a Fecha de primera consulta prenatal;Variables 56, 58;
+;;;;;;;Gerenar error cuando variable 56 > Fecha de corte;Error129;Fecha de primera consulta prenatal es mayor a la fecha de corte;Variable 56, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 56 <= la fecha registrada en la variable 9 (excepto comodines);Error179;Fecha de primera consulta prenatal es menor a la fecha de nacimiento;Variables 9, 55;
+;;;;;;;Validar contenido de fecha en la variable 56;Error449;contenido en el campo primera consulta prenatal no válido;Variable 56;
+;;;;;;;Validar comodines;Error389;Comodín inválido - Fecha de Primera Consulta Prenatal;Variable 56;
+57;Riesgo cardiovascular y metabólico;Resultado de glicemia basal;3;N;"Registre el dato reportado por el laboratorio (máximo 3 enteros y 4 decimales).
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.
+";"Registre el resultado del tamizaje realizado a: población de 18 a 29 años con riesgo identificado, población a partir de los 29 años una vez cada 5 años y gestantes.  Registro opcional para el resto de la población.
+
+Si el resultado es mayor o igual a 997, registre 997.
+
+La opción 998 se usa cuando reporta población sujeto, pero:
+-No reporta el tamizaje.
+-No se tiene información con respecto a la realización o sabe de la realización, pero se desconoce la fecha.";Generar error si la variable 105 > 1900-01-01 Y (variable 57 = 0  ó variable 57 >=  998);Error584;Si registra Fecha de toma de glicemia basal, debe registrar el Resultado de glicemia basal;Variables 57, 105;
+;;;;;;;Generar error cuando (la variable 105 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 57 <> 998) ó  (la variable la variable 57 = 998 Y la variable 105 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01)) ;Error585;Si registró 1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01 en Fecha Glicemia Basal, registre 998 en Resultado GB y viceversa;Variables 57, 105;
+;;;;;;;Generar error si la variable 105 = 1845-01-01 Y (la variable 57 <> 0 ó la edad calculada >= 29 años);Error586;Registre no aplica en Fecha toma de glicemia y Resultado de glicemia, a los menores de 29 años sin riesgo cardiovascular identificado;Variables 57, 105, Edad calculada;
+58;Gestación;Fecha de último control prenatal de seguimiento;10;F;bbba;"Registre la fecha del último control prenatal de seguimineto que tuvo en el último período de reporte y durante la gestación actual.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la atención o cuando se sabe de su realización, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población NO gestante (cuando la variable 14 registra 0, 2 o 21) y sexo masculino.
+";Gerenar error cuando variable 58 > Fecha de corte;Error130;Fecha de último control prenatal de seguimiento es mayor a la fecha de corte;Variable 58, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 58 <= la fecha registrada en la variable 9 (excepto comodines);Error180;Fecha de último control prenatal de seguimiento es menor a la fecha de nacimiento;Variable 9, 58;
+;;;;;;;Validar contenido de fecha en la variable 58;Error450;contenido en el  UltimoControlPrenatal no válido;Variable 58;
+;;;;;;;Validar comodines, de manera excepcional en esta variable solo se permite registrar los comodines 1845-01-01 y 1800-01-01;Error390;Comodín inválido - Fecha de último control prenatal de seguimiento;Variable 58;
+59;Gestación;Suministro de ácido fólico en el control prenatal durante el periodo reportado;2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";"La opción 0 se usa en población NO gestante (cuando la variable 14 registra 0, 2 o 21), sexo masculino o gestantes a las que no aplica la entrega porque ya tienen mas de 12 semanas de gestación.
+
+La opción 1 se usa:
+-Cuando hubo suministro efectivo durante el periodo reportado y se efectuó durante las primeras 12 semanas de gestación.
+-Cuando se suministraron multivitamínicos NO POS durante las primeras 12 semanas de gestación.
+
+La opción 21 se usa cuando reporta una gestante, pero no se tiene información con respecto al suministro o no se evaluó la entrega.";Generar error si la variable 59 registra valor <> 0, 1, 16, 17, 18, 20 ó 21.;Error587;Error en valores permitidos -Suministro de ácido fólico en el control prenatal durante el periodo reportado;Variable 59;
+60;Gestación;Suministro de sulfato ferroso en el control prenatal durante el periodo reportado;2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";"La opción 0 se usa en población NO gestante (cuando la variable 14 registra 0, 2 o 21), sexo masculino, o  gestante con valores de hemoglobina (Hb) superiores a 14 g/dL., a la que no aplica el suministro de sulfato ferroso.
+
+La opción 1 se usa:
+-Cuando hubo suministro efectivo durante el periodo reportado.
+-Cuando se suministraron multivitamínicos NO POS.";Generar error si la variable 60 registra valor <> 0, 1, 16, 17, 18, 20 ó 21.;Error588;Error en valores permitidos -Suministro de sulfato ferroso en el control prenatal durante el periodo reportado;Variable 60;
+61;Gestación;Suministro de carbonato de calcio en el control prenatal durante el periodo reportado;2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";"La opción 0 se usa en población NO gestante (cuando la variable 14 registra 0, 2 o 21), sexo masculino, o gestante de 15 semanas de gestación en adelante, a la que no aplica el suministro de carbonato de calcio.
+
+La opción 1 se usa:
+-Cuando hubo suministro efectivo durante el periodo reportado y se efectuó durante las primeras 14 semanas de gestación.
+-Cuando se suministraron multivitamínicos NO POS durante las primeras 14 semanas de gestación.";Generar error si la variable 61 registra valor <> 0, 1, 16, 17, 18, 20 ó 21.;Error589;Error en valores permitidos -Suministro de carbonato de calcio en el control prenatal durante el periodo reportado;Variable 61;
+62;Agudeza visual;Fecha de valoración agudeza visual;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha de valoración de agudeza visual que se realiza a las personas a partir de los 3 años de edad.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la atención o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en la población no objeto
+
+";Gerenar error cuando variable 62 > Fecha de corte;Error131;Fecha de valoración agudeza visual es mayor a la fecha de corte;Variable 62, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 62 <= la fecha registrada en la variable 9 (excepto comodines);Error181;Fecha de valoración agudeza visual es menor a la fecha de nacimiento;Variables 9, 62;
+;;;;;;;Generar error si la variable 27 = 0 Y variable 28 = 0 Y la variable 62 <> 1845-01-01;Error590;Si las variables Agudeza visual lejana ojo izquierdo y ojo derecho no aplican, debe registrar no aplica en Fecha de valoración de la agudeza visual ;Variables 27, 28, 62;
+;;;;;;;Validar contenido de fecha en la variable 62;Error451;contenido en el campo FechaValoracionAgudezaVisual no válido;Variable 62;
+;;;;;;;Validar comodines;Error391;Comodín inválido - Fecha de valoración de la agudeza visual;Variable 62;
+63;Test 0 a 12 años;Fecha de tamizaje VALE;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha del tamizaje VALE que se realiza a personas hasta los 12 años de edad.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01  se usa en población no sujeto del tamizaje. 
+
+
+";Gerenar error cuando variable 63 > Fecha de corte;Error132;Fecha de tamizaje VALE es mayor a la fecha de corte;Variable 63, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 63 <= la fecha registrada en la variable 9 (excepto comodines);Error182;Fecha de tamizaje VALE es menor a la fecha de nacimiento;Variables 9, 63;
+;;;;;;;Validar contenido de fecha en la variable 63;Error452;contenido en el campo Fecha de tamizaje VALE no válido;Variable 63;
+;;;;;;;Validar comodines;Error392;Comodín inválido - Fecha de tamizaje VALE;Variable 63;
+64;Ca de próstata;Fecha del tacto rectal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando reporta población sujeto a los que no se realizó el tamizaje o cuando se sabe de la realización, pero se desconce la fecha.
+
+La opción 1845-01-01 se usa cuando reporta población no sujeto de la actividad: sexo femenino, hombres menores de 40 años y hombres entre 40 y 49 años sin factores de riesgo.
+";Gerenar error cuando variable 64 > Fecha de corte;Error133;Fecha del tacto rectal es mayor a la fecha de corte;Variable 64, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 64 <= la fecha registrada en la variable 9 (excepto comodines);Error183;Fecha del tacto rectal es menor a la fecha de nacimiento;Variables 9, 64;
+;;;;;;;Validar contenido de fecha en la variable 64;Error453;contenido en el campo Fecha del tacto rectal no válido;Variable 64;
+;;;;;;;Validar comodines;Error393;Comodín inválido - Fecha del tacto rectal;Variable 64;
+65;Recién nacido;Fecha de tamización con oximetría pre y post ductal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01  se usa en población no sujeto del tamizaje.";Gerenar error cuando variable 65 > Fecha de corte;Error134;Fecha tamización con oximetría pre y post ductal es mayor a la fecha de corte;Variable 65, Fecha de  corte;
+;;;;;;;Generar error si la fecha registrada en la variable 65 < la fecha registrada en la variable 9 (excepto comodines);Error184;Fecha tamización con oximetría pre y post ductal es menor a la fecha de nacimiento;Variables 9, 65;
+;;;;;;;Validar contenido de fecha en la variable 65;Error454;contenido en el campo Fecha de tamización con oximetría pre y post ductal no válido;Variable 65;
+;;;;;;;Validar comodines;Error394;Comodín inválido - Fecha tamización con oximetría pre y post ductal;Variable 65;
+66;Ca de colon;Fecha de realización colonoscopia tamizaje;10  ;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre fecha del tamizaje realizado a población a partir de los 50 años de edad. Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del test o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Gerenar error cuando variable 66 > Fecha de corte;Error135;Fecha de realización colonoscopia tamizaje es mayor a la fecha de corte;Variable 66, Fecha de  corte;
+;;;;;;;Generar error si la fecha registrada en la variable 66 <= la fecha registrada en la variable 9 (excepto comodines);Error185;Fecha de realización colonoscopia tamizaje es menor o igual a la fecha de nacimiento;Variables 9, 66;
+;;;;;;;Validar contenido de fecha en la variable 66;Error455;contenido en el campo Fecha realización colonoscopia tamizaje no válido;Variable 66;
+;;;;;;;Validar comodines;Error395;Comodín inválido - Fecha de realización colonoscopia tamizaje;Variable 66;
+67;Ca de colon;Fecha de la prueba sangre oculta en materia fecal (tamizaje Ca de colon);10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre fecha de la prueba realizada a población a partir de los 50 hasta los 75 años. Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del test o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Gerenar error cuando variable 67 > Fecha de corte;Error136;Fecha de la prueba de sangre oculta en materia fecal (tamizaje Ca de colon) es mayor a la fecha de corte;Variable 67, Fecha de corte;
+;;;;N;;;Generar error si la fecha registrada en la variable 67 <= la fecha registrada en la variable 9 (excepto comodines);Error186;Fecha de la prueba de sangre oculta en materia fecal (tamizaje Ca de colon) es menor a la fecha de nacimiento;Variable 9, 67;
+;;;;;;;Validar contenido de fecha en la variable 67;Error456;Fecha de la prueba de sangre oculta en materia fecal no válido;Variable 67;
+;;;;N;;;Validar comodines;Error396;Comodín inválido - Fecha de la prueba de sangre oculta en materia fecal (tamizaje Ca de colon);Variable 67;
+68;No aplica para el reporte;Consulta de Psicología ;10;F;Registrar 1845-01-01;Se debe registrar 1845-01-01  a todas las personas reportadas ;Generar error si la variable 68 <> 1845-01-01;Error591;Error en valores permitidos -Consulta de Psicología;Variable 68;
+;;;;;;;Validar contenido de fecha en la variable 68;Error457;contenido en el campo ConsultaPsicología no válido;Variable 68;
+69;Recién nacido;Fecha de tamizaje auditivo neonatal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01  se usa en población no sujeto del tamizaje.";Gerenar error cuando variable 69 > Fecha de corte;Error138;Fecha de tamizaje auditivo neonatal es mayor a la fecha de corte;Variable 69, Fecha de corte;
+;;;;N;;;Generar error si la fecha registrada en la variable 69 < la fecha registrada en la variable 9 (excepto comodines);Error188;Fecha de tamizaje auditivo neonatal es menor a la fecha de nacimiento;Variable 9, 69;
+;;;;;;;Validar contenido de fecha en la variable 69;Error458;contenido en el campo Fecha de tamizaje auditivo neonatal no válido;Variable 69;
+;;;;N;;;Validar comodines;Error398;Comodín inválido - Fecha de tamizaje auditivo neonatal;Variable 69;
+70;Primera infancia;Suministro de  fortificación casera en la primera infancia (6 a 23 meses);2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";"Registre el suministro de fortificación casera a la población entre 6 meses hasta 23 meses de edad. 
+
+La opción 0 se usa en la población no sujeto de la actividad.
+
+La opción 1 se usa:
+- Cuando hubo suministro efectivo en la consulta de valoración integral en la primera infancia, dentro del periodo que se está reportando.
+- Cuando se suministraron multivitamínicos NO POS. ";Generar error si la variable 70 = 1, 16,17,18, 20 ó 21 Y (la edad calculada < 6 meses ó la edad calculada > 27 meses);Error063;Verifique la edad de la persona con Suministro de  fortificación casera, según normatividad vigente;Variable 70, Edad calculada;
+;;;;;;;Generar error si la variable 70 <> 0, 1, 16, 17, 18, 20 ó 21.;Error592;Error en valores permitidos -Suministro de  fortificación casera en la primera Infancia.;Variable 70;
+;;;;N;;;Generar error si la variable 70 = 0 Y (la edad calculada  >= 6 meses Y la edad calculada <= 27 meses);Error328;"No es válido registrar ""No aplica"" en Suministro de fortificación casera para la edad reportada, revise la normatividad vigente.";Variable 70, Edad calculada;
+71;Primera infancia;Suministro de vitamina A en la primera infancia (24 a 60 meses);2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";"Registre el suministro de Vitamina A a población entre 24 meses hasta 59 meses de edad. 
+
+La opción 0 se usa para población no sujeto de la actividad.
+
+La opción 1 se usa:
+• Cuando hubo suministro efectivo en la consulta de valoración integral en la primera infancia, dentro del periodo que se está reportando
+• Cuando se suministraron multivitamínicos NO POS. ";Generar error si la variable 71 = 1, 16,17,18, 20 ó 21 Y la edad calculada < 24 meses ó > 63 meses;Error064;Verifique la edad de la persona con Suministro de Vitamina A en la primera Infancia, según normatividad vigente;Variable 71, Edad calculada;
+;;;;;;;Generar error si la variable 71 <> 0, 1, 16, 17, 18, 20 ó 21.;Error593;Error en valores permitidos -Suministro de vitamina A en la primera infancia;Variable 71;
+;;;;N;;;Generar error si la variable 71 = 0 Y (la edad calculada >=24 Y la edad calculada <= 63 meses);Error329;"No es válido registrar ""No aplica"" en Suministro de Vitamina A en la primera Infancia, para la edad reportada, revise la normatividad vigente.";Variable 71, Edad calculada;
+72;Riesgo cardiovascular y metabólico;Fecha de toma LDL;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha del tamizaje realizado a la población de 18 a 29 años con riesgo identificado y a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Gerenar error cuando variable 72 > Fecha de corte;Error139;Fecha de toma LDL es mayor a la fecha de corte;Variable 72, Fecha de corte;
+;;;;N;;;Generar error si la fecha registrada en la variable 72 <= la fecha registrada en la variable 9 (excepto comodines);Error189;Fecha de toma LDL es menor o igual a la fecha de nacimiento;Variables 9, 72;
+;;;;;;;Validar contenido de fecha en la variable 72;Error459;contenido en el campo Fecha de toma LDL no válido;Variable 72;
+;;;;N;;;Validar comodines;Error399;Comodín inválido - Fecha de toma LDL;Variable 72;
+73;Ca de próstata;Fecha de toma PSA;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando se sabe de la realización de la consulta, pero no se tiene exactitud de la fecha.
+
+La opción 1845-01-01 se usa en personas que no son sujeto de esta actividad.";Gerenar error cuando variable 73 > Fecha de corte;Error140;Fecha de toma PSA es mayor a la fecha de corte;Variable 73, Fecha de corte;
+;;;;N;;;Generar error si la fecha registrada en la variable 73 <= la fecha registrada en la variable 9 (excepto comodines);Error190;Fecha de toma PSA es menor o igual a la fecha de nacimiento;Variables 9, 73;
+;;;;;;;Validar contenido de fecha en la variable 73;Error460;contenido en el campo Fecha de toma PSA no válido;Variables 73;
+;;;;;;;Validar comodines;Error400;Comodín inválido - Fecha de toma PSA;Variables 73;
+74;No aplica para el reporte;Preservativos entregados a pacientes con ITS;3;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 74 <> 0;Error594;Error en valores permitidos - Preservativos entregados a pacientes con ITS;Variables 74;
+75;Recién nacido;Fecha de tamizaje visual neonatal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01  se usa en población no sujeto del tamizaje.";Gerenar error cuando variable 75 > Fecha de corte;Error141;Fecha de tamizaje visual neonatal es mayor a la fecha de corte;Variable 75, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 75 < la fecha registrada en la variable 9 (excepto comodines);Error191;Fecha de tamizaje visual neonatal es menor a la fecha de nacimiento;Variables 9, 75;
+;;;;;;;Validar contenido de fecha en la variable 75;Error461;contenido en el campo Fecha de tamizaje visual neonatal no válido;Variable 75;
+;;;;;;;Validar comodines;Error401;Comodín inválido - Fecha de tamizaje visual neonatal      ;Variable 75;
+76;COP;Fecha de atención en salud bucal por profesional en odontología;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha en que realizó la actividad a la población sujeto, de acuerdo a la normatividad vigente.
+
+1800-01-01 se usa en población sujeto a la que no está reportando la actividad, o cuando no se tiene información con respecto a la realización, o se sabe que se realizó pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de la actividad: menor de 6 meses.
+
+cuando no se puede realizar valoración por restricciones médicas registre 1810-01-01.";Gerenar error cuando variable 76 > Fecha de corte;Error142;Fecha atención en salud bucal por profesional en odontología es mayor a la fecha de corte;Variable 76, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 76 <= la fecha registrada en la variable 9 (excepto comodines);Error192;Fecha atención en salud bucal por profesional en odontología es menor o igual a la fecha de nacimiento;Variables 9, 76;
+;;;;;;;Validar que si la edad calculada >= 6 meses, la variable 76 = 1845-01-01;Error402;Si registra Fecha atención en salud bucal por profesional en odontología, la edad debe ser mayor o igual a 6 meses;Variable 76, Edad calculada;
+;;;;;;;Validar comodines;Error672;Comodín inválido - Fecha de atención en salud bucal por profesional en odontología;Variable 76;
+;;;;;;;Validar contenido de fecha en la variable 76;Error462;contenido en el campo Fecha de atención en salud bucal por profesional en odontología no válido;Variable 76;
+;;;;;;;Generar error si (la variable 102 = 0 Y la variable 76 <> 1845-01-01) ó si (la variable 102 <> 0 Y la variable 76 = 1845-01-01) ;Error597;Registre no aplica en Atención en salud bucal por profesional en odontología si registró no aplica en COP y viceversa;Variables 76, 102;
+77;Primera infancia;Suministro de hierro en la primera Infancia (24 a 59 meses);2;N;"0 -No aplica
+1 -Sí se suministra
+16-No se suministra por una tradición
+17-No se suministra por una condición de salud
+18-No se suministra por negación de la usuaria
+20-No se suministra por otras razones
+21-Registro no evaluado";"Registre el suministro de hierro a población entre 24 meses hasta 59 meses de edad. 
+
+La opción 0 se usa para población no sujeto de la actividad
+
+La opción 1 se usa:
+• Cuando hubo suministro efectivo en la consulta de valoración integral en la primera infancia, dentro del periodo que se está reportando
+• Cuando se suministraron multivitamínicos NO POS. ";Generar error si la variable 77 <> 0 Y (la edad calculada < 24 meses ó la edad calculada > 63 meses);Error669;Verifique la edad de la persona con Suministro de hierro en la primera Infancia, según normatividad vigente;Variable 77, Edad calculada;
+;;;;;;;Generar error si la variable 77 <> 0, 1, 16, 17, 18, 20 ó 21.;Error598;Error en valores permitidos -Suministro de hierro en la primera Infancia ;Variable 77;
+;;;2;N;;;"Generar error si la variable 77 = 0 Y la edad calculada  se encuentra en el rango entre 24 y 63 meses
+";Error670;"No es válido registrar ""No aplica"" en Suministro de hierro en la primera Infancia, para la edad reportada, revise la normatividad vigente.";Variable 77, Edad calculada;
+78;Toda la población;Fecha de antígeno de superficie hepatitis B (Toda la población);10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registrar la fecha del tamizaje para hepatitis B, según la técnica definida en la normatividad vigente, a todas las gestantes y de forma opcional a la población general.
+
+La opción 1800-01-01 se usa cuando se sabe de la realización del examen, pero no se tiene exactitud de la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto del tamizaje.";Gerenar error cuando variable 78 > Fecha de corte;Error143;Fecha antígeno de superficie hepatitis B es mayor a la fecha de corte;Variable 78, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 78 < la fecha registrada en la variable 9 (excepto comodines);Error193;Fecha antígeno de superficie hepatitis B es menor a la fecha de nacimiento;Variables 9, 78;
+;;;;;;;Validar contenido de fecha en la variable 78;Error429;contenido en el campo FechaAntigenoSuperficieHepatitisB  no válido;Variable 78;
+;;;1;N;;;Validar comodines;Error403;Comodín inválido - Fecha antígeno de superficie hepatitis B ;Variable 78;
+79;Toda la población;Resultado de antígeno de superficie hepatitis B (Toda la población);2;N;"0 -No aplica
+4 -Reactivo
+5 -No reactivo
+21-Riesgo no evaluado";"Registrar el resultado del tamizaje para hepatitis B, según la técnica definida en la normatividad vigente, a todas las gestantes y de forma opcional a la población general.
+
+La opción 0 se usa en población general sin riesgo identificado.
+
+La opción 21 se usa cuando:
+-Reporta población sujeto de la actividad, pero no se se tiene información con respecto a la identificación del riesgo.
+-Cuando se sabe el resultado del tamizaje, pero se desconoce la fecha.";Generar error si la variable 78 > 1900-01-01 Y la variable 79 = 0 ó 21;Error341;Si registra fecha válida para Fecha antígeno de superficie hepatitis B, debe registrar resultado;Variables 78, 79;
+;;;;;;;Generar error si la variable 78 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 79 <> 21;Error599;Si registra un comodín que indican no realización o sin dato en Fecha de antígeno de superficie hepatitis B, registre 21 en el resultado;Variables 78, 79;
+;;;;;;;Generar error si la variable 79 = 0 Y la variable 78 <> 1845-01-01;Error600;Si Resultado antígeno de superficie hepatitis B no aplica, el registro de Fecha antígeno de superficie hepatitis B tampoco aplica;Variables 78, 79;
+;;;;;;;Generar error si la variable 79 registra valor <> 0, 4, 5 ó 21;Error601;Error en valores permitidos - Resultado antígeno de superficie hepatitis B;Variable 79;
+80;Toda la población;Fecha de toma de prueba tamizaje para sífilis;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registrar la fecha del tamizaje para sífilis, según la técnica definida en la normatividad vigente, a todas las gestantes y de forma opcional a la población general.
+
+La opción 1800-01-01 se usa cuando se sabe de la realización del examen, pero no se tiene exactitud de la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto del tamizaje.";Gerenar error cuando variable 80 > Fecha de corte;Error144;Fecha de toma de la prueba de tamizaje para sífilis es mayor a la fecha de corte;Variable 80, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 80 < la fecha registrada en la variable 9 (excepto comodines);Error194;Fecha de toma de la prueba de tamizaje para sífilis es menor a la fecha de nacimiento;Variables 9, 80;
+;;;;;;;Validar contenido de fecha en la variable 80;Error430;contenido en el campo prueba de tamizaje para sífilis  no válido;Variable 80;
+;;;1;N;;;Validar comodines;Error404;Comodín inválido - Fecha de toma de la prueba de tamizaje para sífilis;Variable 80;
+81;Toda la población;Resultado de prueba tamizaje para sífilis;2;N;"0 -No aplica
+4 -Positivo
+5 -Negativo
+21-Riesgo no evaluado";"Registrar el resultado del tamizaje para sífilis, según la técnica definida en la normatividad vigente, a todas las gestantes y de forma opcional a la población general.
+
+La opción 0 se usa en población general sin riesgo identificado.
+
+La opción 21 se usa cuando:
+-Reporta población sujeto de la actividad, pero no se se tiene información con respecto a la identificación del riesgo.
+-Cuando se sabe el resultado del tamizaje, pero se desconoce la fecha.";Generar error si la variable 80 > 1900-01-01 Y la variable 81 = 0 ó 21;Error344;Si registra Fecha de toma de la prueba de tamizaje para sífilis, debe registrar resultado de prueba;Variables 80, 81;
+;;;;;;;Generar error si la variable 80 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 81 <> 21;Error602;Si registra un comodín que indica no realización o sin dato en Fecha de prueba de tamizaje para sífilis, registre 21 en el resultado;Variables 80, 81;
+;;;;;;;Generar error si la variable 81 = 0 Y la variable 80 <> 1845-01-01;Error603;Si Resultado de prueba de tamizaje para sífilis no aplica, el registro de Fecha de prueba de tamizaje para sífilis tampoco aplica;Variables 80, 81;
+;;;;;;;Generar error si la variable 81 registra valor <> 0, 4, 5 ó 21;Error604;Error en valores permitidos - Resultado de prueba de tamizaje para sífilis;Variable 81;
+82;Toda la población;Fecha de toma de prueba para VIH;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registrar la fecha del tamizaje para VIH, según la técnica definida en la normatividad vigente, a todas las gestantes y de forma opcional a la población general.
+
+La opción 1800-01-01 se usa cuando se sabe de la realización del examen, pero no se tiene exactitud de la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto del tamizaje.";Gerenar error cuando variable 82 > Fecha de corte;Error145;Fecha de toma de prueba para VIH es mayor a la fecha de corte;Variable 82, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 82 < la fecha registrada en la variable 9 (excepto comodines);Error195;Fecha de toma de prueba para VIH es menor a la fecha de nacimiento;Variables 9, 82;
+;;;;;;;Validar contenido de fecha en la variable 82;Error431;contenido en el campo Fecha prueba VIH  no válido;Variable 82;
+;;;1;N;;;Validar comodines;Error405;Comodín inválido - Fecha de toma de prueba para VIH;Variable 82;
+83;Toda la población;Resultado de prueba para VIH;2;N;"0 -No aplica
+4 -Reactivo
+5 -No reactivo
+21-Riesgo no evaluado";"Registrar el resultado del tamizaje para VIH, según la técnica definida en la normatividad vigente, a todas las gestantes y de forma opcional a la población general.
+
+La opción 0 se usa en población general sin riesgo identificado.
+
+La opción 21 se usa cuando:
+-Reporta población sujeto de la actividad, pero no se se tiene información con respecto a la identificación del riesgo.
+-Cuando se sabe el resultado del tamizaje, pero se desconoce la fecha.";Generar error si la variable 82 > 1900-01-01 Y la variable 83 = 0 ó 21;Error346;Si registra fecha de toma de prueba para VIH, debe registrar resultado para prueba de VIH;Variables 82, 83;
+;;;;;;;Generar error si la variable 82 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 83 <> 21;Error605;Si registra alguno de los comodines que indican no realización en Fecha de prueba para VIH, registre riesgo no evaluado en el resultado;Variables 82, 83;
+;;;;;;;Generar error si la variable 82 = 1845-01-01 Y la variable 83  <> 0;Error606;Si fecha de la prueba para VIH no aplica, el registro de resultado de la prueba para VIH tampoco aplica;Variables 82, 83;
+;;;;;;;Generar error si la variable 83 registra valor <> 0, 4, 5, 21;Error607;Error en valores permitidos - Resultado de la prueba para VIH;Variable 83;
+84;Recién nacido;Fecha de TSH neonatal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01  se usa en población no sujeto del tamizaje."; Generar error si la variable 85 = 0 Y la variable 84 <> 1845-01-01;Error350;Si registra fecha de toma de TSH Neonatal, debe registrar resultado de TSH Neonatal;Variables 84, 85;
+;;;1;N;;;Gerenar error cuando variable 84 > Fecha de corte;Error146;Fecha de TSH neonatal es mayor a la fecha de corte;Variable 84, Fecha de corte;
+;;;1;N;;;La fecha registrada en la variable 84 debe ser >= la fecha registrada en la variable 9 (excepto comodines);Error196;Fecha de TSH neonatal es menor a la fecha de nacimiento;Variables 9, 84;
+;;;;;;;Validar contenido de fecha en la variable 84;Error432;contenido en el campo FechaTSHneonatal no válido;Variable 84;
+;;;1;N;;;Validar comodines;Error406;Comodín inválido - Fecha de TSH neonatal;Variable 84;
+85;Recién nacido;Resultado de TSH neonatal;2;N;"0 -No aplica
+4 -Alterado
+5 -Normal
+21-Riesgo no evaluado";"La opción 0 se usa cuando la persona reportada NO es recién nacido
+
+La opción 21 se usa cuando es un recién nacido al que no se le ha realizado el tamizaje ó cuando se sabe el resultado del examen, pero se desconoce la fecha en que se realizó.";Generar error si la variable 85 registra valor <> 0, 4, 5 ó 21;Error608;Error en valores permitidos - Resultado de TSH neonatal;Variable 84;
+;;;;;;;Generar warning cuando la variable 84 > 1900-01-01 Y la edad calculada > 7 días Y la variable 85 = 4 ó 5.;Warning068;Verifique la actividad -Resultado de TSH- realizada en población con edad mayor a 7 días;Variable 84, 85, Edad calculada;
+;;;;;;;Generar error si la variable 85 = 21 Y la variable 84 <> (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01) ;Error609;Si Resultado de TSH neonatal es riesgo no evaluado, debe registrar un comodín que indique no realización o sin dato en la fecha del tamizaje ;Variables 84, 85;
+86;Ca cervix;Tamizaje del cáncer de cuello uterino ;2;N;"0 -No aplica
+1 -Citología cérvico uterina 
+2 -Prueba ADN – VPH
+3 -Técnica de inspección visual
+4 -Prueba ADN-VPH y citología cérvico uterina
+16-No se realiza por una tradición
+17-No se realiza por una condición de salud 
+18-No se realiza por negación de la usuaria 
+19-No se realiza por tener datos de contacto de la usuaria no actualizados
+20-No se realiza por otras razones
+21-Riesgo no evaluado";"La opción 0 se usa en población no sujeto de la actividad: sexo masculino y mujeres menores de 10 años.
+
+La opción 21 se usa en población sujeto cuando:
+-No está reportando la actividad.
+-No se tiene información a cerca de la realización del tamizaje o cuando se sabe de la realización, pero se desconoce la fecha en que se realizó.
+
+La opción 4 se usa cuando se reportan mujeres mayores de 30 años a las cuales realizó ADN-VPH con resultado positivo y posteriormente se realizó citología cérvico uterina. ";Generar error si la variable 86 <> 0 Y (la variable 10 <> F ó la edad calculada < 10 años);Error069;Si registra Tamizaje Cáncer de Cuello Uterino, la edad debe ser mayor o igual a 10 años y el sexo F;Variables 10, 86, Edad calculada;
+;;;;;;;Generar error si la variable 86  = (1, 2, 3 ó 4) Y la variable 87 <= 1900-01-01;Error610;Si registra Tamizaje cáncer de cuello uterino, debe registrar Fecha tamizaje cáncer de cuello uterino;Variables 86, 87;
+;;;;;;;Generar error si la variable 86  = (1 ó 4) Y la variable 88 <> (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ó 18);Error611;"Si reportó la opción de respuesta ""1"" o ""4"" en Tamizaje Cáncer de Cuello Uterino, reporte una opción entre 1 a 18 en el Resultado de tamizaje de CaCu";Variables 86, 88;
+;;;;;;;Generar error si la variable 86  = 2 ó 3 Y la variable 88 <> 19 ó 20;Error612;"Si reportó la opción de respuesta ""2"" o ""3"" en Tamizaje Cáncer de Cuello Uterino, reporte la opción ""19"" o ""20"" en el Resultado tamizaje de CaCu";Variables 86, 88;
+;;;;;;;Generar error si la variable 86 = 0  Y (la variable 87 <> 1845-01-01 ó la variable 88 <> 0);Error613;Si Tamizaje cáncer de cuello uterino no aplica, el registro de Fecha y resultado de tamizaje de cáncer de cuello tampoco aplica;Variables 86, 87, 88;
+;;;;;;;Generar error si la variable 86 = 21 Y (la variable 87 <> (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01) ó la variable 88 <> 21);Error614;Si Registró 21 en Tamizaje cáncer de cuello uterino, debe registrar comodín de no realización o sin dato en Fecha del tamizaje y  21 en el resultado;Variables 86, 87, 88;
+87;Ca cervix;Fecha de tamizaje cáncer de cuello uterino;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa en población sujeto cuando:
+-No está reportando la actividad.
+-No se tiene información a cerca de la realización del tamizaje o cuando se sabe de la realización, pero se desconoce la fecha en que se realizó.
+
+La opción 1845-01-01 se usa en poblción no sujeto de la actividad: sexo masculino y mujeres menores de 10 años.";Generar error si la variable 87 > 1900-01-01 Y la variable 88 registra un valor  < 1 ó  >20;Error352;Si registra Fecha de tamizaje cáncer de cuello uterino, debe registrar Resultado tamizaje de cáncer de cuello uterino;Variables 87, 88;
+;;;1;N;;;Validar que si la variable 87 <> 1845-01-01, la variable 10 debe registrar F;Error071;Si registra Fecha de tamizaje cáncer de cuello uterino, el sexo debe ser F;Variables 10, 87;
+;;;1;N;;;Validar que si la variable 87 <> 1845-01-01, la edad calculada debe ser >= 10 años;Error070;Si registra Fecha de tamizaje cáncer de cuello uterino, la edad debe ser mayor o igual a 10 años;Variable 87, Edad calculada;
+;;;1;N;;;Gerenar error cuando variable 87 > Fecha de corte;Error147;Fecha de tamizaje cáncer de cuello uterino es mayor a la fecha de corte;Variable 87, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 87 <= la fecha registrada en la variable 9 (excepto comodines);Error197;Fecha de tamizaje cáncer de cuello uterinoa es menor a la fecha de nacimiento;Variables 9, 87;
+;;;1;N;;;Validar comodines;Error407;Comodín inválido - Fecha de tamizaje cáncer de cuello uterino;Variables 87;
+88;Ca cervix;Resultado tamizaje cáncer de cuello uterino;3;N;"Resultado citología cérvico uterina
+Escamosas:
+1  - ASC-US (células escamosas atípicas de significado indeterminado)
+2  - ASC-H (células escamosas atípicas, de significado indeterminado sugestivo de LEI de alto grado)
+3  - Lesión intraepitelial escamosa (LEI) de bajo grado- HPV (NIC I) (LEI BG)
+4  - Lesión intraepitelial escamosa (LEI) de alto grado (NIC II-III CA INSITU) (LEI AG)
+5  - Lesión intraepitelial escamosa de alto grado sospechosa de infiltración
+6  - Carcinoma de células escamosas (Escamocelular)
+Glandulares:
+7  - Células endocervicales atípicas sin ningún otro significado
+8  - Células endometriales atípicas sin ningún otro significado
+9  - Células glandulares atípicas sin ningún otro significado
+10 - Células endocervicales atípicas sospechosas de neoplasia
+11 - Células endometriales atípicas sospechosas de neoplasia
+12 - Células glandulares atípicas sospechosas de neoplasia
+13 - Adenocarcinoma endocervical in situ
+14 - Adenocarcinoma endocervical
+15 - Adenocarcinoma endometrial
+16 - Otras neoplasias
+17 - Negativa para lesión intraepitelial o neoplasia
+18 - Inadecuada para lectura
+
+Resultado para prueba AND-VPH ó inspección visual
+19 - Positivo 
+20 - Negativo
+
+21 -Riesgo no evaluado
+0  -No aplica";"La opción 0 se usa en población no sujeto de la actividad: sexo masculino y mujeres menores de 10 años.
+
+La opción 21 se usa en población sujeto cuando:
+-No está reportando la actividad.
+-No se tiene información a cerca de la realización del tamizaje o cuando se sabe de la realización, pero se desconoce la fecha en que se realizó.
+
+En el caso en que el reporte de la citología determine una lesión de células escamosas y otra de células glandulares, se deberá realizar el reporte con el dato del tipo de lesión glandular.
+
+";"Validar que si la variable 88 <> 0, la edad calculada debe ser >= 10 años
+";Error072;Si registra Resultado tamizaje de cáncer de cuello uterino, la edad debe ser mayor o igual a 10 años;Variable 88, Edad calculada;
+;;;;;;;"Validar que si la variable 88 <> 0, la variable 10 debe registrar F
+";Error073;Si registra Resultado tamizaje de cáncer de cuello, el sexo debe ser F;Variables 10, 88;
+;;;;;;;Validar contenido de fecha en la variable 88;Error433;contenido en el campo resultado de tamizaje cáncer de cuello uterino no válido;Variable 88;
+;;;1;N;;;Generar error si la variable 88 registra valor <> 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ó 21;Error616;Error en valores permitidos -  Resultado tamizaje de cáncer de cuello;Variable 88;
+89;Ca cervix;Calidad en la muestra de citología cervicouterina;3;N;"0 -No aplica
+1 -Satisfactoria Zona de Transformación Presente
+2 -Satisfactoria Zona de Transformación Ausente
+3 -Insatisfactoria
+4 -Rechazada
+Si no tiene el dato registrar 999.";"La opción 0 se usa en población no sujeto de la actividad: sexo masculino, mujeres menores de 10 años y mujeres con edad mayor o igual a 10 años a las que no se está reportando citología cervicouterina.
+
+La opción 999 se usa en mujeres con edad mayor o igual a 10 años a las que se está reportando citología cervicouterina, pero no se tiene información a cerca de la realización del tamizaje o se sabe de la realización pero se desconoce la fecha.";Generar error si la variable 89 =(1 ó 2 ó 3) Y (la variable 88 < 1 ó la variable 88 > 18) ;Error354;Si registra calidad de la muestra, debe registrar resultado de citología;Variables 88, 89;
+;;;;;;;Generar error si la variable 89 = 4 Y la variable 88 <> 18;Error615;Si registra calidad de la muestra es insatisfactoria, el resultado de citología es insatisfactorio para la lectura;Variables 88, 89;
+;;;;;;;Generar error si la variable 89 = 1, 2, 3, 4 ó 999  Y la edad calculada < 10 años;Error074;Si registra Calidad en la Muestra de Citología Cervicouterina, la edad debe ser mayor o igual a 10 años;Variable 89, Edad calculada;
+;;;1;N;;;Validar que si la variable 89  <> 0, la variable 10 debe ser = F;Error075;Si registra Calidad en la Muestra de Citología Cervicouterina, el sexo debe ser F;Variables 10, 89;
+90;Ca cervix;Código de habilitación IPS donde se realiza  tamizaje cáncer de cuello uterino;12;N;"Tabla REPS (Registro Especial de Prestadores de Servicios de Salud). 
+Si no tiene el dato registrar 999.
+Si no aplica registrar 0.";"La opción 999 se usa:
+-Cuando se desconoce el dato
+-Cuando el código de la IPS aún no se encuentra actualizado en el REPS.
+
+La opción 0 se usa en población no sujeto de la actividad: sexo masculino, mujeres menores de 10 años y mujeres con edad mayor o igual a 10 años a las que no se está reportando tamizaje de cáncer de cuello uterino.";Validar que el código registrado en la variable 90 se encuentre en el REPS del MSPS;Error022;La IPS de tamizaje cáncer de cuello uterino no existe;Variable 90, tabla REPS;
+;;;;;;;Validar que si la variable 90 <> 0, la edad calculada debe ser mayor a 10 años;Error076;Si registra IPS de tamizaje de cáncer de cuello uterino, la edad debe ser mayor a 10 años;Variable 90, Edad calculada;
+;;;;;;;Validar que si la variable 90 <> 0, la variable 10 debe registrar F;Error077;Si registra IPS de tamizaje de cáncer de cuello uterino, el sexo debe ser F;Variables 10, 90;
+;;;12;N;;;Validar que si la variable 89 = 1,2,3 ó 4, la variable 90 debe registrar valor <> 0 ó 999;Error355;Si registra Código de habilitación IPS tamizaje cáncer de cuello uterino, debe registrar calidad de la muestra;Variables 89, 90;
+91;Ca cervix;Fecha de colposcopia;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa en población sujeto cuando:
+-No está reportando la actividad.
+-No se tiene información a cerca de la realización del tamizaje o cuando se sabe de la realización, pero se desconoce la fecha en que se realizó.
+
+La opción 1845-01-01 se usa: 
+-Sexo masculino y mujeres menores de 10 años.
+-Mujeres de 10 o más años de edad a las que no se realizó el tamizaje de cáncer de cuello uterino, o a las reportadas con resultado negativo o normal del tamizaje reportado en el periodo, o con muestra rechazada";Generar error cuando la variable 91 <> 1845-01-01 Y la edad calculada < 10 años;Error078;Si registra Fecha Colposcopia, la edad debe ser mayor o igual a 10 años;Variable 91, Edad calculada;
+;;;1;N;;;Validar que si la variable 90 <> 1845-01-01, la variable 10 debe registrar F;Error079;Si registra Fecha Colposcopia, el sexo debe ser Femenino;Variables 10, 91;
+;;;1;N;;;Gerenar error cuando variable 91 > Fecha de corte;Error148;Fecha colposcopia es mayor a la fecha de corte;Variable 91, Fecha de corte;
+;;;1;N;;;La fecha registrada en la variable 91 debe ser > la fecha registrada en la variable 9 (excepto comodines);Error198;Fecha colposcopia es menor a la fecha de nacimiento;Variables 9, 91;
+;;;;;;;Validar contenido de fecha en la variable 91;Error434;contenido en el campo FechaColposcopia no válido;Variables 91;
+;;;1;N;;;Validar comodines;Error408;Comodín inválido - Fecha colposcopia;Variables 91;
+92;Riesgo cardiovascular y metabólico;Resultado de LDL;12;N;"Registre el dato reportado por el laboratorio (máximo 3 enteros y 4 decimales).
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";"Registre el resultado del tamizaje realizado a población de 18 a 29 años con riesgo identificado y a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+La opción 998 se usa cuando reporta población sujeto, pero:
+-No reporta el tamizaje.
+-No se tiene información con respecto a la realizacióne o sabe de la realización, pero se desconoce la fecha.";Generar error si la variable 72 > 1900-01-01 Y ( la variable 92 = 0 ó  la variable 92 >= 998);Error617;Si registra Fecha válida en Fecha de toma LDL, debe registrar Resultado de LDL;Variables 72, 92;
+;;;;;;;Generar error cuando (la variable 72 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 92 <> 998) ó  (la variable la variable 92 = 998 Y la variable 72 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01)) ;Error618;Si registró 1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01 en Fecha de toma LDL, registre 998 en Resultado de LDL y viceversa;Variables 72, 92, Edad calculada;
+;;;12;N;;;Generar error si la variable 72 = 1845-01-01 Y (la variable 92 <> 0 ó la edad calculada >= 29 años);Error619;Registre no aplica en Fecha de toma de LDL y Resultado de LDL, a los menores de 29 años sin riesgo cardiovascular identificado;Variables 72, 92, Edad calculada;
+93;Ca cervix;Fecha de biopsia cervicouterina;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"La opción 1800-01-01 se usa en población sujeto cuando:
+-No está reportando la actividad.
+-No se tiene información a cerca de la realización del tamizaje o cuando se sabe de la realización, pero se desconoce la fecha en que se realizó.
+
+La opción 1845-01-01 se usa: 
+-Sexo masculino y mujeres menores de 10 años.
+-Mujeres de 10 o más años de edad a las que no se realizó el tamizaje de cáncer de cuello uterino, o a las reportadas con resultado negativo o normal del tamizaje reportado en el periodo, o con muestra rechazada";"Validar que si la variable 93 <> 1845-01-01, la variable 10 debe registrar F
+";Error083;Si registra Fecha biopsia cervicouterina, el sexo debe ser Femenino;Variables 10, 93;
+;;;1;N;;;"Validar que si la variable 93 <> 1845-01-01, la edad calculada debe ser mayor a 10 años
+";Error082;Si registra Fecha biopsia cervicouterina, la edad debe ser mayor a 10 años;Variable 93, Edad calculada;
+;;;1;N;;;Gerenar error cuando variable 93 > Fecha de corte;Error149;Fecha biopsia cervicouterina es mayor a la fecha de corte;Variable 93, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 93 <= la fecha registrada en la variable 9 (excepto comodines);Error199;Fecha biopsia cervicouterina es menor a la fecha de nacimiento;Variables 9, 93;
+;;;;;;;Validar contenido de fecha en la variable 93;Error435;contenido en el campo fecha biopsia cervicouterina no válido;Variable 93;
+;;;1;N;;;Validar comodines;Error409;Comodín inválido - Fecha biopsia cervicouterina;Variable 93;
+94;Ca cervix;Resultado de biopsia cervicouterina;3;N;"0 -No aplica
+1 -Negativo para neoplasia 
+3 -NIC de bajo grado (NIC I)
+4 -NIC de alto grado: (NIC II - NIC III) 
+5 -Neoplasia micro infiltrante: escamocelular o adenocarcinoma
+6 -Neoplasia Infiltrante: escamocelular o adenocarcinoma
+21-Riesgo no evaluado";"La opción 21 se usa en población sujeto cuando:
+-No está reportando la actividad.
+-No se tiene información a cerca de la realización del tamizaje o cuando se sabe de la realización, pero se desconoce la fecha en que se realizó.
+
+La opción 0 se usa: 
+-Sexo masculino y mujeres menores de 10 años.
+-Mujeres de 10 o más años de edad a las que no se realizó el tamizaje de cáncer de cuello uterino, o a las reportadas con resultado negativo o normal del tamizaje reportado en el periodo.";Generar error si la variable 94 = (1 ó 3 ó 4 ó 5 ó 6) Y la variable 93 <= 1900-01-01;Error359;Si registra resultado de biopsia cervicouterina, debe registrar Fecha biopsia cervicouterina;Variables 93, 94;
+;;;;;;;Generar error si la variable 94 registra valor <> 0, 1, 3, 4, 5, 6 ó 21;Error620;Error en valores permitidos - Resultado de biopsia cervicouterina;Variable 94;
+;;;;;;;Generar error si la variable 94 = 0 Y la variable 93 <> 1845-01-01;Error621;Si Resultado de biopsia cervicouterina no aplica, el registro de Fecha biopsia cervicouterina tampoco aplica;Variables 93, 94;
+;;;;;;;Generar error si la variable 94 = 21 Y la variable 93 <> (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01);Error622;Se registra riesgo no evaluado en Resultado biopsia cervicouterina es sin dato, debe registrar comodín asociado en Fecha de biopsia cervicouterina;Variables 93, 94;
+;;;1;N;;;Generar error si la variable 94 = 1, 3, 4, 5, 6 ó 21 Y la edad calcuada  < = 10 años;Error084;Si registra Resultado de biopsia cervicouterina, la edad debe ser mayor a 10 años;Variable 94, Edad calculada;
+;;;1;N;;;Validar que si la variable 94 <> 0, la variable 10 debe registrar F;Error085;Si registra Resultado de Biopsia Cervical, el sexo debe ser Femenino;Variables 10, 94;
+95;Riesgo cardiovascular y metabólico;Resultado de HDL;12;N;"Registre el dato reportado por el laboratorio (máximo 3 enteros y 4 decimales).
+Riesgo no evaluado registrar 998.
+Si no aplica registre 0.";"Registre el resultado del tamizaje realizado a población de 18 a 29 años con riesgo identificado y a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+La opción 998 se usa cuando reporta población sujeto, pero:
+-No reporta el tamizaje.
+-No se tiene información con respecto a la realizacióne o sabe de la realización, pero se desconoce la fecha.";Generar error si la variable 111 > 1900-01-01 Y (la variable 95 = 0 ó  la variable 95 >= 998);Error623;Si registra fecha válida en Fecha de toma HDL, debe registrar Resultado de HDL;Variables 95, 111;
+;;;;;;;Generar error cuando (la variable 111 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 95 <> 998) ó  (la variable la variable 95 = 998 Y la variable 111 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01)) ;Error624;Si registró 1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01 en Fecha de toma HDL, registre 998 en Resultado de HDL y viceversa;Variables 95, 111, Edad calculada;
+;;;;;;;Generar error si la variable 111 = 1845-01-01 Y (la variable 95 <> 0 ó la edad calculada >= 29 años);Error625;Registre no aplica en Fecha de toma HDL y Resultado de HDL, a los menores de 29 años sin riesgo cardiovascular identificado;Variables 95, 111, Edad calculada;
+96;Ca mama;Fecha de toma de mamografía;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registro obligatorio en las mujeres mayores de 50 años. Registro opcional en mujeres de 35 a 49 años.
+
+Cuando se sabe de la realización de la actividad, pero no se tiene exactitud de la fecha, registre la opción 1800-01-01.
+
+La opción 1845-01-01 se usa en población no sujeto de la actividad: sexo masculino, mujeres menores de 35 años o mujeres de 35 hasta 49 años de edad que no tienen riesgo identificado.";Generar error si la variable 96 <> 1845-01-01 Y la edad calculada < 35 años;Error088;"Registre ""No aplica"" en la Fecha de mamografía, si la edad es menor a 35 años";Variable 96, Edad calculada;
+;;;1;N;;;"Validar que si la variable 96 <> 1845-01-01 la variable 10 debe registrar F
+";Error089;Si registra una fecha válida o un comodín en la Fecha de mamografía, el sexo debe ser Femenino;Variables 10, 96;
+;;;1;N;;;Generar error cuando variable 96 > Fecha de corte;Error150;Fecha de mamografía es mayor a la fecha de corte;Variable 96, Fecha de corte;
+;;;1;N;;;Generar error si la fecha registrada en la variable 96 <= la fecha registrada en la variable 9 (excepto comodines);Error200;Fecha de mamografía es menor a la fecha de nacimiento;Variables 9, 96;
+;;;1;N;;;Validar comodines;Error410;Comodín inválido - Fecha de mamografía;Variable 96;
+;;;;;;;Validar contenido de fecha en la variable 96;Error436;contenido en el campo FechaMamografia no válido;Variable 96;
+;;;1;N;;;Generar error si la variable 10 = F Y variable 96 = 1845-01-01 Y la edad calculada >= 50 años;Error362;"Si es mujer mayor o igual de 50 años, no es válido registrar ""no aplica"" para mamografía";Variable 96, Edad calculada;
+97;Ca mama;Resultado de mamografía;3;N;"Registre el resultado según la clasificación BIRADS:
+0 -No aplica
+1 -BIRADS 0: necesidad de nuevo estudio imagenológico o mamograma previo para evaluación
+2 -BIRADS 1: negativo
+3 -BIRADS 2: hallazgos benignos
+4 -BIRADS 3: probablemente benigno
+5 -BIRADS 4: anormalidad sospechosa
+6 -BIRADS 5: altamente sospechoso de malignidad
+7 -BIRADS 6: malignidad por biopsia conocida
+21-Riesgo no evaluado";"Registro obligatorio en las mujeres mayores de 50 años. Registro opcional en mujeres de 35 a 49 años.
+
+Cuando se realizó mamografía pero se desconoce el resultado, registre la opción 21
+
+La opción 0 se usa en población no sujeto de la actividad: sexo masculino, mujeres menores de 35 años o mujeres de 35 hasta 49 años de edad que no tienen riesgo identificado.";Generar error si la edad calculada >= 50 años Y la variable 10 = F  Y la variable 96 = (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01) Y la variable 97 <> 21;Error626;Si es mujer mayor o igual de 50 años y registró un comodín de no realización o sin dato en Fecha de Mamografía, registre 21 en Resultado mamografía;Variables 10, 96, 97, Edad calculada;
+;;;;;;;Generar error si la variable 96 > 1900-01-01 Y la variable 97 <> (1, 2, 3, 4, 5, 6 ó 7);Error361; Si registra fecha de mamografía, debe registrar resultado de mamografía;Variables 96, 97;
+;;;;;;;Generar error si la variable 96 = 1845-01-01 Y la variable 97 <> 0;Error627;Si registró 1845-01-01 en Fecha de Mamografía, registre 0 en Resultado mamografía;Variables 96, 97;
+;;;1;N;;;Generar error si la variable 97 <> 0 Y la edad calculada < 35 años;Error090;Si registra Resultado mamografía, la edad debe ser mayor o igual a 35 años;Variable 97, Edad calculada;
+;;;1;N;;;Validar que si la variable 97 <> 0, la variable 10 debe registrar F;Error091;Si registra Resultado mamografía, el sexo debe ser F;Variables 10, 97;
+;;;;;;;Validar que si la edad calculada es < 35 años, la variable 97 debe registrar 0 ;Error364;Si es menor de 35 años no aplica para resultado de mamografía;Variable 97, Edad calculada;
+;;;1;N;;;Generar error si la variable 97 registra valor <> 0, 1, 2, 3, 4, 5, 6, 7 ó 21;Error628;Error en valores permitidos - Resultado mamografía;Variable 97;
+98;Riesgo cardiovascular y metabólico;Resultado de triglicéridos;12;N;"Registre el dato reportado por el laboratorio (máximo 3 enteros y 4 decimales).
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";"Registre el resultado del tamizaje realizado a población de 18 a 29 años con riesgo identificado y a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+Si el resultado es mayor o igual a 997, registre 997.
+
+La opción 998 se usa cuando reporta población sujeto, pero:
+-No reporta el tamizaje.
+-No se tiene información con respecto a la realizacióne o sabe de la realización, pero se desconoce la fecha.";Generar error si la variable 118 > 1900-01-01 Y (la variable 98 = 0 ó la variable 98 >= 998);Error629;Si registró Fecha de toma triglicéridos válida, registre el resultado en Resultado triglicéridos.;Variables 98, 118;
+;;;;;;;Generar error cuando (la variable 118 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 98 <> 998) ó  (la variable la variable 98 = 998 Y la variable 118 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01)) ;Error630;Si registró 1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01 en Fecha toma triglicéridos, registre 998 en Resultado y viceversa;Variables 98, 118, Edad calculada;
+;;;;;;;Generar error si la variable 118 = 1845-01-01 Y ( la variable 98 <> 0 ó la edad calculada >= 29 años);Error631;Registre no aplica en Fecha de toma triglicéridos y Resultado de triglicéridos, a los menores de 29 años sin riesgo cardiovascular identificado;Variable 98, 118, Edad calculada;
+99;Ca mama;Fecha de toma biopsia de mama;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registro obligatorio en las mujeres con mamografía anormal.
+
+Cuando se sabe de la realización del examen, pero se desconoce la fecha, use la opción 1800-01-01.
+
+La opción 1845-01-01 se usa en población no sujeto de la actividad: sexo masculino, mujeres menores de 35 años, mujeres con reporte de mamografía normal.";Validar que si la variable 99 >1900-01-01, la variable 10 debe ser = F;Error094;Si registra Fecha de toma biopsia de mama, el sexo debe ser F;Variables 10, 99;
+;;;;;;;Generar error cuando variable 99 > Fecha de corte;Error151;Fecha de toma biopsia de mama es mayor a la fecha de corte;Variable 99, Fecha de corte;
+;;;;;;;Generar error si la variable 99 registra > 1900-01-01 Y la variable 99 <= la fecha registrada en la variable 9;Error201;Fecha de toma biopsia mama es menor a la fecha de nacimiento;Variables 9, 99;
+;;;;;;;Validar contenido de fecha en la variable 99;Error437;contenido en el campo FechaTomaBiopsiaMama no válido;Variable 99;
+;;;;;;;Validar comodines;Error411;Comodín inválido - Fecha de toma biopsia mama;Variable 99;
+100;Ca mama;Fecha de resultado biopsia de mama;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01 
+·Si no aplica registrar 1845-01-01";"Registro obligatorio en las mujeres con mamografía anormal.
+
+Cuando se sabe de la realización del examen, pero se desconoce la fecha, use la opción 1800-01-01.
+
+La opción 1845-01-01 se usa en población no sujeto de la actividad: sexo masculino, mujeres menores de 35 años, mujeres con reporte de mamografía normal.";Validar que si la variable 99 > 1900-01-01 Y variable 100 > 1900-01-01, variable 100 debe ser > variable 99;Error368;La Fecha de resultado de biopsia de mama es menor a la fecha de toma de la biopsia;Variables 99, 100;
+;;;;;;;Validar que si la variable 100 >1900-01-01, la variable 10 debe ser = F;Error095;Si registra Fecha resultado de biopsia de mama, el sexo debe ser F;Variables 10, 100;
+;;;;;;;Generar error si la variable 100 registra > 1900-01-01 Y la variable 100 <= la fecha registrada en la variable 9;Error202;Fecha resultado de biopsia de mama es menor a la fecha de nacimiento;Variables 9, 100;
+;;;;;;;Gerenar error cuando variable 100 > Fecha de corte;Error152;Fecha resultado de biopsia de mama es mayor a la fecha de corte;Variable 100, Fecha de corte;
+;;;;;;;Generar error si la variable 100 <> 1800-01-01 Y la variable 101 = 21;Error632;Si registra sin dato en Resultado de biopsia de mama, debe registrar sin dato en Fecha de resultado de biopsia;Variables 100, 101;
+;;;;;;;Validar que si variable 101= 1, 2, 3, 4 ó 5, la variable 100 debe ser > 1900-01-01;Error369;Si registra un Resultado de biopsia de mama debe registrar Fecha resultado de biopsia de mama;Variables 100, 101;
+;;;;;;;Validar contenido de fecha en la variable 100;Error438;contenido en el campo FechaResultadoBiopsiaMama no válido;Variable 100;
+;;;;;;;Validar comodines, de manera excepcional en esta variable solo se permite registrar los comodines 1845-01-01 y 1800-01-01;Error412;Comodín inválido - Fecha resultado biopsia mama;Variable 100;
+101;Ca mama;Resultado de biopsia de mama;3;N;"0 -No aplica
+1 -Benigna
+2 -Atípica (Indeterminada)
+3 -Malignidad sospechosa/probable
+4 -Maligna
+5 -No satisfactoria
+21-Riesgo no evaluado";"Registro obligatorio en las mujeres con mamografía anormal.
+
+La opción 0 se usa en población no sujeto de la actividad: sexo masculino, mujeres menores de 35 años, mujeres con reporte de mamografía normal.
+
+Cuando se sabe de la realización del examen, pero se desconoce la fecha, use la opción 21.";Generar error si (variable 100 = 1800-01-01 o variable 100>1900-01-01) Y la variable 101 =0;Error367;Si registra sin dato o fecha válida de resultado de biopsia de mama, debe registrar sin dato o el resultado de biopsia de mama;Variables 100, 101;
+;;;;;;;Generar error si variable 101 <> 0, 1, 2, 3, 4, 5 ó 21;Error633;Error en valores permitidos - Resultado de Biopsia de mama;Variable 101;
+;;;;;;;Validar que si variable 101 = 1, 2, 3, 4, 5 ó 21, variable 10 debe ser = F;Error096;Si registra Resultado de biopsia de mama, el sexo debe ser F;Variables 10, 101;
+102;COP;COP por persona;12;N;"Se debe reportar en consulta de primera vez de odontología.
+Debe registrarse una sola variable con longitud de 12 dígitos,  donde los dos primeros dígitos corresponden a sanos, los dos siguientes dígitos corresponden a caries no cavitacional, los siguientes dos a caries cavitacional, los dos siguientes a obturados por caries, los dos siguientes dígitos a perdidos por caries y los dos últimos al total de dientes presentes al momento de la valoración. Por ejemplo, el valor 180204030127 se construyó así:
+ 
+Ver hoja COP
+
+21-Riesgo no evaluado.
+0 -No aplica.";"Registre el COP, de acuerdo a la normatividad vigente.
+
+La opción 0 se usa en población no sujeto de la actividad: menor de 6 meses.
+
+La opción 21 se usa cuando reporta población mayor o igual a 6 meses pero:
+-No está reportando una fecha atención en salud bucal por profesional en odontología.
+-No se realizó o no se tiene información con respecto a la medición del COP.
+
+Si es edéntulo registre 000000000000.";Generar error si la edad calculada >= 6 meses Y la variable 76 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 102 <> 21;Error634;Si registró comodín de no realización o sin dato en Fecha atención en salud bucal a partir de los 6 meses de edad, registre 0 en COP por persona;Variables 76, 102, Edad calculada;
+;;;;;;;Generar error si la longitud del campo es diferente de 1, 2 o 12 dígitos.;Error678;Solo se permite el registro de los valores 0, 21 o un valor de 12 dígitos de longitud;Variable 102;
+;;;;;;;Generar error si la variable 76 > 1900-01-01 Y la longitud de la variable 102 no contiene 12 dígitos ;Error635;Si registró Fecha atención en salud bucal por profesional en odontología, debe registrar el resultado de COP. Si es edéntulo, registre 000000000000.;Variables 76, 102;
+;;;;;;;Generar error si la variable 76 > 1900-01-01 Y la edad calculada (>=6 meses Y <5 años ) Y uno o más de los componentes de dos dígitos de la variable 102 no contiene un valor entre 00 Y 22;Error690;En personas de 6 meses a 4 años 11 meses y 29 días de edad, el rango de valores permitidos para cada componente es entre 00 y 22;Variables 76, 102, Edad calculada;
+;;;;;;;Generar error si la variable 76 > 1900-01-01 Y la edad calculada >=5 años Y uno o más de los componentes de dos dígitos de la variable 102 no contiene un valor entre 00 Y 32;Error691;En personas de 5 años y más de edad, el rango de valores permitidos para cada componente es entre 00 y 32;Variables 76, 102, Edad calculada;
+103;Riesgo cardiovascular y metabólico;Fecha de toma hemoglobina;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre fecha del tamizaje realizado a población entre 6 a 23 meses según riesgo, mujeres entre 10 a 17 años y getantes. Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Generar error cuando variable 103 > Fecha de corte;Error153;Fecha de toma hemoglobina es mayor a la fecha de corte;Variable 103, Fecha de corte;
+;;;;;;;La fecha registrada en la variable 103 debe ser >= la fecha registrada en la variable 9 (excepto comodines);Error203;Fecha de toma hemoglobina es menor a la fecha de nacimiento;Variables 9, 103;
+;;;;;;;Validar comodines;Error413;Comodín inválido - Fecha de toma hemoglobina;Variable 103;
+;;;;;;;Validar contenido de fecha en la variable 103;Error439;contenido en el campo FechaHemoglobina no válido;Variable 103;
+;;;;;;;Generar error si la variable 10 = F Y (la edad calculada  >=10 años y <= 17 años) Y la variable 103 = 1845-01-01;Error638;Si es mujer entre 10 y 17 años debe registrar una Fecha de toma hemoglobina diferente de 1845-01-01;Variable 103, Edad calculada;
+104;Riesgo cardiovascular y metabólico;Resultado de hemoglobina;4;D;"Registre el dato reportado por el laboratorio (máximo 3 enteros y 4 decimales).
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";"Registre el resultado del tamizaje realizado a población entre 6 a 23 meses según riesgo, mujeres entre 10 a 17 años y getantes. Registro opcional para el resto de la población.
+
+La opción 998 se usa cuando reporta población sujeto, pero:
+-No reporta el tamizaje.
+-No se tiene información con respecto a la realización o sabe de la realización, pero se desconoce la fecha.
+";Generar warning si (la variable 104> 0 Y <1,5) ó (si la variable 104 >25 Y < 998);Warning098;Si registra resultado para Hemoglobina, este debe estar entre 1,5 y 25;Variable 104;
+;;;;;;;Generar error si la variable 103 > 1900-01-01 Y ( la variable 104 = 0 ó la variable 104 >= 99);Error639;Si registró Fecha de toma hemoglobina válida, registre el resultado de la hemoglobina;Variables 103, 104;
+;;;;;;;Generar error si la variable 103 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y (la edad calculada es >= 10 Y <=17) Y la variable 10 = F Y la variable 104 <> 998;Error640;Si es mujer entre 10 y 17 años y registró un comodín de no realización o sin dato en Fecha toma de hemoglobina, registre 998 en Resultado;Variables 10, 103, 104, Edad calculada;
+;;;;;;;Generar error si la variable 103 = 1845-01-01 Y la variable 104  <> 0;Error641;Registró no aplica en Fecha toma de hemoglobina, registre 0 en Resultado de hemogobina;Variables 103, 104;
+105;Riesgo cardiovascular y metabólico;Fecha de toma glicemia basal;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha del tamizaje realizado a población de 18 a 29 años con riesgo identificado, población a partir de los 29 años una vez cada 5 años y gestantes.  Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Gerenar error cuando variable 105 > Fecha de corte;Error642;Fecha de toma de glicemia basal es mayor a la fecha de corte;Variable 105, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 105 <= la fecha registrada en la variable 9 (excepto comodines);Error643;Fecha de toma de glicemia basal es menor a la fecha de nacimiento;Variables 9, 105;
+;;;;;;;Validar contenido de fecha en la variable 105;Error440;contenido en el campo FechaTomaGlicemiaBasal no válido;Variable 105;
+;;;;;;;Validar comodines;Error644;Comodín inválido - Fecha de toma de glicemia basal;Variable 105;
+106;Riesgo cardiovascular y metabólico;Fecha de toma creatinina;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha del tamizaje realizado a población de 18 a 29 años con riesgo identificado, población a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Gerenar error cuando variable 106 > Fecha de corte;Error155;Fecha creatinina es mayor a la fecha de corte;Variable 106, Fecha de corte;
+;;;;;;;La fecha registrada en la variable 106 debe ser mayor a la fecha registrada en la variable 9 (excepto comodines);Error205;Fecha creatinina es menor a la fecha de nacimiento;Variables 9, 106;
+;;;;;;;Validar contenido de fecha en la variable 106;Error441;contenido en el campo FechaCreatinina no válido;Variable 106;
+;;;;;;;Validar comodines;Error415;Comodín inválido - Fecha creatinina;Variable 106;
+107;Riesgo cardiovascular y metabólico;Resultado de creatinina;4;D;"Registre el dato reportado por el laboratorio (máximo 3 enteros y 4 decimales).
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";"Registre el resultado del tamizaje realizado a población de 18 a 29 años con riesgo identificado, población a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+La opción 998 se usa cuando reporta población sujeto, pero:
+-No reporta el tamizaje.
+-No se tiene información con respecto a la realizacióne o sabe de la realización, pero se desconoce la fecha.
+";Generar error si (la variable 107< 0.15 O la variable 107> 37) Y (la variable 107 no es (0  ó 998));Warning099;Si registra resultado para Creatinina, este debe estar entre 0.15 y 37;Variable 107;
+;;;;;;;Validar que si la variable 106 > 1900-01-01, variable 107 debe ser > 0 Y  < 998;Error371;Si registra Fecha de toma creatinina, debe registrar el Resultado de creatinina;Variables 106, 107;
+;;;;;;;Generar error cuando (la variable 106 = (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01) Y la variable 107 <> 998) ó  (la variable la variable 107 = 998 Y la variable 106 <> (1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01)) ;Error645;Si registró 1800-01-01, 1805-01-01, 1810-01-01, 1825-01-01, 1830-01-01 ó 1835-01-01 en Fecha toma creatinina, registre 998 en el Resultado y viceversa;Variables 106, 107, Edad calculada;
+;;;;;;;Generar error si la variable 106 = 1845-01-01 Y (la variable 107 <> 0 ó la edad calculada >= 29 años);Error646;Registre no aplica en Fecha de toma creatinina y Resultado de creatinina, a los menores de 29 años sin riesgo cardiovascular identificado;Variables 106, 107, Edad calculada;
+108;No aplica para el reporte;Fecha Hemoglobina Glicosilada;10;F;Registrar 1845-01-01;Se debe registrar 1845-01-01  a todas las personas reportadas ;Generar error si la variable 108 <> 1845-01-01;Error647;Error en valores permitidos- Fecha Hemoglobina Glicosilada;Variable 108;
+;;;;;;;Validar contenido de fecha en la variable 108;Error442;Contendio en el campo FechaHemoglobinaGlicosilada no válido;Variable 108;
+109;Ca de próstata;Resultado de PSA;4;D;"Registre el dato reportado por el laboratorio (máximo 3 enteros y 4 decimales).
+Riesgo no evaluado registre 998.
+Si no aplica registre 0.";"La opción 0 se usa:
+-Cuando reporta población no sujeto de la actividad: sexo femenino, hombres menores de 40 años y hombres entre 40 y 49 años sin factores de riesgo.
+-Cuando el resultado del PSA es igual a 0. En este caso debe haber registrado una fecha válida en la variable Fecha de toma PSA.
+
+La opción 998 se usa cuando reporta población sujeto a los que no se realizó el tamizaje o cuando se sabe de la realización, pero se desconce la fecha.";Generar error si la variable 73 > 1900-01-01 Y (la variable 109 = 0 ó la variable 109 >= 998 ó la edad calculada < 40 años ó la variable 10 <>  M);Error649;Si registra Fecha de toma PSA, debe ser hombre mayor de 40 y registrar Resultado PSA;Variables 10, 73, 109, Edad calculada;
+;;;;;;;Generar error si la variable 109 = 998 Y la variable 73 <> (1800-01-01 ó 1805-01-01 ó 1810-01-01 ó 1825-01-01 ó 1830-01-01 ó 1835-01-01);Error650;Si Resultado de PSA es riesgo no evaluado, debe registrar alguno de los comodines que indican no realización o sin dato en la fecha de PSA;Variables 73, 109;
+;;;;;;;Generar error si la variable 10 = F Y (la variable 109 <> 0 ó la variable 73 <> 1845-01-01);Error651;Si el sexo es F, registre no aplica en la fecha y el resultado de tacto rectal;Variables 10, 73, 109;
+;;;;;;;Generar error si la edad calculada < 40 años Y la variable 10 = M  Y (la variable 109 <> 0 ó la variable 73 <> 1845-01-01);Error652;Si es hombre menor de 40 años, debe registrar  no aplica en el resultado y la fecha de PSA;Variables 10, 73, 109, Edad calculada;
+110;Toda la población;Fecha de toma  de tamizaje hepatitis C;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha del tamizaje realizado a personas mayores de 50 años o población general identificada con trasfusión de sangre antes de 1996.
+
+La opción 1800-01-01 se usa en población sujeto a la que no se está reportando la realización de la prueba o cuando se sabe de la realización de la prueba, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población que no es sujeto de esta actividad.";Gerenar error cuando variable 110 > Fecha de corte;Error157;Fecha de toma de tamizaje hepatitis C es mayor a la fecha de corte;Variable 110, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 110 < la fecha registrada en la variable 9 (excepto comodines);Error207;Fecha de toma de tamizaje hepatitis C es menor a la fecha de nacimiento;Variables 9, 110;
+;;;;;;;Validar contenido de fecha en la variable 110;Error443;contenido en el campo fecha de toma de tamizaje hepatitis C no válido;Variable 110;
+;;;;;;;Validar comodines;Error417;Comodín inválido - Fecha de toma de tamizaje hepatitis C;Variable 110;
+111;Riesgo cardiovascular y metabólico;Fecha de toma HDL;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre la fecha del tamizaje realizado a población de 18 a 29 años con riesgo identificado y a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Gerenar error cuando variable 111 > Fecha de corte;Error158;Fecha de toma de HDL es mayor a la fecha de corte;Variable 111, Fecha de corte;
+;;;;;;;La fecha registrada en la variable 111 debe ser > la fecha registrada en la variable 9 (excepto comodines);Error208;Fecha de toma de HDL es menor a la fecha de nacimiento;Variables 9, 111;
+;;;;;;;Validar contenido de fecha en la variable 111;Error444;contenido en el campo FechaTomaHDL no válido;Variable 111;
+;;;;;;;Validar comodines;Error418;Comodín inválido - Fecha de toma de HDL;Variable 111;
+112;Tuberculosis;Fecha de toma de baciloscopia diagnóstico;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Aplica a toda la población a la que se realiza la intervención para confirmar diagnóstico de tuberculosis.
+
+La opción 1800-01-01 no se tiene infomación sobre la realización del examen, o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de la actividad.";Generar error cuando la variable 112 > fecha de corte;Error159;Fecha de toma de baciloscopia de diagnóstico es mayor a la fecha de corte;Variable 112, fecha de corte;
+;;;;;;;Generar error cuando la variable 112 < variable 9;Error209;Fecha de toma de baciloscopia de diagnóstico es menor a la fecha de nacimiento;Variables 9, 112;
+;;;;;;;Validar contenido de fecha en la variable 112;Error445;contenido en el campo FechaTomaBaciloscopiaDiagnostico no válido;Variable 112;
+;;;;;;;Validar comodines;Error419;Comodín inválido - Fecha de toma de baciloscopia de diagnóstico;Variable 112;
+113;Tuberculosis;Resultado de baciloscopia diagnóstico;2;N;"1 -Negativa
+2 -Positiva
+3 -En proceso
+4 -No
+21-Riesgo no evaluado";"La opción 4 se usa cuando no se tomó Baciloscopia para hacer diagnóstico porque no era un Sintomático Respiratorio 
+
+La opción 21 se usa cuando no se indaga ni se tiene información con respecto a la identificación de este riesgo o cuando se realizó pero se desconoce la fecha.";Generar error cuando la variable 112 > 1900-01-01 Y la variable 113 <> (1 ó 2 ó 3);Error375;Si registra fecha toma de baciloscopia, debe registrar Resultado de baciloscopia diagnóstico. Si aún no tiene el resultado, indique en proceso;Variables 112, 113;
+;;;;;;;Generar error si la variable 113 registra valor <> 1, 2, 3, 4 ó 21;Error653;Error en valores permitidos -  Resultado de baciloscopia diagnóstico;Variable 113;
+114;Riesgo cardiovascular y metabólico;Clasificación del riesgo cardiovascular;2;N;"0 -No aplica
+4 -Alto
+5 -Bajo
+6 -Moderado
+21-Riesgo no evaluado
+";"Reporte el resultado de acuerdo a las tablas de clasificación, como está descrito en la normatividad vigente.
+
+La opción 0 se usa cuando reporta población menor de 18 años. 
+
+La opción 21 se usa cuando reporta población sujeto de la actividad, pero no se se tiene información con respecto a la identificación de este riesgo.
+";Generar warning cuando la variable 114  = ( 4 ó 5 ó 6 ó 21) Y la edad calculada < 18 años;Warning654;Verifique la actividad -Clasificación del riesgo cardiovascular- se reporta a población mayor a 18 años;Variable 114, Edad calculada;
+;;;;;;;Generar error si la variable 114 registra valor <> 0, 4, 5, 6 ó 21.;Error655;Error en valores permitidos -Clasificación del riesgo cardiovascular;Variable 114;
+115;No aplica para el reporte;Tratamiento para Sífilis gestacional;2;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 115 <> 0;Error656;Error en valores permitidos - Tratamiento para sífilis gestacional;Variable 115;
+116;No aplica para el reporte;Tratamiento para Sífilis Congénita;2;N;0-No aplica;Se debe registrar la opción 0 a todas las personas reportadas;Generar error si la variable 116 <> 0;Error657;Error en valores permitidos -  Tratamiento para sífilis congénita;Variable 116;
+117;Riesgo cardiovascular y metabólico;Clasificación del riesgo metabólico;2;N;"0 - No aplica
+4 -Alto
+5 -Bajo
+6 -Moderado
+21-Riesgo no evaluado";"Reporte el resultado de acuerdo a las tablas de clasificación, como está descrito en la normatividad vigente.
+
+La opción 0 se usa cuando reporta población menor de 18 años. 
+
+La opción 21 se usa cuando reporta población sujeto de la actividad, pero no se se tiene información con respecto a la identificación de este riesgo.";Generar error si la variable 117 = (4 ó 5 ó 6 ó 21) Y la edad calculada < 18 años;Warning664;Verifique la actividad -Clasificación de riesgo metabólico- se reporta a población mayor a 18 años;Variable 117, Edad calculada;
+;;;;;;;Generar error si la variable 117 registra valor <> 0, 4, 5, 6 ó 21.;Error665;Error en valores permitidos -Clasificación de riesgo metabólico;Variable 117;
+118;Riesgo cardiovascular y metabólico;Fecha de toma triglicéridos;10;F;"AAAA-MM-DD
+·Si no se tiene el dato registrar 1800-01-01
+·Si no se realiza por una tradición registrar 1805-01-01
+·Si no se realiza por una condición de salud registrar 1810-01-01
+·Si no se realiza por negación del usuario registrar 1825-01-01
+·Si no se realiza por tener datos de contacto del usuario no actualizados registrar 1830-01-01
+·Si no se realiza por otras razones registrar 1835-01-01
+·Si no aplica registrar 1845-01-01";"Registre fecha del tamizaje realizado a población de 18 a 29 años con riesgo identificado y a partir de los 29 años una vez cada 5 años. Registro opcional para el resto de la población.
+
+La opción 1800-01-01 se usa cuando no se tiene información con respecto a la realización del tamizaje o cuando se sabe que se realizó, pero se desconoce la fecha.
+
+La opción 1845-01-01 se usa en población no sujeto de esta actividad.";Generar error cuando la variable 118 > fecha de corte;Error666;Fecha de toma triglicéridos es mayor a la fecha de corte;Variable 118, Fecha de corte;
+;;;;;;;Generar error si la fecha registrada en la variable 118 <= la fecha registrada en la variable 9 (excepto comodines);Error667;Fecha de toma triglicéridos es menor a la fecha de nacimiento;Variables 9, 118;
+;;;;;;;Validar contenido de fecha en la variable 118;Error446;contenido en el campo Fecha de toma triglicéridos no válido;Variable 118;
+;;;;;;;Validar comodines;Error668;Comodín inválido - Fecha de toma triglicéridos;Variable 118;
+;;;;;;;Si un registro de afiliado se encuentra en el mismo periodo;Error211;Registro repetido en el corte actual;;
