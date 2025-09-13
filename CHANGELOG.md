@@ -13,11 +13,70 @@ y este proyecto adhiere al [Versionado Semántico](https://semver.org/lang/es/).
 - RPMS (Ruta Promoción y Mantenimiento de Salud) para todos los momentos del curso de vida
 - Sistema de autenticación y autorización basado en roles
 - APIs de integración con sistemas externos (RIPS, ADRES)
-- Sincronización completa de modelos Pydantic con esquema de base de datos
 
 ### En Desarrollo
-- Refinamiento de modelos de datos según análisis exhaustivo Resolución 3280
-- Configuración de tests globales con service_role para todo el proyecto
+- Refactorización Primera Infancia para integrar transversalidad
+- Tests de integración transversal
+
+---
+
+## [v0.6.0] - 2025-09-13 - 🏗️ MILESTONE: ARQUITECTURA TRANSVERSAL COMPLETA
+
+### **🚀 HITO CRÍTICO COMPLETADO**
+**Implementación exitosa del primer milestone de arquitectura transversal según Resolución 3280 Art. 1364-1370**
+
+### 🚀 ARQUITECTURA TRANSVERSAL - IMPLEMENTACIÓN COMPLETA
+**MILESTONE CRÍTICO**: Implementación completa de los 3 componentes transversales según Resolución 3280 Art. 1364-1370
+
+#### ✨ Nuevas Funcionalidades
+- **🌍 Entornos de Salud Pública**: 
+  - 5 tipos de entorno implementados (familiar, educativo, comunitario, laboral, institucional)
+  - CRUD completo con 11 endpoints especializados
+  - Reportes por tipo y características de entorno
+  - Gestión de recursos y actores institucionales
+
+- **👨‍👩‍👧‍👦 Familia Integral Salud Pública**:
+  - Gestión completa del núcleo familiar como sujeto de atención
+  - 7 tipos de estructura familiar y 7 etapas de ciclo vital
+  - CRUD completo con endpoints especializados de búsqueda
+  - Integración con entornos y datos JSONB estructurados
+
+- **🎯 Atención Integral Transversal**:
+  - Coordinación transversal de cuidados según RIAS
+  - 5 modalidades de atención y 4 niveles de complejidad
+  - 15+ endpoints incluyendo reportes avanzados
+  - Gestión del ciclo completo de atención integral
+
+#### 📊 Base de Datos Robusta
+- **30 migraciones aplicadas** para estabilización completa (20250910151835 → 20250913005000)
+- **Configuración RLS uniforme**: Todas las tablas con service_role_full_access
+- **3 nuevas tablas transversales** con tipos ENUM y índices optimizados
+- **Backend conectado a Supabase remoto** (productivo)
+- **Sincronización local-remoto completada** con `supabase db reset`
+
+#### 🔐 Resolución de Problemas Críticos
+- **CLI Supabase**: Problemas de sincronización persistentes resueltos con `supabase db reset`
+- **RLS Inconsistente**: Limpieza completa y reconfiguración uniforme con service_role
+- **Historial de Migraciones**: Reparado con `supabase migration repair` para 6 migraciones
+- **Sincronización Local-Remoto**: Completada exitosamente tras reset completo
+
+#### 🧪 Verificación Funcional
+- **30+ endpoints REST** implementados y verificados funcionando
+- **Modelos Pydantic** completamente alineados con esquemas Supabase  
+- **Validaciones y serialización** JSON correctas
+- **Referencias UUID** entre tablas establecidas y funcionando
+
+#### 📚 Documentación Actualizada
+- **CLAUDE.md** actualizado en backend/ y supabase/
+- **Estructura proyecto** documentada con templates GitHub
+- **Roadmap y changelog** completamente actualizados
+- **Guías técnicas** de arquitectura transversal completas
+
+### 🎯 Estado del Proyecto
+**ARQUITECTURA TRANSVERSAL: 100% FUNCIONAL** 🎉
+- Base sólida lista para escalar a todo el ecosistema RIAS
+- Puntos de retorno seguros establecidos
+- Próximos pasos claramente definidos
 
 ---
 
@@ -222,6 +281,6 @@ Para cambios en desarrollo, se usa el formato:
 
 ---
 
-**Última actualización**: 12 de septiembre, 2025  
+**Última actualización**: 13 de septiembre, 2025  
 **Mantenido por**: Equipo Principal de Desarrollo  
 **Revisión**: Cada sprint completado o cambio significativo

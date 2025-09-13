@@ -64,6 +64,20 @@ Las migraciones están organizadas cronológicamente y documentan la evolución 
 #### Security & Access (Sep 12, 2025)
 - `20250912025908_add_rls_policy_to_pacientes.sql`: Patient table RLS
 - `20250912030639_add_full_rls_policy_to_pacientes.sql`: Comprehensive patient policies
+- `20250912195000_grant_service_role_permissions.sql`: Service role configuration
+
+#### **Arquitectura Transversal - COMPLETADA (Sep 13, 2025)**
+- `20250913000000_create_transversal_models_consolidated.sql`: **Tablas transversales completas**
+- `20250913001000_fix_rls_entornos_development.sql`: RLS policies para entornos
+- `20250913002000_fix_inconsistent_rls_configuration.sql`: **Limpieza RLS completa**
+- `20250913003000_enable_rls_with_service_role_all_tables.sql`: Service role para todas las tablas
+- `20250913004000_complete_rls_cleanup_and_reset.sql`: Reset y configuración uniforme
+- `20250913005000_fix_entornos_rls_specifically.sql`: RLS específico para entornos
+
+#### **Estado Actual: 30 Migraciones Aplicadas (Sep 13, 2025)**
+- **Rango**: `20250910151835` → `20250913005000` 
+- **Sincronización**: Local-Remoto COMPLETADA con `supabase db reset`
+- **Problemas CLI**: Resueltos con reset manual y migration repair
 
 ## Database Schema Overview
 
@@ -100,6 +114,43 @@ detalle_control_prenatal (id, campos_específicos_prenatal, ...)
 detalle_parto (id, campos_específicos_parto, ...)
 detalle_recien_nacido (id, campos_específicos_rn, ...)
 detalle_puerperio (id, campos_específicos_puerperio, ...)
+```
+
+### **Arquitectura Transversal (COMPLETADA Sep 13, 2025)**
+```sql
+-- Entornos de Salud Pública (5 tipos)
+entornos_salud_publica (
+  id uuid PRIMARY KEY,
+  codigo_identificacion_entorno_unico text UNIQUE,
+  tipo_entorno tipo_entorno_salud_publica,  -- ENUM: 5 tipos
+  descripcion_detallada_entorno text,
+  actores_institucionales_involucrados jsonb,
+  recursos_tecnicos_disponibles jsonb,
+  ...
+)
+
+-- Familia Integral como Sujeto de Atención
+familia_integral_salud_publica (
+  id uuid PRIMARY KEY,
+  codigo_identificacion_familia_unico text UNIQUE,
+  tipo_estructura_familiar tipo_estructura_familiar_integral, -- ENUM: 5 tipos
+  ciclo_vital_familiar ciclo_vital_familiar, -- ENUM: 7 etapas
+  antecedentes_medicos_familiares jsonb,
+  factores_riesgo_contextuales jsonb,
+  ...
+)
+
+-- Atención Integral Transversal (Coordinación)
+atencion_integral_transversal_salud (
+  id uuid PRIMARY KEY,
+  codigo_atencion_integral_unico text UNIQUE,
+  tipo_abordaje_atencion tipo_abordaje_atencion_integral_salud, -- ENUM: 5 tipos
+  modalidad_atencion modalidad_atencion_integral, -- ENUM: 5 modalidades
+  nivel_complejidad_atencion nivel_complejidad_atencion_integral, -- ENUM: 4 niveles
+  plan_intervencion_detallado jsonb,
+  resultados_obtenidos_medicion jsonb,
+  ...
+)
 ```
 
 ### Chronic Disease Control
@@ -146,12 +197,25 @@ supabase db diff -f nombre_descriptivo_migracion
 # Apply migrations locally
 supabase db reset
 
-# Validate migration
+# Validate migration  
 supabase db lint
 
 # IMPORTANTE: Seguir convenciones de nombres
 # Formato: YYYYMMDD_HHMMSS_descripcion_clara.sql
 # Ejemplo: 20241215_143000_add_riamp_control_prenatal_complete_fields.sql
+
+### **Resolución de Problemas CLI (Sep 13, 2025)**
+```bash
+# Si CLI falla con conectividad (problema actual)
+# Opción 1: Reset completo (RECOMENDADA)
+supabase db reset  # ✅ Reconstruye local desde migraciones
+
+# Opción 2: Reparar historial de migraciones
+supabase migration repair --status applied [timestamp]
+
+# Opción 3: SQL directo en Supabase Dashboard
+# Ejecutar SQL manualmente y crear migración después
+```
 ```
 
 ### Production Deployment
