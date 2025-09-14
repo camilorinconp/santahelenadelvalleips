@@ -1,46 +1,69 @@
-# Getting Started with Create React App
+# Frontend IPS Santa Helena del Valle
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 🎯 **Inicio Rápido - Arquitectura Frontend Completa**
 
-## Available Scripts
+👉 **Para entender la arquitectura completa del frontend:**  
+📖 **[🎨 Ver Guía Frontend Maestra](docs/01-foundations/frontend-overview.md)** ⭐
 
-In the project directory, you can run:
+Single Page Application (React + TypeScript) para gestión de RIAS con interfaces especializadas por perfil de usuario (Clínico + Call Center) y integración polimórfica con backend FastAPI.
 
-### `npm start`
+## 🔧 **Configuración AI Assistant**
+- 📋 [Configuración Frontend](CLAUDE.md) - Setup desarrollo React con AI
+- 🧠 [Contexto Técnico](GEMINI.md) - Historia arquitectónica frontend
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 📚 **Documentación Organizada**
+La documentación técnica está estructurada por especialización:
+- **`docs/01-foundations/`** - Hub central y arquitectura React base
+- **`docs/02-architecture/`** - Patrones React + TypeScript + MUI  
+- **`docs/03-integration/`** - Integración backend polimórfico
+- **`docs/04-development/`** - Setup, testing, deployment día a día
+- **`docs/05-features/`** - Features médicos específicos implementados
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+---
 
-### `npm test`
+## ⚡ **Setup Rápido Desarrollo**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+# 1. Instalar dependencias
+npm install
 
-### `npm run build`
+# 2. Iniciar desarrollo
+npm start
+# Aplicación disponible en http://localhost:3000
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# 3. En paralelo: backend + BD
+cd ../backend && uvicorn main:app --reload
+cd ../supabase && supabase start
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📊 **Estado Actual**
+- **✅ Completado:** Gestión pacientes (CRUD 100%), Layout sistema, Form patterns
+- **🚧 En desarrollo:** Workflows atención médica, Forms polimórficos  
+- **📋 Pendiente:** Dual profiles UI, Dashboard reportería
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🎯 **Stack Tecnológico**
+- **Framework:** React 19 + TypeScript 4.9
+- **UI Library:** Material-UI 7.3
+- **State Management:** TanStack React Query 5.8
+- **Forms:** React Hook Form + Zod validation
+- **Integration:** Axios → FastAPI backend
 
-### `npm run eject`
+## 🔧 **Comandos Esenciales**
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm start                    # Servidor desarrollo
+npm test                     # Testing interactivo  
+npm run build               # Build producción
+npm test -- --coverage     # Coverage completo
+npx tsc --noEmit           # Type checking
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🔗 **Referencias Backend**
+- **[Backend Overview](../backend/docs/01-foundations/architecture-overview.md)** - Arquitectura polimórfica  
+- **[Backend APIs](../backend/CLAUDE.md)** - Endpoints disponibles
+- **[Resolución 3280](../backend/docs/02-regulations/resolucion-3280-master.md)** - Compliance requirements
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+---
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+**📖 Para arquitectura completa, patrones React, integración backend y roadmap detallado:**  
+**➡️ [Consultar Guía Frontend Maestra](docs/01-foundations/frontend-overview.md)**

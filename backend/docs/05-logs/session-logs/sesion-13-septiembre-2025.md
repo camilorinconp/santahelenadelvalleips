@@ -304,7 +304,7 @@ class GeneradorReportePEDT:
 
 ### **📁 DOCUMENTOS CRÍTICOS SESIÓN:**
 ```
-/backend/docs_IPS/resolucion_202_data/
+/backend/docs/02-regulations/resolucion-202-data/
 ├── 📄 ANALISIS_COMPLETO_RESOLUCION_202.md ← PRINCIPAL (este análisis)
 ├── 📄 analisis_resolucion_202_EquipoConsultorExterno.md ← INSIGHTS CLAVE
 ├── 📊 Controles_RPED_202.csv ← 119 variables especificación

@@ -4,7 +4,16 @@ from .atencion_model import Atencion
 from .medico_model import Medico
 from .paciente_model import Paciente
 from .intervencion_colectiva_model import IntervencionColectiva
-from .atencion_primera_infancia_model import AtencionPrimeraInfancia
+from .atencion_primera_infancia_model import (
+    AtencionPrimeraInfancia,  # Alias para compatibilidad
+    AtencionIntegralPrimeraInfanciaTransversal,
+    AtencionPrimeraInfanciaCrear,
+    AtencionPrimeraInfanciaActualizar, 
+    AtencionPrimeraInfanciaRespuesta,
+    EstadoNutricionalPrimeraInfancia,
+    ResultadoTamizajeDesarrollo,
+    EstadoEsquemaVacunacion
+)
 from .atencion_materno_perinatal_model import AtencionMaternoPerinatal
 from .tamizaje_oncologico_model import TamizajeOncologico
 from .control_cronicidad_model import ControlCronicidad, ControlCronicidadPolimorfica # Añadido ControlCronicidadPolimorfica

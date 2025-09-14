@@ -1,49 +1,51 @@
-# Contexto del Proyecto: Frontend para IPS Santa Helena del Valle
+# Contexto del Proyecto (Frontend): UI para IPS Santa Helena del Valle
+**Última Actualización:** 14 de septiembre, 2025
 
-Este documento proporciona el contexto esencial para la asistencia de IA en el frontend de este proyecto.
+## 1. Propósito y Dominio
+Este proyecto es la interfaz de usuario (UI) para la API de la IPS Santa Helena del Valle. Es una Single Page Application (SPA) construida con React, cuyo objetivo es proporcionar al personal clínico y administrativo una herramienta eficiente para gestionar las Rutas Integrales de Atención en Salud (RIAS) conforme a la **Resolución 3280 de 2018**.
 
-### 1. Propósito y Dominio
-Este proyecto es el frontend para la API de la IPS Santa Helena del Valle. Su objetivo es proporcionar una interfaz de usuario intuitiva y eficiente para que el personal médico gestione las Rutas Integrales de Atención en Salud (RIAS) de los pacientes, conforme a la **Resolución 3280 de 2018**.
-
-### 2. Stack Tecnológico Principal
-- **Framework:** React
-- **Lenguaje:** TypeScript
+## 2. Stack Tecnológico Principal
+- **Framework:** React con TypeScript
 - **Librería de UI:** Material-UI (MUI)
 - **Gestión de Estado del Servidor:** React Query (TanStack Query)
+- **Gestión de Formularios:** React Hook Form + Zod para validación
 - **Cliente HTTP:** Axios
-- **Gestión de Formularios:** React Hook Form + Zod
 - **Enrutamiento:** React Router
-- **Build Tool:** Create React App (CRA)
+- **Pruebas:** Jest + React Testing Library
 
-### 3. Arquitectura y Convenciones
-- **Estructura de Carpetas:**
-    - `src/pages`: Componentes que representan páginas completas.
-    - `src/components`: Componentes de UI genéricos y reutilizables.
-    - `src/api`: Lógica para comunicarse con el backend (configuración de Axios y funciones de llamada).
-    - `src/hooks`: Hooks de React personalizados.
-    - `src/utils`: Funciones de utilidad (ej. `formatters.ts`).
-    - `src/theme.ts`: Configuración del tema de Material-UI.
+## 3. Fuentes de la Verdad (Jerarquía de Documentación)
+La documentación del frontend ha sido reorganizada para máxima claridad y eficiencia. Debe ser consultada en el siguiente orden dentro de la carpeta `frontend/docs/`:
 
-- **Comunicación con Backend:**
-    - La comunicación con la API se centraliza en los archivos dentro de `src/api/`.
-    - Se debe usar **React Query** para toda la gestión de estado del servidor (fetching, caching, mutaciones).
-    - Los formularios se gestionan con **React Hook Form** y la validación se define con **Zod**.
+1.  **`01-foundations/frontend-overview.md`**: **PUNTO DE PARTIDA OBLIGATORIO.** Es el hub central que resume la arquitectura, el stack y el estado de avance del frontend, enlazando a los demás documentos.
+2.  **`02-architecture/`**: Contiene las decisiones y patrones de arquitectura específicos de React (gestión de estado, patrones de componentes, sistema de diseño).
+3.  **`03-integration/`**: Guías cruciales sobre cómo el frontend se integra con el backend, incluyendo el manejo de la API polimórfica y los patrones de validación.
+4.  **`04-development/`**: Guías prácticas para el día a día: cómo configurar el entorno, guías de testing, etc.
+5.  **`05-features/`**: Documentación funcional de cada módulo de negocio implementado.
 
-- **Estilo de Código:**
-    - Seguir las convenciones de la comunidad de React y TypeScript.
-    - Usar componentes funcionales con Hooks.
-    - Tipado estricto en todo el código.
+## 4. Arquitectura General y Patrones Clave
 
-### 4. Fuentes de la Verdad (Lectura Obligatoria)
-1.  **`docs/01-ARCHITECTURE-GUIDE.md`**: Guía de arquitectura general, incluyendo patrones de frontend.
-2.  **`backend/GEMINI.md`**: Para entender la estructura de la API, los modelos de datos y los endpoints que se van a consumir.
-3.  **`docs/02-DEVELOPMENT-WORKFLOW.md`**: Flujo de trabajo de desarrollo, incluyendo convenciones de Git y testing.
+La aplicación sigue un patrón de **Backend Unificado con Vistas de Frontend Especializadas por Rol**. Esto significa que una única aplicación React contiene diferentes "experiencias" para distintos usuarios.
 
-### 5. Procedimiento de Pruebas
-- Las pruebas se escriben con **Jest** y **React Testing Library**.
-- Los archivos de prueba deben tener la extensión `.test.tsx` o `.spec.tsx`.
-- **Comando de ejecución:** `npm test`
-- **Comando con cobertura:** `npm test -- --coverage --watchAll=false`
+- **Estructura de Carpetas:** El código en `src/` está organizado por funcionalidad:
+    - `/pages`: Componentes que representan una página completa o una ruta principal.
+    - `/components`: Componentes de UI genéricos y reutilizables.
+    - `/api`: Centraliza toda la comunicación con el backend. Contiene las funciones que llaman a los endpoints de FastAPI.
+    - `/hooks`: Hooks de React personalizados para encapsular lógica reutilizable.
 
-### 6. Idioma de Interacción
-La comunicación con el usuario y toda la UI debe realizarse preferentemente en **español**.
+- **Patrones Arquitectónicos Fundamentales:**
+    1.  **Gestión de Estado Dual:** Se separa estrictamente el estado del servidor del estado de la UI.
+        *   **Estado del Servidor:** Gestionado **exclusivamente** por **React Query**. Se usa para fetching, caching, y mutaciones de datos del backend.
+        *   **Estado de la UI:** Gestionado con hooks nativos de React (`useState`, `useContext`, `useReducer`).
+    2.  **Formularios Robustos:**
+        *   **React Hook Form** para gestionar el estado, los eventos y el rendimiento de los formularios.
+        *   **Zod** para definir los esquemas de validación, que deben ser un espejo de los modelos Pydantic del backend para garantizar la consistencia.
+
+## 5. Módulos Clave y Estado de Avance
+
+- **Núcleo de la Aplicación (85%):** La base está sólidamente construida. Esto incluye el layout principal, el sistema de enrutamiento, la configuración del tema de Material-UI y la integración de React Query.
+- **Gestión de Pacientes (100%):** El CRUD (Crear, Leer, Actualizar, Eliminar) de pacientes está completo y funcional. Las páginas `PacientesPage.tsx` y `PacienteFormPage.tsx` existen y están conectadas a la API.
+- **Formularios Clínicos Especializados (RIAMP/RPMS) (5%):** Se han definido los patrones, pero **no se ha construido ningún formulario clínico detallado**. No existen componentes como `ControlPrenatalForm.tsx` o similares. Este es el principal trabajo pendiente.
+- **Módulo de Gestión Proactiva (Demanda Inducida) (0%):** No iniciado. No existe la página `GestionProactivaPage.tsx` ni los componentes asociados.
+
+## 6. Idioma de Interacción
+La comunicación con el asistente de IA y toda la interfaz de usuario debe ser en **español**.

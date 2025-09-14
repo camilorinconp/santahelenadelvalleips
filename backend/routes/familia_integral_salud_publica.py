@@ -10,9 +10,9 @@ from uuid import UUID
 
 from database import get_supabase_client
 from models.familia_integral_model import (
-    ModeloFamiliaIntegralSaludPublicaCrear,
-    ModeloFamiliaIntegralSaludPublicaRespuesta,
-    ModeloFamiliaIntegralSaludPublicaActualizar
+    ModeloFamiliaIntegralCrear,
+    ModeloFamiliaIntegralRespuesta,
+    ModeloFamiliaIntegralActualizar
 )
 
 # =============================================================================
@@ -29,9 +29,9 @@ router = APIRouter(
 # ENDPOINTS CRUD - FAMILIA INTEGRAL
 # =============================================================================
 
-@router.post("/", response_model=ModeloFamiliaIntegralSaludPublicaRespuesta, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ModeloFamiliaIntegralRespuesta, status_code=status.HTTP_201_CREATED)
 def crear_familia_integral_salud_publica(
-    familia: ModeloFamiliaIntegralSaludPublicaCrear, 
+    familia: ModeloFamiliaIntegralCrear, 
     db: Client = Depends(get_supabase_client)
 ):
     """
@@ -62,7 +62,7 @@ def crear_familia_integral_salud_publica(
         )
 
 
-@router.get("/", response_model=List[ModeloFamiliaIntegralSaludPublicaRespuesta])
+@router.get("/", response_model=List[ModeloFamiliaIntegralRespuesta])
 def listar_familias_integral_salud_publica(
     skip: int = 0,
     limit: int = 100,
@@ -107,7 +107,7 @@ def listar_familias_integral_salud_publica(
         )
 
 
-@router.get("/{familia_id}", response_model=ModeloFamiliaIntegralSaludPublicaRespuesta)
+@router.get("/{familia_id}", response_model=ModeloFamiliaIntegralRespuesta)
 def obtener_familia_integral_por_id(
     familia_id: UUID, 
     db: Client = Depends(get_supabase_client)
@@ -135,7 +135,7 @@ def obtener_familia_integral_por_id(
         )
 
 
-@router.get("/codigo/{codigo_familia}", response_model=ModeloFamiliaIntegralSaludPublicaRespuesta)
+@router.get("/codigo/{codigo_familia}", response_model=ModeloFamiliaIntegralRespuesta)
 def obtener_familia_integral_por_codigo(
     codigo_familia: str, 
     db: Client = Depends(get_supabase_client)
@@ -144,7 +144,7 @@ def obtener_familia_integral_por_codigo(
     Obtener una familia integral específica por su código identificador único.
     """
     try:
-        result = db.table("familia_integral_salud_publica").select("*").eq("codigo_identificacion_familia_unico", codigo_familia).execute()
+        result = db.table("familia_integral_salud_publica").select("*").eq("codigo_identificacion_familiar_unico", codigo_familia).execute()
         
         if result.data and len(result.data) > 0:
             return result.data[0]
@@ -163,10 +163,10 @@ def obtener_familia_integral_por_codigo(
         )
 
 
-@router.put("/{familia_id}", response_model=ModeloFamiliaIntegralSaludPublicaRespuesta)
+@router.put("/{familia_id}", response_model=ModeloFamiliaIntegralRespuesta)
 def actualizar_familia_integral_salud_publica(
     familia_id: UUID,
-    familia_actualizada: ModeloFamiliaIntegralSaludPublicaActualizar,
+    familia_actualizada: ModeloFamiliaIntegralActualizar,
     db: Client = Depends(get_supabase_client)
 ):
     """
@@ -299,7 +299,7 @@ def reporte_familias_por_ciclo_vital(
         )
 
 
-@router.get("/buscar/por-jefe-hogar", response_model=List[ModeloFamiliaIntegralSaludPublicaRespuesta])
+@router.get("/buscar/por-jefe-hogar", response_model=List[ModeloFamiliaIntegralRespuesta])
 def buscar_familias_por_jefe_hogar(
     nombre_jefe: str,
     db: Client = Depends(get_supabase_client)
@@ -324,7 +324,7 @@ def buscar_familias_por_jefe_hogar(
         )
 
 
-@router.get("/entorno/{entorno_id}/familias", response_model=List[ModeloFamiliaIntegralSaludPublicaRespuesta])
+@router.get("/entorno/{entorno_id}/familias", response_model=List[ModeloFamiliaIntegralRespuesta])
 def listar_familias_por_entorno(
     entorno_id: UUID,
     db: Client = Depends(get_supabase_client)

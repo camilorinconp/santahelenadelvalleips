@@ -197,16 +197,21 @@ The interface must accommodate the complex data structures required by Colombian
 
 ## Documentación de Referencia
 
-### **📚 Documentación Principal**
-- **`/docs/00-PROJECT-OVERVIEW.md`**: Estado actual y roadmap
-- **`/docs/01-ARCHITECTURE-GUIDE.md`**: Arquitectura técnica detallada
-- **`/docs/02-DEVELOPMENT-WORKFLOW.md`**: Flujo de desarrollo y convenciones
-- **`/ROADMAP.md`**: Hoja de ruta con próximas funcionalidades frontend
+### **📚 Documentación Reorganizada**
+
+**👉 PUNTO DE ENTRADA:** [Guía Frontend Maestra](docs/01-foundations/frontend-overview.md) ⭐
+
+### **📋 Por Especialización:**
+- **`docs/01-foundations/`** - Hub central y arquitectura React base
+- **`docs/02-architecture/`** - Patrones React + TypeScript + MUI  
+- **`docs/03-integration/`** - Integración backend polimórfico
+- **`docs/04-development/`** - Setup, testing, deployment día a día
+- **`docs/05-features/`** - Features médicos específicos
 
 ### **🔗 Integración con Backend**
-- **`backend/CLAUDE.md`**: APIs disponibles y estructura de datos
-- **`supabase/CLAUDE.md`**: Esquema de base de datos y tipos
-- **`docs/resolucion_3280_de_2018_limpio.md`**: Requerimientos normativos para formularios
+- **`../backend/docs/01-foundations/architecture-overview.md`**: Arquitectura backend polimórfica
+- **`../backend/CLAUDE.md`**: APIs disponibles y estructura de datos
+- **`../backend/docs/02-regulations/resolucion-3280-master.md`**: Compliance requirements
 
 ## Notes for AI Assistant
 
@@ -219,10 +224,10 @@ The interface must accommodate the complex data structures required by Colombian
 - **Compliance Forms**: Formularios deben capturar todos los campos requeridos por Resolución 3280
 
 ### **📖 Referencias Obligatorias por Prioridad:**
-1. **`/docs/01-ARCHITECTURE-GUIDE.md`** - Patrones y decisiones técnicas
-2. **`backend/CLAUDE.md`** - APIs y estructura de datos del backend
-3. **`docs/resolucion_3280_de_2018_limpio.md`** - Requerimientos normativos
-4. **`/docs/02-DEVELOPMENT-WORKFLOW.md`** - Convenciones de desarrollo
+1. **`docs/01-foundations/frontend-overview.md`** - Hub central y navegación completa ⭐
+2. **`docs/03-integration/backend-api-guide.md`** - Integración polimórfica FastAPI
+3. **`../backend/docs/02-regulations/resolucion-3280-master.md`** - Compliance requirements
+4. **`docs/04-development/setup-guide.md`** - Configuración desarrollo completa
 
 ### **🎨 Consideraciones UX/UI:**
 - **Profesionales de Salud**: Interfaces optimizadas para personal médico

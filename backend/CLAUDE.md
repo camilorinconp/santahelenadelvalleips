@@ -101,24 +101,29 @@ supabase db push
 ## Important Considerations
 
 ### Resolution 3280 Compliance
-This project strictly follows Colombian health regulations (Resolución 3280 de 2018). All data models, business logic, and workflows must align with these requirements. The document `docs/resolucion_3280_de_2018_limpio.md` is the ultimate authority for implementation decisions.
+This project strictly follows Colombian health regulations (Resolución 3280 de 2018). All data models, business logic, and workflows must align with these requirements. The document `docs/02-regulations/resolucion-3280-master.md` is the ultimate authority for implementation decisions.
 
 ### Architecture References
 
-### **📚 Documentación Principal (Lectura Obligatoria)**
-- **`/docs/00-PROJECT-OVERVIEW.md`**: Visión general ejecutiva y estado actual del proyecto
-- **`/docs/01-ARCHITECTURE-GUIDE.md`**: Guía técnica detallada de arquitectura y patrones
-- **`/docs/02-DEVELOPMENT-WORKFLOW.md`**: Flujo de trabajo estándar y convenciones de desarrollo
-- **`/ROADMAP.md`**: Hoja de ruta ejecutiva con cronograma de 12 meses
+### **📚 Documentación Reorganizada (Lectura Obligatoria)**
+
+**👉 PUNTO DE ENTRADA:** [Guía Arquitectónica Maestra](docs/01-foundations/architecture-overview.md) ⭐
+
+### **📋 Por Propósito:**
+- **`docs/01-foundations/`** - Fundamentos críticos y arquitectura completa
+- **`docs/02-regulations/`** - Compliance normativo (Res. 3280, 202)  
+- **`docs/03-architecture/`** - Decisiones estratégicas y perfiles duales
+- **`docs/04-development/`** - Guías operativas día a día
+- **`docs/05-logs/`** - Registros históricos y verificaciones
 
 ### **⚖️ Normatividad y Compliance**  
-- **`docs/resolucion_3280_de_2018_limpio.md`**: Documento normativo maestro (Resolución 3280)
-- **`docs/recomendaciones_equipo_asesor_externo.md`**: Guía arquitectónica de expertos externos
+- **`docs/02-regulations/resolucion-3280-master.md`**: Documento normativo maestro
+- **`docs/03-architecture/external-recommendations.md`**: Guía arquitectónica expertos
 
 ### **📋 Contexto Histórico y Lecciones**
 - **`GEMINI.md`**: Contexto del polimorfismo de datos y estrategia inicial
-- **`DEVELOPMENT_LOG.md`**: Lecciones aprendidas críticas y mejores prácticas
-- **`CHANGELOG.md`**: Registro histórico completo de cambios del proyecto
+- **`docs/04-development/lessons-learned.md`**: Lecciones aprendidas críticas
+- **`docs/04-development/current-status.md`**: Estado actual y próximos pasos
 
 ### Database Synchronization
 Always ensure synchronization between:
@@ -162,9 +167,9 @@ The nested polymorphic approach provides:
 
 ### **📋 Para comenzar inmediatamente:**
 1. **Leer documentación crítica** (30 min):
-   - `/docs/00-PROJECT-OVERVIEW.md` - Estado actual y contexto
-   - `/docs/01-ARCHITECTURE-GUIDE.md` - Arquitectura técnica
-   - `docs/resolucion_3280_de_2018_limpio.md` - Normativa colombiana (crítico)
+   - `docs/01-foundations/architecture-overview.md` - Guía maestra completa ⭐
+   - `docs/02-regulations/resolucion-3280-master.md` - Normativa colombiana (crítico)
+   - `docs/04-development/current-status.md` - Estado actual y contexto
 
 2. **Setup del entorno** (15 min):
    ```bash
@@ -179,17 +184,17 @@ The nested polymorphic approach provides:
    - Ejecutar test específico: `pytest tests/test_atencion_materno_perinatal.py -v`
 
 ### **🎯 Para contribuir efectivamente:**
-- **Workflow completo**: `/docs/02-DEVELOPMENT-WORKFLOW.md`
-- **Patrones arquitectónicos**: `/docs/01-ARCHITECTURE-GUIDE.md`
+- **Workflow completo**: `docs/04-development/testing-guide.md`
+- **Patrones arquitectónicos**: `docs/01-foundations/architecture-overview.md`
 - **Templates de Issues/PRs**: `/.github/` (usar siempre)
 
 ## Notes for AI Assistant
 
 ### **📖 Referencias Obligatorias por Orden de Prioridad:**
-1. **`/docs/00-PROJECT-OVERVIEW.md`** - Estado actual y próximos hitos
-2. **`docs/resolucion_3280_de_2018_limpio.md`** - Autoridad normativa definitiva  
-3. **`/docs/01-ARCHITECTURE-GUIDE.md`** - Decisiones técnicas y patrones
-4. **`docs/recomendaciones_equipo_asesor_externo.md`** - Guía de arquitectura de datos
+1. **`docs/01-foundations/architecture-overview.md`** - Guía maestra y navegación completa ⭐
+2. **`docs/02-regulations/resolucion-3280-master.md`** - Autoridad normativa definitiva  
+3. **`docs/03-architecture/dual-profiles-strategy.md`** - Decisiones técnicas y patrones
+4. **`docs/03-architecture/external-recommendations.md`** - Guía de arquitectura de datos
 
 ### **🔧 Reglas de Desarrollo:**
 - **Compliance First**: Validar contra Resolución 3280 antes de implementar

@@ -1,10 +1,27 @@
-# Proyecto Monorepo: IPS Santa Helena del Valle
+# Backend IPS Santa Helena del Valle
 
-Este repositorio contiene el proyecto completo para la IPS Santa Helena del Valle, implementado como un monorepo que incluye tanto el backend API como el frontend de la aplicación.
+## 🎯 **Inicio Rápido - Arquitectura Completa**
 
-## 1. Visión General del Proyecto
+👉 **Para entender la arquitectura completa del proyecto:**  
+📖 **[🏗️ Ver Guía Arquitectónica Maestra](docs/01-foundations/architecture-overview.md)** ⭐
 
-El proyecto es una API REST para una Institución Prestadora de Salud (IPS) en Colombia, cuyo objetivo es gestionar las Rutas Integrales de Atención en Salud (RIAS) según la normativa colombiana (Resolución 3280). El frontend es una Single Page Application (SPA) que consume esta API para proporcionar una interfaz de usuario.
+El sistema integral de gestión de RIAS (Rutas Integrales de Atención en Salud) según Resolución 3280 de 2018, con arquitectura polimórfica anidada y estrategia de perfiles duales (Clínico + Call Center).
+
+## 🔧 **Configuración AI Assistant**
+- 📋 [Configuración Completa](CLAUDE.md) - Setup desarrollo con AI
+- 🧠 [Contexto Polimorfismo](GEMINI.md) - Historia técnica arquitectura
+
+## 📚 **Documentación Organizada**
+La documentación técnica está estructurada por propósito:
+- **`docs/01-foundations/`** - Fundamentos críticos y guía maestra
+- **`docs/02-regulations/`** - Compliance normativo (Res. 3280, 202)  
+- **`docs/03-architecture/`** - Decisiones estratégicas y perfiles duales
+- **`docs/04-development/`** - Guías operativas día a día
+- **`docs/05-logs/`** - Registros históricos y verificaciones
+
+---
+
+## ⚡ **Configuración Rápida**
 
 ## 2. Estructura del Monorepo
 
