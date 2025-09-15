@@ -1,0 +1,110 @@
+# =============================================================================
+# Docker Compose - IPS Santa Helena del Valle
+# Configuración Growth Tier para desarrollo y testing
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: ips-santa-helena-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Supabase configuration
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      
+      # Application configuration
+      - ENVIRONMENT=development
+      - LOG_LEVEL=info
+      - API_PREFIX=/api/v1
+      
+      # Security configuration
+      - SECRET_KEY=${SECRET_KEY:-fallback-secret-key-for-development}
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8000
+      
+      # APM and monitoring
+      - APM_ENABLED=true
+      - METRICS_ENABLED=true
+      - SECURITY_AUDIT_ENABLED=true
+      
+    volumes:
+      # Hot-reload para desarrollo
+      - ./backend:/app/backend:ro
+      - ./conftest.py:/app/conftest.py:ro
+    networks:
+      - ips-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend (React) - Opcional para desarrollo full-stack
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ips-santa-helena-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_ENVIRONMENT=development
+    volumes:
+      - ./frontend/src:/app/src:ro
+      - ./frontend/public:/app/public:ro
+      - frontend_node_modules:/app/node_modules
+    networks:
+      - ips-network
+    depends_on:
+      - backend
+    profiles:
+      - full-stack  # Solo se ejecuta con --profile full-stack
+
+  # Nginx reverse proxy (Growth Tier)
+  nginx:
+    image: nginx:alpine
+    container_name: ips-nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - ips-network
+    depends_on:
+      - backend
+    profiles:
+      - production
+
+  # Redis para cache y rate limiting (opcional)
+  redis:
+    image: redis:7-alpine
+    container_name: ips-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ips-network
+    profiles:
+      - cache
+
+volumes:
+  frontend_node_modules:
+  redis_data:
+
+networks:
+  ips-network:
+    driver: bridge
+    name: ips-santa-helena-network

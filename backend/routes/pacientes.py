@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from supabase import Client
 from models import Paciente
 from database import get_supabase_client
+from core.monitoring import apm_collector, health_metrics, PerformanceTimer
 
 # Crear el router
 router = APIRouter(
@@ -28,7 +29,23 @@ def get_paciente(paciente_id: str, db: Client = Depends(get_supabase_client)):
 def create_paciente(paciente: Paciente, db: Client = Depends(get_supabase_client)):
     # Forzar la serialización a JSON para manejar tipos de datos complejos como 'date'
     paciente_dict = paciente.model_dump(mode='json', exclude_unset=True)
-    response = db.table("pacientes").insert(paciente_dict).execute()
+    
+    # 📊 APM: Track database operation
+    with PerformanceTimer("Database INSERT pacientes"):
+        response = db.table("pacientes").insert(paciente_dict).execute()
+        
+        # Track database metrics
+        apm_collector.track_database_operation(
+            table="pacientes",
+            operation="INSERT",
+            response_time=0.1,  # Will be updated by PerformanceTimer
+            record_count=len(response.data) if response.data else 0
+        )
+        
+        # 🏥 Healthcare Business Metric
+        if response.data:
+            health_metrics.track_patient_creation(paciente_dict)
+    
     return {"data": response.data}
 
 # Actualizar un paciente

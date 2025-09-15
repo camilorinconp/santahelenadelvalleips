@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import pacientes, atenciones, intervenciones_colectivas, atencion_primera_infancia, atencion_materno_perinatal, tamizaje_oncologico, control_cronicidad, entornos_salud_publica, familia_integral_salud_publica, atencion_integral_transversal_salud, catalogo_ocupaciones_simple #, medicos, codigos_rias
 
-# Importar configuración de error handling y monitoring
+# Importar configuración de error handling, monitoring y security
 from core.error_handling import setup_error_handling
 from core.monitoring import setup_monitoring
+from core.security import setup_security
+from database import get_supabase_client
 
 # Inicializar la aplicación de FastAPI
 app = FastAPI(
@@ -52,6 +54,9 @@ setup_error_handling(app)
 
 # Configurar performance monitoring y health checks
 setup_monitoring(app)
+
+# Configurar sistema de seguridad avanzada
+setup_security(app, get_supabase_client())
 
 # Root endpoint con información básica
 @app.get("/")

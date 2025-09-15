@@ -18,6 +18,8 @@ from database import get_supabase_client
 from typing import List, Optional
 from uuid import UUID, uuid4
 from datetime import date, datetime
+from core.monitoring import apm_collector, health_metrics, PerformanceTimer
+import time
 
 router = APIRouter(
     prefix="/atenciones-primera-infancia",
@@ -327,14 +329,32 @@ def aplicar_ead3(
             'updated_at': datetime.now().isoformat()
         }
         
-        # Actualizar en base de datos
+        # 📊 APM: Track database operation + business metric
+        start_time = time.time()
         response = db.table("atencion_primera_infancia").update(update_data).eq("id", str(atencion_id)).execute()
+        db_time = time.time() - start_time
+        
+        # Track database performance
+        apm_collector.track_database_operation(
+            table="atencion_primera_infancia",
+            operation="UPDATE_EAD3",
+            response_time=db_time,
+            record_count=len(response.data) if response.data else 0
+        )
         
         if not response.data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Atención no encontrada o error al aplicar EAD-3"
             )
+        
+        # 🏥 Track healthcare business metric - EAD3 application
+        health_metrics.track_medical_attention(
+            attention_type="primera_infancia",
+            duration_minutes=0,  # Evaluation time
+            ead3_applied=True,
+            asq3_applied=False
+        )
         
         updated_atencion = response.data[0]
         
