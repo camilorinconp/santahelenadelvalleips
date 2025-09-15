@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import date, datetime
 from uuid import UUID # Importar UUID
@@ -47,8 +47,7 @@ class PacienteResponse(Paciente):
         description="Categoría nivel 1 de la ocupación (populated)"
     )
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PacienteCreate(BaseModel):
     """Modelo para creación de paciente"""

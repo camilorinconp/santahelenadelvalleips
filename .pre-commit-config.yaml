@@ -1,0 +1,98 @@
+# Pre-commit hooks configuration - IPS Santa Helena del Valle
+# Instalar con: pip install pre-commit && pre-commit install
+
+repos:
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        language_version: python3.12
+        args: [--line-length=100]
+        files: ^backend/
+        
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.6
+    hooks:
+      - id: ruff
+        args: [--fix, --select, E,W,F,B,I, --ignore, E203,W503]
+        files: ^backend/
+        
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports, --no-strict-optional]
+        files: ^backend/.*\.py$
+        additional_dependencies: [types-all]
+        
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        files: ^backend/
+        
+  - repo: local
+    hooks:
+      - id: run-critical-tests
+        name: Run critical tests
+        entry: bash -c 'cd backend && pytest tests/test_atencion_primera_infancia.py -x -q'
+        language: system
+        pass_filenames: false
+        files: ^backend/(models|routes|tests)/.*\.py$
+        
+      - id: validate-requirements
+        name: Validate requirements.txt format
+        entry: bash -c 'cd backend && python -c "
+import re
+with open(\"requirements.txt\") as f:
+    lines = f.readlines()
+for line in lines:
+    if line.strip() and not line.startswith(\"#\") and \"==\" not in line:
+        print(f\"❌ Version not fixed: {line.strip()}\")
+        exit(1)
+print(\"✅ All requirements have exact versions\")
+"'
+        language: system
+        pass_filenames: false
+        files: ^backend/requirements\.txt$
+        
+      - id: sql-migration-naming
+        name: Validate SQL migration naming
+        entry: bash -c '
+for file in supabase/migrations/*.sql; do
+  if [[ ! $(basename "$file") =~ ^[0-9]{14}_[a-z_]+\.sql$ ]]; then
+    echo "❌ Invalid migration name: $(basename "$file")"
+    echo "Format should be: YYYYMMDDHHMMSS_descriptive_name.sql"
+    exit 1
+  fi
+done
+echo "✅ All migration names follow convention"
+'
+        language: system
+        pass_filenames: false
+        files: ^supabase/migrations/.*\.sql$
+        
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        files: ^backend/.*\.(py|md|yml|yaml)$
+      - id: end-of-file-fixer
+        files: ^backend/.*\.(py|md|yml|yaml)$
+      - id: check-yaml
+        files: \.ya?ml$
+      - id: check-json
+        files: \.json$
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+        
+# Configuración específica
+exclude: |
+  (?x)^(
+    backend/venv/.*|
+    backend/__pycache__/.*|
+    backend/\.pytest_cache/.*|
+    \.git/.*
+  )$

@@ -43,7 +43,7 @@ async def buscar_ocupaciones_autocompletado(
         ..., 
         min_length=3, 
         description="Término de búsqueda (mínimo 3 caracteres)",
-        example="enfer"
+        examples=["enfer"]
     ),
     limit: int = Query(
         10, 

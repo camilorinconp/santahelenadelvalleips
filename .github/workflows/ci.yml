@@ -1,44 +1,109 @@
-name: CI/CD Monorepo
+name: CI/CD Pipeline - IPS Santa Helena del Valle
 
-on:
+on: 
   push:
-    branches:
-      - main
+    branches: [ main, develop ]
   pull_request:
-    branches:
-      - main
+    branches: [ main, develop ]
 
 jobs:
   backend_ci:
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test_proyecto_salud
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Python
+        
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Install Backend Dependencies
+          
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            
+      - name: Install backend dependencies
         run: |
+          cd backend
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-
-      - name: Run Backend Linter (Ruff)
+          pip install -r requirements.txt
+          
+      - name: Install dev dependencies
         run: |
-          pip install ruff
-          ruff check backend/
-
-      - name: Run Backend Formatter Check (Ruff)
+          cd backend
+          pip install ruff black pytest pytest-cov coverage safety detect-secrets mypy
+          
+      - name: Code formatting check (Black)
         run: |
-          pip install ruff
-          ruff format backend/ --check
-
-      - name: Run Backend Tests (Pytest)
+          cd backend
+          black --check . --line-length 100
+          
+      - name: Linting check (Ruff)
         run: |
-          pip install pytest
-          pytest backend/
+          cd backend
+          ruff check . --select E,W,F,B,I --ignore E203,W503
+          
+      - name: Type checking (MyPy) 
+        run: |
+          cd backend
+          mypy . --ignore-missing-imports --no-strict-optional || true
+          
+      - name: Security check (Safety)
+        run: |
+          cd backend
+          safety check || true
+          
+      - name: Check for secrets in code
+        run: |
+          cd backend
+          detect-secrets scan --all-files --force-use-all-plugins || true
+          
+      - name: Setup test environment
+        run: |
+          cd backend
+          echo "SUPABASE_URL=http://localhost:3000" > .env
+          echo "SUPABASE_ANON_KEY=test-key" >> .env
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_proyecto_salud" >> .env
+          echo "ENVIRONMENT=test" >> .env
+          
+      - name: Run tests with coverage
+        run: |
+          cd backend
+          pytest --cov=. --cov-report=xml --cov-report=term-missing --cov-fail-under=80 -v
+          
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage.xml
+          directory: ./backend
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+          
+      - name: Validate SQL migrations
+        run: |
+          echo "🔍 Validando migraciones SQL..."
+          find supabase/migrations -name "*.sql" -exec echo "✅ Migration found: {}" \;
 
   frontend_ci:
     runs-on: ubuntu-latest

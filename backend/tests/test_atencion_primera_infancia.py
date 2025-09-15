@@ -222,7 +222,10 @@ class TestEAD3ASQ3Consolidado:
         
         response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/ead3", json=datos_ead3_invalidos)
         assert response.status_code == 400
-        assert "debe estar entre 0 y 100" in response.json()["detail"]
+        response_data = response.json()
+        # Adaptado al formato de error personalizado
+        error_message = response_data.get("error", {}).get("message", "")
+        assert "debe estar entre 0 y 100" in error_message
         
         # Test campo faltante
         datos_ead3_incompletos = {
@@ -233,7 +236,9 @@ class TestEAD3ASQ3Consolidado:
         
         response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/ead3", json=datos_ead3_incompletos)
         assert response.status_code == 400
-        assert "Campo requerido faltante" in response.json()["detail"]
+        response_data = response.json()
+        error_message = response_data.get("error", {}).get("message", "")
+        assert "Campo requerido faltante" in error_message
     
     def test_aplicar_asq3_basico(self):
         """Test aplicar ASQ-3 básico."""
@@ -295,7 +300,9 @@ class TestCasosEdgeConsolidados:
         
         response = client.get(f"/atenciones-primera-infancia/{atencion_id_falso}")
         assert response.status_code == 404
-        assert "no encontrada" in response.json()["detail"]
+        response_data = response.json()
+        error_message = response_data.get("error", {}).get("message", "")
+        assert "no encontrada" in error_message
     
     def test_crear_atencion_paciente_inexistente(self):
         """Test crear atención con paciente inexistente."""
@@ -319,7 +326,9 @@ class TestCasosEdgeConsolidados:
         
         response = client.patch(f"/atenciones-primera-infancia/{atencion_id_falso}/ead3", json=datos_ead3)
         assert response.status_code == 404
-        assert "no encontrada" in response.json()["detail"]
+        response_data = response.json()
+        error_message = response_data.get("error", {}).get("message", "")
+        assert "no encontrada" in error_message
 
 # =============================================================================
 # TESTS FUNCIONALIDAD INTEGRADA

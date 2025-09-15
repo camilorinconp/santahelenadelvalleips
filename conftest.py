@@ -11,6 +11,10 @@ from fastapi.testclient import TestClient
 from supabase import create_client, Client
 
 # Importar la app principal y el dependency que queremos overridear
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
+
 from main import app
 from database import get_supabase_client
 
@@ -115,4 +119,4 @@ def create_test_patient_data(patient_id=None):
     }
 
 
-# Configuración específica del backend - no plugins globales
+# Configuración global de pytest - nivel raíz

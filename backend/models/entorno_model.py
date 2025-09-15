@@ -65,7 +65,6 @@ class ModeloEntornoSaludPublicaIntegralCompleto(BaseModel):
     codigo_identificacion_entorno_unico: str = Field(
         ..., 
         description="Código único identificador del entorno",
-        example="ENT-FAM-001"
     )
     tipo_entorno: TipoEntornoSaludPublica = Field(
         ...,
@@ -74,7 +73,6 @@ class ModeloEntornoSaludPublicaIntegralCompleto(BaseModel):
     nombre_descriptivo_entorno: str = Field(
         ...,
         description="Nombre descriptivo del entorno",
-        example="Entorno Familiar Barrio Los Pinos"
     )
     descripcion_caracterizacion_entorno: Optional[str] = Field(
         None,
@@ -93,34 +91,28 @@ class ModeloEntornoSaludPublicaIntegralCompleto(BaseModel):
     departamento_ubicacion: Optional[str] = Field(
         None,
         description="Departamento donde se ubica el entorno",
-        example="Valle del Cauca"
     )
     municipio_ubicacion: Optional[str] = Field(
         None,
         description="Municipio donde se ubica el entorno",
-        example="Cali"
     )
     zona_territorial: Optional[str] = Field(
         None,
         description="Zona territorial: urbana, rural, dispersa",
-        example="urbana"
     )
     coordenadas_geograficas: Optional[Dict[str, Any]] = Field(
         None,
         description="Coordenadas geográficas del entorno",
-        example={"latitud": 3.4516, "longitud": -76.5320}
     )
     
     # Caracterización poblacional del entorno
     poblacion_objetivo_estimada: Optional[int] = Field(
         None,
         description="Población objetivo estimada para intervenciones",
-        example=1500
     )
     rango_edad_poblacion_objetivo: Optional[Dict[str, int]] = Field(
         None,
         description="Rango de edad de población objetivo",
-        example={"min_edad": 0, "max_edad": 18}
     )
     caracteristicas_demograficas_poblacion: Optional[Dict[str, Any]] = Field(
         None,
@@ -163,7 +155,6 @@ class ModeloEntornoSaludPublicaIntegralCompleto(BaseModel):
     coordinacion_institucional_nivel: Optional[str] = Field(
         None,
         description="Nivel de coordinación institucional",
-        example="ALTO"
     )
     mecanismos_participacion_comunitaria: Optional[Dict[str, Any]] = Field(
         None,
@@ -182,7 +173,6 @@ class ModeloEntornoSaludPublicaIntegralCompleto(BaseModel):
     responsable_coordinacion_entorno: Optional[str] = Field(
         None,
         description="Responsable de la coordinación del entorno",
-        example="Dr. Juan Pérez - Coordinador Territorial"
     )
     observaciones_adicionales_entorno: Optional[str] = Field(
         None,
@@ -225,7 +215,6 @@ class ModeloEntornoSaludPublicaCrear(BaseModel):
     codigo_identificacion_entorno_unico: str = Field(
         ..., 
         description="Código único identificador del entorno",
-        example="ENT-FAM-001"
     )
     tipo_entorno: TipoEntornoSaludPublica = Field(
         ...,
@@ -234,7 +223,6 @@ class ModeloEntornoSaludPublicaCrear(BaseModel):
     nombre_descriptivo_entorno: str = Field(
         ...,
         description="Nombre descriptivo del entorno",
-        example="Entorno Familiar Barrio Los Pinos"
     )
     descripcion_caracterizacion_entorno: Optional[str] = Field(
         None,
