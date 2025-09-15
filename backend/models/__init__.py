@@ -5,14 +5,12 @@ from .medico_model import Medico
 from .paciente_model import Paciente
 from .intervencion_colectiva_model import IntervencionColectiva
 from .atencion_primera_infancia_model import (
-    AtencionPrimeraInfancia,  # Alias para compatibilidad
-    AtencionIntegralPrimeraInfanciaTransversal,
+    AtencionPrimeraInfancia,
     AtencionPrimeraInfanciaCrear,
     AtencionPrimeraInfanciaActualizar, 
-    AtencionPrimeraInfanciaRespuesta,
-    EstadoNutricionalPrimeraInfancia,
-    ResultadoTamizajeDesarrollo,
-    EstadoEsquemaVacunacion
+    AtencionPrimeraInfanciaResponse,
+    EstadoNutricional,
+    ResultadoTamizaje
 )
 from .atencion_materno_perinatal_model import AtencionMaternoPerinatal
 from .tamizaje_oncologico_model import TamizajeOncologico

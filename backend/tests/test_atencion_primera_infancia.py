@@ -1,256 +1,387 @@
+# =============================================================================
+# Tests Consolidados Atención Primera Infancia - Arquitectura Vertical
+# Tests independientes sin dependencias cruzadas
+# Fecha: 15 septiembre 2025
+# =============================================================================
+
+import pytest
+from fastapi.testclient import TestClient
+from main import app
+from datetime import date, datetime
 from uuid import uuid4
-from datetime import date
+import random
 
-# Tests now use global configuration from conftest.py
+client = TestClient(app)
 
-def create_test_patient(patient_id: str, test_client):
-    patient_data = {
-        "id": patient_id,
+# =============================================================================
+# FIXTURES Y UTILIDADES
+# =============================================================================
+
+def generar_numero_documento_unico():
+    """Generar número de documento único para tests."""
+    return str(random.randint(1000000000, 9999999999))
+
+def crear_paciente_test(numero_documento: str = None):
+    """Crear paciente de prueba y retornar su ID."""
+    if numero_documento is None:
+        numero_documento = generar_numero_documento_unico()
+    
+    paciente_data = {
         "tipo_documento": "CC",
-        "numero_documento": str(uuid4())[:9], # Unique document number
+        "numero_documento": numero_documento,
         "primer_nombre": "Test",
-        "primer_apellido": "Patient",
-        "fecha_nacimiento": "2000-01-01",
-        "genero": "MASCULINO"  # Updated for consistency
+        "primer_apellido": "PrimeraInfancia",
+        "fecha_nacimiento": "2020-01-15",
+        "genero": "MASCULINO"
     }
-    response = test_client.post("/pacientes/", json=patient_data)
-    if response.status_code != 201:
-        raise Exception(f"Failed to create test patient: {response.text}")
-    return patient_id
-
-def create_test_atencion_data(patient_id: str, fecha_atencion: str):
-    return {
-        "paciente_id": patient_id,
-        "fecha_atencion": fecha_atencion,
-        "entorno": "Hogar",
-        "peso_kg": 10.5,
-        "talla_cm": 80.0,
-        "perimetro_cefalico_cm": 45.0,
-        "estado_nutricional": "Normal",
-        "practicas_alimentarias_observaciones": "Lactancia materna exclusiva",
-        "suplementacion_hierro": True,
-        "suplementacion_vitamina_a": True,
-        "suplementacion_micronutrientes_polvo": False,
-        "desparasitacion_intestinal": True,
-        "desarrollo_fisico_motor_observaciones": "Normal",
-        "desarrollo_socioemocional_observaciones": "Normal",
-        "desarrollo_cognitivo_observaciones": "Normal",
-        "hitos_desarrollo_acordes_edad": True,
-        "salud_visual_observaciones": "Normal",
-        "salud_visual_tamizaje_resultado": "Normal",
-        "salud_auditiva_comunicativa_observaciones": "Normal",
-        "salud_auditiva_tamizaje_resultado": "Normal",
-        "salud_bucal_observaciones": "Normal",
-        "salud_bucal_higiene_oral": "Buena",
-        "salud_sexual_observaciones": "N/A",
-        "salud_mental_observaciones": "Normal",
-        "esquema_vacunacion_completo": True,
-        "vacunas_pendientes": "Ninguna"
-    }
-
-# ================== Tests Básicos Existentes (Actualizados) ==================
-
-def test_create_atencion_primera_infancia(test_client):
-    """Test crear atención primera infancia usando fixture global"""
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    atencion_data = create_test_atencion_data(patient_id, "2023-01-15")
-    response = test_client.post("/atenciones-primera-infancia/", json=atencion_data)
+    
+    response = client.post("/pacientes/", json=paciente_data)
     assert response.status_code == 201
-    assert response.json()["paciente_id"] == patient_id
-    assert response.json()["fecha_atencion"] == "2023-01-15"
-    assert "id" in response.json()
+    
+    return response.json()["data"][0]["id"]
 
-def test_get_all_atenciones_primera_infancia(test_client):
-    """Test obtener todas las atenciones primera infancia"""
-    # Create a new attention for this test
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    atencion_data = create_test_atencion_data(patient_id, "2023-02-01")
-    create_response = test_client.post("/atenciones-primera-infancia/", json=atencion_data)
-    assert create_response.status_code == 201
-
-    response = test_client.get("/atenciones-primera-infancia/")
-    assert response.status_code == 200
-    assert isinstance(response.json(), list)
-    # Check if the newly created attention is in the list
-    assert any(item["id"] == create_response.json()["id"] for item in response.json())
-
-def test_get_atencion_primera_infancia_by_id(test_client):
-    """Test obtener atención primera infancia por ID"""
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    atencion_data = create_test_atencion_data(patient_id, "2024-02-20")
-    create_response = test_client.post("/atenciones-primera-infancia/", json=atencion_data)
-    assert create_response.status_code == 201
-    atencion_id = create_response.json()["id"]
-
-    response = test_client.get(f"/atenciones-primera-infancia/{atencion_id}")
-    assert response.status_code == 200
-    assert response.json()["id"] == atencion_id
-    assert response.json()["paciente_id"] == patient_id
-
-# ================== Tests Nuevos CRUD Completo ==================
-
-def test_get_atenciones_primera_infancia_by_paciente(test_client):
-    """Test obtener atenciones de primera infancia por paciente"""
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    
-    # Crear 2 atenciones para el mismo paciente
-    atencion_data1 = create_test_atencion_data(patient_id, "2023-01-15")
-    atencion_data2 = create_test_atencion_data(patient_id, "2023-02-15")
-    
-    response1 = test_client.post("/atenciones-primera-infancia/", json=atencion_data1)
-    response2 = test_client.post("/atenciones-primera-infancia/", json=atencion_data2)
-    assert response1.status_code == 201
-    assert response2.status_code == 201
-    
-    # Obtener atenciones por paciente
-    response = test_client.get(f"/atenciones-primera-infancia/paciente/{patient_id}")
-    assert response.status_code == 200
-    assert isinstance(response.json(), list)
-    assert len(response.json()) == 2
-    
-    # Verificar que ambas atenciones están en la respuesta
-    atencion_ids = [item["id"] for item in response.json()]
-    assert response1.json()["id"] in atencion_ids
-    assert response2.json()["id"] in atencion_ids
-
-def test_update_atencion_primera_infancia_put(test_client):
-    """Test actualizar atención primera infancia completa (PUT)"""
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    atencion_data = create_test_atencion_data(patient_id, "2023-01-15")
-    
-    # Crear atención
-    create_response = test_client.post("/atenciones-primera-infancia/", json=atencion_data)
-    assert create_response.status_code == 201
-    atencion_id = create_response.json()["id"]
-    
-    # Datos actualizados
-    updated_data = create_test_atencion_data(patient_id, "2023-01-20")
-    updated_data.update({
-        "peso_kg": 11.0,
-        "talla_cm": 82.0,
-        "estado_nutricional": "Sobrepeso",
-        "esquema_vacunacion_completo": False,
-        "vacunas_pendientes": "Triple viral"
-    })
-    
-    # Actualizar
-    response = test_client.put(f"/atenciones-primera-infancia/{atencion_id}", json=updated_data)
-    assert response.status_code == 200
-    assert response.json()["id"] == atencion_id
-    assert response.json()["peso_kg"] == 11.0
-    assert response.json()["talla_cm"] == 82.0
-    assert response.json()["estado_nutricional"] == "Sobrepeso"
-    assert response.json()["fecha_atencion"] == "2023-01-20"
-    assert response.json()["esquema_vacunacion_completo"] == False
-    assert response.json()["vacunas_pendientes"] == "Triple viral"
-
-def test_patch_atencion_primera_infancia(test_client):
-    """Test actualización parcial de atención primera infancia (PATCH)"""
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    atencion_data = create_test_atencion_data(patient_id, "2023-01-15")
-    
-    # Crear atención
-    create_response = test_client.post("/atenciones-primera-infancia/", json=atencion_data)
-    assert create_response.status_code == 201
-    atencion_id = create_response.json()["id"]
-    
-    # Actualización parcial - solo algunos campos
-    patch_data = {
+def crear_atencion_test_data(paciente_id: str):
+    """Crear datos de atención de test."""
+    return {
+        "paciente_id": paciente_id,
+        "codigo_atencion_primera_infancia_unico": f"PI-TEST-{datetime.now().strftime('%Y%m%d%H%M%S')}-{random.randint(1000, 9999)}",
+        "fecha_atencion": date.today().isoformat(),
+        "entorno": "INSTITUCION_SALUD",
         "peso_kg": 12.5,
-        "estado_nutricional": "Desnutrición leve",
-        "desarrollo_fisico_motor_observaciones": "Ligero retraso en marcha"
+        "talla_cm": 85.0,
+        "perimetro_cefalico_cm": 47.5,
+        "estado_nutricional": "NORMAL"
     }
-    
-    # Actualizar parcialmente
-    response = test_client.patch(f"/atenciones-primera-infancia/{atencion_id}", json=patch_data)
-    assert response.status_code == 200
-    assert response.json()["id"] == atencion_id
-    assert response.json()["peso_kg"] == 12.5
-    assert response.json()["estado_nutricional"] == "Desnutrición leve"
-    assert response.json()["desarrollo_fisico_motor_observaciones"] == "Ligero retraso en marcha"
-    
-    # Verificar que otros campos no cambiaron
-    assert response.json()["talla_cm"] == 80.0  # Valor original
-    assert response.json()["fecha_atencion"] == "2023-01-15"  # Valor original
 
-def test_delete_atencion_primera_infancia(test_client):
-    """Test eliminar atención primera infancia"""
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    atencion_data = create_test_atencion_data(patient_id, "2023-01-15")
-    
-    # Crear atención
-    create_response = test_client.post("/atenciones-primera-infancia/", json=atencion_data)
-    assert create_response.status_code == 201
-    atencion_id = create_response.json()["id"]
-    
-    # Verificar que existe
-    get_response = test_client.get(f"/atenciones-primera-infancia/{atencion_id}")
-    assert get_response.status_code == 200
-    
-    # Eliminar
-    delete_response = test_client.delete(f"/atenciones-primera-infancia/{atencion_id}")
-    assert delete_response.status_code == 204
-    
-    # Verificar que ya no existe
-    get_after_delete = test_client.get(f"/atenciones-primera-infancia/{atencion_id}")
-    assert get_after_delete.status_code == 404
+# =============================================================================
+# TESTS CRUD BÁSICO
+# =============================================================================
 
-def test_get_primera_infancia_stats(test_client):
-    """Test obtener estadísticas de primera infancia"""
-    patient_id1 = create_test_patient(str(uuid4()), test_client)
-    patient_id2 = create_test_patient(str(uuid4()), test_client)
+class TestAtencionPrimeraInfanciaConsolidada:
+    """Suite de tests para funcionalidad consolidada de Primera Infancia."""
     
-    # Crear atenciones con diferentes características
-    atencion_data1 = create_test_atencion_data(patient_id1, "2023-01-15")
-    atencion_data1.update({
-        "estado_nutricional": "Normal",
-        "esquema_vacunacion_completo": True
-    })
+    def test_crear_atencion_basica(self):
+        """Test crear atención Primera Infancia básica."""
+        # Crear paciente independiente
+        paciente_id = crear_paciente_test()
+        
+        # Crear atención
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert response.status_code == 201
+        
+        data = response.json()
+        assert data["paciente_id"] == paciente_id
+        assert data["peso_kg"] == 12.5
+        assert data["talla_cm"] == 85.0
+        assert data["estado_nutricional"] == "NORMAL"
+        
+        # Verificar campos calculados
+        assert "desarrollo_apropiado_edad" in data
+        assert "porcentaje_esquema_vacunacion" in data
+        assert "proxima_consulta_recomendada_dias" in data
     
-    atencion_data2 = create_test_atencion_data(patient_id2, "2023-02-15")
-    atencion_data2.update({
-        "estado_nutricional": "Sobrepeso",
-        "esquema_vacunacion_completo": False
-    })
+    def test_obtener_atencion_por_id(self):
+        """Test obtener atención por ID."""
+        # Crear paciente y atención independientes
+        paciente_id = crear_paciente_test()
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        atencion_id = create_response.json()["id"]
+        
+        # Obtener por ID
+        response = client.get(f"/atenciones-primera-infancia/{atencion_id}")
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert data["id"] == atencion_id
+        assert data["paciente_id"] == paciente_id
     
-    # Crear las atenciones
-    test_client.post("/atenciones-primera-infancia/", json=atencion_data1)
-    test_client.post("/atenciones-primera-infancia/", json=atencion_data2)
+    def test_listar_atenciones(self):
+        """Test listar atenciones con filtros."""
+        response = client.get("/atenciones-primera-infancia/")
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert isinstance(data, list)
     
-    # Obtener estadísticas
-    response = test_client.get("/atenciones-primera-infancia/stats/general")
-    assert response.status_code == 200
+    def test_listar_atenciones_por_paciente(self):
+        """Test listar atenciones filtradas por paciente."""
+        # Crear paciente y atención
+        paciente_id = crear_paciente_test()
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        
+        # Listar por paciente
+        response = client.get(f"/atenciones-primera-infancia/?paciente_id={paciente_id}")
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert len(data) >= 1
+        assert all(atencion["paciente_id"] == paciente_id for atencion in data)
     
-    stats = response.json()
-    assert "total_atenciones" in stats
-    assert "estados_nutricionales" in stats
-    assert "vacunacion" in stats
-    assert stats["total_atenciones"] >= 2
+    def test_actualizar_atencion(self):
+        """Test actualizar atención."""
+        # Crear paciente y atención
+        paciente_id = crear_paciente_test()
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        atencion_id = create_response.json()["id"]
+        
+        # Actualizar
+        update_data = {
+            "peso_kg": 13.0,
+            "talla_cm": 87.0,
+            "observaciones_profesional_primera_infancia": "Desarrollo normal para la edad"
+        }
+        
+        response = client.put(f"/atenciones-primera-infancia/{atencion_id}", json=update_data)
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert data["peso_kg"] == 13.0
+        assert data["talla_cm"] == 87.0
+        assert "Desarrollo normal" in data["observaciones_profesional_primera_infancia"]
     
-    # Verificar estructura de vacunación
-    assert "completa" in stats["vacunacion"]
-    assert "incompleta" in stats["vacunacion"]
-    assert "sin_especificar" in stats["vacunacion"]
+    def test_eliminar_atencion(self):
+        """Test eliminar atención."""
+        # Crear paciente y atención
+        paciente_id = crear_paciente_test()
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        atencion_id = create_response.json()["id"]
+        
+        # Eliminar
+        response = client.delete(f"/atenciones-primera-infancia/{atencion_id}")
+        assert response.status_code == 204
+        
+        # Verificar que no existe
+        get_response = client.get(f"/atenciones-primera-infancia/{atencion_id}")
+        assert get_response.status_code == 404
 
-# ================== Tests de Casos de Error ==================
+# =============================================================================
+# TESTS FUNCIONALIDAD ESPECIALIZADA
+# =============================================================================
 
-def test_get_atencion_primera_infancia_not_found(test_client):
-    """Test obtener atención que no existe"""
-    fake_id = str(uuid4())
-    response = test_client.get(f"/atenciones-primera-infancia/{fake_id}")
-    assert response.status_code == 404
-
-def test_update_atencion_primera_infancia_not_found(test_client):
-    """Test actualizar atención que no existe"""
-    fake_id = str(uuid4())
-    patient_id = create_test_patient(str(uuid4()), test_client)
-    update_data = create_test_atencion_data(patient_id, "2023-01-15")
+class TestEAD3ASQ3Consolidado:
+    """Tests para aplicación de EAD-3 y ASQ-3 básicos."""
     
-    response = test_client.put(f"/atenciones-primera-infancia/{fake_id}", json=update_data)
-    assert response.status_code == 404
+    def test_aplicar_ead3_basico(self):
+        """Test aplicar EAD-3 básico."""
+        # Crear paciente y atención
+        paciente_id = crear_paciente_test()
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        atencion_id = create_response.json()["id"]
+        
+        # Aplicar EAD-3
+        datos_ead3 = {
+            "ead3_motricidad_gruesa_puntaje": 75,
+            "ead3_motricidad_fina_puntaje": 80,
+            "ead3_audicion_lenguaje_puntaje": 70,
+            "ead3_personal_social_puntaje": 85
+        }
+        
+        response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/ead3", json=datos_ead3)
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert data["ead3_aplicada"] == True
+        assert data["ead3_puntaje_total"] == 310  # Suma de puntajes
+        assert data["fecha_aplicacion_ead3"] is not None
+        assert data["desarrollo_apropiado_edad"] == True  # 310 > 200
+    
+    def test_aplicar_ead3_validaciones(self):
+        """Test validaciones EAD-3."""
+        # Crear paciente y atención
+        paciente_id = crear_paciente_test()
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        atencion_id = create_response.json()["id"]
+        
+        # Test puntaje fuera de rango
+        datos_ead3_invalidos = {
+            "ead3_motricidad_gruesa_puntaje": 150,  # Fuera de rango
+            "ead3_motricidad_fina_puntaje": 80,
+            "ead3_audicion_lenguaje_puntaje": 70,
+            "ead3_personal_social_puntaje": 85
+        }
+        
+        response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/ead3", json=datos_ead3_invalidos)
+        assert response.status_code == 400
+        assert "debe estar entre 0 y 100" in response.json()["detail"]
+        
+        # Test campo faltante
+        datos_ead3_incompletos = {
+            "ead3_motricidad_gruesa_puntaje": 75,
+            "ead3_motricidad_fina_puntaje": 80
+            # Faltan campos requeridos
+        }
+        
+        response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/ead3", json=datos_ead3_incompletos)
+        assert response.status_code == 400
+        assert "Campo requerido faltante" in response.json()["detail"]
+    
+    def test_aplicar_asq3_basico(self):
+        """Test aplicar ASQ-3 básico."""
+        # Crear paciente y atención
+        paciente_id = crear_paciente_test()
+        atencion_data = crear_atencion_test_data(paciente_id)
+        
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        atencion_id = create_response.json()["id"]
+        
+        # Aplicar ASQ-3
+        datos_asq3 = {
+            "asq3_comunicacion_puntaje": 45,
+            "asq3_motor_grueso_puntaje": 50,
+            "asq3_motor_fino_puntaje": 40,
+            "asq3_resolucion_problemas_puntaje": 55,
+            "asq3_personal_social_puntaje": 48
+        }
+        
+        response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/asq3", json=datos_asq3)
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert data["asq3_aplicado"] == True
+        assert data["asq3_comunicacion_puntaje"] == 45
+        assert data["fecha_aplicacion_asq3"] is not None
 
-def test_delete_atencion_primera_infancia_not_found(test_client):
-    """Test eliminar atención que no existe"""
-    fake_id = str(uuid4())
-    response = test_client.delete(f"/atenciones-primera-infancia/{fake_id}")
-    assert response.status_code == 404
+# =============================================================================
+# TESTS ESTADÍSTICAS Y FUNCIONALIDAD AUXILIAR
+# =============================================================================
+
+class TestEstadisticasConsolidadas:
+    """Tests para estadísticas básicas."""
+    
+    def test_estadisticas_basicas(self):
+        """Test endpoint de estadísticas básicas."""
+        response = client.get("/atenciones-primera-infancia/estadisticas/basicas")
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert "resumen_general" in data
+        assert "total_atenciones" in data["resumen_general"]
+        assert "porcentaje_ead3_aplicada" in data["resumen_general"]
+        assert "porcentaje_asq3_aplicado" in data["resumen_general"]
+        assert "porcentaje_vacunacion_completa" in data["resumen_general"]
+        assert "fecha_calculo" in data
+
+# =============================================================================
+# TESTS CASOS EDGE Y ERRORES
+# =============================================================================
+
+class TestCasosEdgeConsolidados:
+    """Tests para casos edge y manejo de errores."""
+    
+    def test_atencion_no_encontrada(self):
+        """Test manejar atención no encontrada."""
+        atencion_id_falso = str(uuid4())
+        
+        response = client.get(f"/atenciones-primera-infancia/{atencion_id_falso}")
+        assert response.status_code == 404
+        assert "no encontrada" in response.json()["detail"]
+    
+    def test_crear_atencion_paciente_inexistente(self):
+        """Test crear atención con paciente inexistente."""
+        paciente_id_falso = str(uuid4())
+        atencion_data = crear_atencion_test_data(paciente_id_falso)
+        
+        response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        # Debe fallar por foreign key constraint
+        assert response.status_code == 400
+    
+    def test_aplicar_ead3_atencion_inexistente(self):
+        """Test aplicar EAD-3 a atención inexistente."""
+        atencion_id_falso = str(uuid4())
+        
+        datos_ead3 = {
+            "ead3_motricidad_gruesa_puntaje": 75,
+            "ead3_motricidad_fina_puntaje": 80,
+            "ead3_audicion_lenguaje_puntaje": 70,
+            "ead3_personal_social_puntaje": 85
+        }
+        
+        response = client.patch(f"/atenciones-primera-infancia/{atencion_id_falso}/ead3", json=datos_ead3)
+        assert response.status_code == 404
+        assert "no encontrada" in response.json()["detail"]
+
+# =============================================================================
+# TESTS FUNCIONALIDAD INTEGRADA
+# =============================================================================
+
+class TestFuncionalidadIntegrada:
+    """Tests para funcionalidad completa integrada."""
+    
+    def test_flujo_completo_atencion(self):
+        """Test flujo completo de atención Primera Infancia."""
+        # 1. Crear paciente
+        paciente_id = crear_paciente_test()
+        
+        # 2. Crear atención básica
+        atencion_data = crear_atencion_test_data(paciente_id)
+        create_response = client.post("/atenciones-primera-infancia/", json=atencion_data)
+        assert create_response.status_code == 201
+        atencion_id = create_response.json()["id"]
+        
+        # 3. Aplicar EAD-3
+        datos_ead3 = {
+            "ead3_motricidad_gruesa_puntaje": 75,
+            "ead3_motricidad_fina_puntaje": 80,
+            "ead3_audicion_lenguaje_puntaje": 70,
+            "ead3_personal_social_puntaje": 85
+        }
+        ead3_response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/ead3", json=datos_ead3)
+        assert ead3_response.status_code == 200
+        
+        # 4. Aplicar ASQ-3
+        datos_asq3 = {
+            "asq3_comunicacion_puntaje": 45,
+            "asq3_motor_grueso_puntaje": 50,
+            "asq3_motor_fino_puntaje": 40,
+            "asq3_resolucion_problemas_puntaje": 55,
+            "asq3_personal_social_puntaje": 48
+        }
+        asq3_response = client.patch(f"/atenciones-primera-infancia/{atencion_id}/asq3", json=datos_asq3)
+        assert asq3_response.status_code == 200
+        
+        # 5. Actualizar datos adicionales
+        update_data = {
+            "esquema_vacunacion_completo": True,
+            "bcg_aplicada": True,
+            "hepatitis_b_rn_aplicada": True,
+            "pentavalente_dosis_completas": 3,
+            "srp_aplicada": True,
+            "tamizaje_visual_realizado": True,
+            "tamizaje_visual_resultado_general": "NORMAL",
+            "observaciones_profesional_primera_infancia": "Desarrollo normal, continuar seguimiento rutinario"
+        }
+        update_response = client.put(f"/atenciones-primera-infancia/{atencion_id}", json=update_data)
+        assert update_response.status_code == 200
+        
+        # 6. Verificar estado final
+        final_response = client.get(f"/atenciones-primera-infancia/{atencion_id}")
+        assert final_response.status_code == 200
+        
+        final_data = final_response.json()
+        assert final_data["ead3_aplicada"] == True
+        assert final_data["asq3_aplicado"] == True
+        assert final_data["esquema_vacunacion_completo"] == True
+        assert final_data["desarrollo_apropiado_edad"] == True
+        assert final_data["porcentaje_esquema_vacunacion"] == 100.0
+        assert "rutinario" in final_data["observaciones_profesional_primera_infancia"]

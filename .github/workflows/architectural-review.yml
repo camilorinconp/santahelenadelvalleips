@@ -1,0 +1,183 @@
+name: Architectural Review Automation
+
+# Automatización para propuestas arquitectónicas
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request:
+    types: [opened, synchronize, labeled]
+    branches: [main, develop]
+
+jobs:
+  # Job para auto-asignar reviewers basado en labels
+  assign-reviewers:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Assign architectural reviewers
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = pr.labels.map(label => label.name);
+            
+            let reviewers = [];
+            let teamReviewers = [];
+            
+            // Asignar reviewers basado en labels
+            if (labels.includes('arquitectura')) {
+              teamReviewers.push('equipo-arquitectura');
+            }
+            
+            if (labels.includes('database')) {
+              teamReviewers.push('database-team');
+            }
+            
+            if (labels.includes('api')) {
+              teamReviewers.push('backend-team');
+            }
+            
+            if (labels.includes('impacto-alto') || labels.includes('critico')) {
+              // Para cambios críticos, require senior architect review
+              reviewers.push('arquitecto-senior');
+            }
+            
+            // Asignar reviewers si hay alguno
+            if (reviewers.length > 0 || teamReviewers.length > 0) {
+              await github.rest.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                reviewers: reviewers,
+                team_reviewers: teamReviewers
+              });
+            }
+
+  # Job para validar estructura de propuestas arquitectónicas
+  validate-architectural-proposal:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'propuesta')
+    steps:
+      - name: Check architectural proposal completeness
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            
+            // Verificar sección requeridas
+            const requiredSections = [
+              '## 🎯 Descripción del Problema',
+              '## 💡 Solución Propuesta',
+              '## 🔧 Detalles Técnicos',
+              '## 📊 Análisis de Impacto',
+              '## ✅ Criterios de Aceptación'
+            ];
+            
+            const missingSections = requiredSections.filter(section => 
+              !body.includes(section)
+            );
+            
+            if (missingSections.length > 0) {
+              const comment = `⚠️ **Propuesta Arquitectónica Incompleta**\n\nEsta propuesta no incluye las siguientes secciónes requeridas:\n\n${missingSections.map(s => `- ${s}`).join('\n')}\n\nPor favor, actualiza la propuesta usando el template completo para facilitar la revisión del equipo arquitectónico.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: comment
+              });
+              
+              // Agregar label de necesita-revision
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['necesita-revision']
+              });
+            } else {
+              // Si está completa, remover label necesita-revision si existe
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: 'necesita-revision'
+                });
+              } catch (error) {
+                // Label no existía, continuar
+              }
+            }
+
+  # Job para notificar cuando se aprueban propuestas arquitectónicas
+  notify-approval:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'aprobado'
+    steps:
+      - name: Notify architectural proposal approval
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            
+            const comment = `✅ **Propuesta Arquitectónica Aprobada**\n\nEsta propuesta ha sido aprobada por el equipo arquitectónico. Próximos pasos:\n\n1. 🌱 Crear branch de implementación: \`arch/[tipo]-[descripcion]\`\n2. 📝 Implementar cambios siguiendo los criterios de aceptación\n3. 🚀 Crear Pull Request linking este issue\n4. 🔍 Code review por Code Owners\n\n**Naming Convention:**\n\`\`\`\narch/[database|api|modelo|performance]-[descripcion-corta]\n\`\`\`\n\n**Recuerda:**\n- Seguir templates de PR\n- Incluir tests comprehensivos\n- Actualizar documentación relevante\n- Validar compliance con normativas colombianas`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: comment
+            });
+
+  # Job para validar naming conventions en PRs arquitectónicos
+  validate-branch-naming:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Validate branch naming convention
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const branchName = pr.head.ref;
+            const labels = pr.labels.map(label => label.name);
+            
+            // Patrones de naming esperados
+            const patterns = {
+              architectural: /^arch\/(database|api|modelo|performance|seguridad)-[a-z0-9-]+$/,
+              feature: /^feature\/[a-z0-9-]+-[a-z0-9-]+$/,
+              fix: /^fix\/[a-z0-9-]+-[a-z0-9-]+$/,
+              hotfix: /^hotfix\/[a-z0-9-]+$/
+            };
+            
+            let isValid = false;
+            let expectedPattern = '';
+            
+            // Determinar qué patrón aplicar
+            if (labels.includes('arquitectura')) {
+              isValid = patterns.architectural.test(branchName);
+              expectedPattern = 'arch/[tipo]-[descripcion-corta]';
+            } else if (branchName.startsWith('feature/')) {
+              isValid = patterns.feature.test(branchName);
+              expectedPattern = 'feature/[modulo]-[funcionalidad]';
+            } else if (branchName.startsWith('fix/')) {
+              isValid = patterns.fix.test(branchName);
+              expectedPattern = 'fix/[modulo]-[descripcion-problema]';
+            } else if (branchName.startsWith('hotfix/')) {
+              isValid = patterns.hotfix.test(branchName);
+              expectedPattern = 'hotfix/[descripcion-urgente]';
+            } else {
+              // Permitir otros patrones para branches temporales
+              isValid = true;
+            }
+            
+            if (!isValid) {
+              const comment = `🏷️ **Naming Convention Issue**\n\nEl nombre del branch \`${branchName}\` no sigue las convenciones establecidas.\n\n**Formato esperado:** \`${expectedPattern}\`\n\n**Ejemplos válidos:**\n- \`arch/database-catalogo-medicamentos\`\n- \`feature/pacientes-historial-medico\`\n- \`fix/api-validacion-cedulas\`\n\nPor favor, renombra el branch o consulta la [Guía de Configuración](.github/CONFIGURATION_GUIDE.md#-naming-conventions).`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: comment
+              });
+            }

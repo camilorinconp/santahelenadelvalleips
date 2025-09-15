@@ -1,0 +1,51 @@
+# IPS Santa Helena del Valle - Code Owners
+# Cada línea es un patrón de archivo seguido de uno o más propietarios
+# Los propietarios serán solicitados para revisión cuando alguien abra un PR que modifique estos archivos
+
+# Configuración global del proyecto - requiere revisión de arquitectura
+* @equipo-arquitectura
+
+# Base de datos y migraciones - críticos para integridad del sistema
+/supabase/migrations/ @database-team @arquitecto-senior
+/supabase/config.toml @database-team
+/supabase/scripts/ @database-team
+
+# Backend APIs y modelos - core business logic
+/backend/models/ @backend-team @arquitecto-senior
+/backend/routes/ @backend-team
+/backend/database.py @database-team @backend-team
+/backend/services/ @backend-team
+
+# Frontend components críticos
+/frontend/src/components/ @frontend-team
+/frontend/src/api/ @frontend-team @backend-team
+/frontend/src/services/ @frontend-team
+
+# Documentación arquitectónica - requiere revisión especializada
+/docs/01-foundations/ @arquitecto-senior @equipo-arquitectura
+/docs/02-regulations/ @compliance-lead @arquitecto-senior
+/docs/03-architecture/ @arquitecto-senior
+
+# Scripts de automatización y DevOps
+/backend/scripts/ @backend-team @database-team
+/supabase/scripts/ @database-team
+
+# Tests - calidad y regresión
+/backend/tests/ @backend-team
+/frontend/src/**/*.test.* @frontend-team
+
+# Templates y configuración GitHub - governance
+/.github/ @arquitecto-senior @equipo-arquitectura
+
+# Archivos críticos de configuración del proyecto
+CLAUDE.md @arquitecto-senior
+README.md @equipo-arquitectura
+requirements.txt @backend-team
+package.json @frontend-team
+
+# Archivos de estado y roadmap - requieren consensus
+ESTADO_ACTUAL_POST_REORGANIZACION.md @equipo-arquitectura
+ROADMAP.md @equipo-arquitectura @product-owner
+
+# Assets y recursos críticos
+/backend/assets/ @backend-team @compliance-lead

@@ -1,33 +1,173 @@
----
-name: Plantilla de Pull Request
-about: Plantilla estándar para todos los Pull Requests del proyecto.
-title: ''
-labels: ''
-assignees: ''
+# 🚀 Pull Request - IPS Santa Helena del Valle
+
+## 📋 Información General
+
+**Tipo de Cambio:**
+- [ ] 🏗️ Arquitectura (cambio estructural)
+- [ ] ✨ Feature (nueva funcionalidad)
+- [ ] 🐛 Bug Fix (corrección de error)
+- [ ] 📚 Documentación
+- [ ] 🎨 Refactor (mejora de código sin cambio funcional)
+- [ ] ⚡ Performance (optimización)
+- [ ] ✅ Tests (agregar o actualizar tests)
+
+**Componentes Afectados:**
+- [ ] Database/Migraciones
+- [ ] Backend APIs
+- [ ] Frontend Components  
+- [ ] Modelos de Datos
+- [ ] Tests
+- [ ] Documentación
+
+**Issue Relacionado:** 
+<!-- Incluir # del issue si existe -->
+Closes #
+
+## 📝 Descripción del Cambio
+
+### Resumen
+<!-- Descripción clara y concisa de los cambios -->
+
+### Motivación
+<!-- Por qué es necesario este cambio -->
+
+### Contexto Adicional
+<!-- Información relevante para entender el cambio -->
+
+## 🔧 Detalles Técnicos
+
+### Cambios Realizados
+- 
+- 
+- 
+
+### Base de Datos (si aplica)
+**Migraciones:**
+- [ ] Nueva migración creada: `YYYYMMDD_HHMMSS_descripcion.sql`
+- [ ] Migración probada localmente
+- [ ] Rollback documentado
+
+**Cambios de Schema:**
+- [ ] Nuevas tablas
+- [ ] Modificación tablas existentes
+- [ ] Nuevos índices
+- [ ] RLS policies actualizadas
+
+### APIs (si aplica)
+**Endpoints Nuevos/Modificados:**
+- `GET/POST/PUT/DELETE /endpoint` - Descripción
+
+**Modelos Pydantic:**
+- [ ] Modelos existentes actualizados
+- [ ] Nuevos modelos creados
+- [ ] Validaciones agregadas
+
+## 🧪 Testing
+
+### Tests Ejecutados
+- [ ] `pytest -v` (todos los tests pasan)
+- [ ] Tests específicos para el cambio
+- [ ] Tests de regresión
+- [ ] Tests de integración
+
+### Nuevos Tests Añadidos
+- [ ] Tests unitarios para nuevas funciones
+- [ ] Tests de API endpoints
+- [ ] Tests de base de datos
+
+### Manual Testing
+- [ ] Funcionalidad probada manualmente
+- [ ] Casos edge probados
+- [ ] Performance validada
+
+## 📊 Compliance y Validación
+
+### Normativas Colombianas
+- [ ] Cumple Resolución 3280 de 2018 (RIAS)
+- [ ] Cumple Resolución 202 de 2021 (PEDT)
+- [ ] Otros requerimientos normativos validados
+
+### Arquitectura
+- [ ] Sigue patrones arquitectónicos establecidos
+- [ ] Mantiene polimorfismo anidado (si aplica)
+- [ ] Estrategia de tipado 3 capas respetada
+- [ ] Nomenclatura en español consistente
+
+### Seguridad
+- [ ] RLS policies configuradas apropiadamente
+- [ ] Validaciones de entrada implementadas
+- [ ] No expone información sensible
+- [ ] Maneja errores apropiadamente
+
+## 📚 Documentación
+
+### Actualizada
+- [ ] Código autodocumentado con comentarios
+- [ ] README/CLAUDE.md actualizado (si aplica)
+- [ ] Documentación técnica actualizada
+- [ ] API docs actualizadas (FastAPI auto-docs)
+
+### Referencias
+**Documentos Consultados:**
+- [ ] `docs/02-regulations/resolucion-3280-master.md`
+- [ ] `docs/01-foundations/architecture-overview.md`
+- [ ] Otros:
+
+## 🚀 Deploy y Post-Deploy
+
+### Pre-Deploy Checklist
+- [ ] Database backup tomado
+- [ ] Plan de rollback definido
+- [ ] Migraciones validadas en staging
+
+### Post-Deploy Validación
+- [ ] Health checks passing
+- [ ] Performance baseline mantenida
+- [ ] No errores en logs
+- [ ] Funcionalidad disponible para usuarios
+
+## 📄 Screenshots/Videos
+<!-- Si aplica, incluir capturas de pantalla o videos demostrando el cambio -->
+
+## 📝 Notas para Revisores
+
+### Puntos Clave para Revisar
+- 
+- 
+
+### Preguntas/Decisiones Pendientes
+- 
+- 
+
+### Testing Recommendations
+- 
 
 ---
 
-### 1. ¿Qué problema o tarea resuelve este PR?
-<!-- Describe de forma clara y concisa el objetivo. Si está relacionado con una tarea o issue, enlázalo aquí. Ej: "Resuelve el Issue #23" o "Implementa la Fase 2 del roadmap para Control de Cronicidad". -->
+## 👥 Checklist Final del Autor
 
+### Antes de Crear PR
+- [ ] Código completo y funcional
+- [ ] Tests creados y pasando
+- [ ] Documentación actualizada
+- [ ] Commits organizados y mensajes descriptivos
+- [ ] Branch actualizado con main/develop
 
-### 2. Resumen del Cambio
-<!-- Describe a alto nivel qué se ha hecho. Ej: "Se ha creado el endpoint POST /control-cronicidad/diabetes-detalles/ y su lógica de servicio asociada." -->
+### Calidad del Código
+- [ ] No hay código comentado innecesario
+- [ ] Variables y funciones con nombres descriptivos
+- [ ] Manejo apropiado de errores
+- [ ] Código sigue convenciones del proyecto
+- [ ] Performance considerada
 
+### Compliance Final
+- [ ] Todo el desarrollo en español
+- [ ] Terminología médica correcta
+- [ ] Alineado con normativas colombianas
+- [ ] Compatible con arquitectura existente
 
-### 3. Decisiones de Diseño y Arquitectura Tomadas
-<!-- Esta es la sección más importante para la revisión del Equipo Asesor. Explica el "porqué" de tus decisiones. Ej: "Se decidió usar una tabla separada para los detalles de diabetes en lugar de añadir más columnas a `control_cronicidad` para seguir el patrón polimórfico definido en la documentación." -->
+---
 
+**🤖 Generado con [Claude Code](https://claude.ai/code)**
 
-### 4. ¿Cómo se ha probado este cambio?
-<!-- Describe los pasos para verificar que tu cambio funciona. Detalla las pruebas manuales realizadas y, sobre todo, las pruebas automatizadas que se han añadido. -->
-- [ ] Se han añadido/actualizado pruebas unitarias en `tests/`.
-- [ ] Se ha probado el endpoint manualmente con Postman/Swagger UI.
-- [ ] Todas las pruebas existentes (`pytest`) pasan con éxito.
-
-
-### 5. Checklist del Autor
-- [ ] Mi código sigue las guías de estilo y las convenciones del proyecto.
-- [ ] He añadido comentarios en el código, particularmente en las áreas más complejas.
-- [ ] He actualizado la documentación relevante (ej. `README.md` o docstrings) si ha sido necesario.
-- [ ] He verificado que no hay información sensible (claves, contraseñas) en el código.
+**Co-Authored-By:** Claude <noreply@anthropic.com>

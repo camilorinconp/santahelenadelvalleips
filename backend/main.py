@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import pacientes, atenciones, intervenciones_colectivas, atencion_primera_infancia, atencion_primera_infancia_transversal, atencion_materno_perinatal, tamizaje_oncologico, control_cronicidad, entornos_salud_publica, familia_integral_salud_publica, atencion_integral_transversal_salud #, medicos, codigos_rias
+from routes import pacientes, atenciones, intervenciones_colectivas, atencion_primera_infancia, atencion_materno_perinatal, tamizaje_oncologico, control_cronicidad, entornos_salud_publica, familia_integral_salud_publica, atencion_integral_transversal_salud, catalogo_ocupaciones_simple #, medicos, codigos_rias
 
 # Inicializar la aplicación de FastAPI
 app = FastAPI(
@@ -24,17 +24,17 @@ app.add_middleware(
 )
 
 
-# Incluir las rutas de los diferentes módulos
+# Incluir las rutas de los diferentes módulos - VERSIÓN CONSOLIDADA
 app.include_router(pacientes.router)
 app.include_router(atenciones.router)
 app.include_router(intervenciones_colectivas.router)
-app.include_router(atencion_primera_infancia.router)  # Legacy - mantener por compatibilidad
-app.include_router(atencion_primera_infancia_transversal.router)  # Nueva arquitectura transversal
+app.include_router(atencion_primera_infancia.router)  # VERSIÓN CONSOLIDADA - Arquitectura vertical
 app.include_router(atencion_materno_perinatal.router)
 app.include_router(tamizaje_oncologico.router)
 app.include_router(control_cronicidad.router)
 app.include_router(entornos_salud_publica.router)
 app.include_router(familia_integral_salud_publica.router)
 app.include_router(atencion_integral_transversal_salud.router)
+app.include_router(catalogo_ocupaciones_simple.router)  # Catálogo ocupaciones DANE para PEDT
 # app.include_router(medicos.router)
 # app.include_router(codigos_rias.router)
