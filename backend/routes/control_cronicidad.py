@@ -1,230 +1,626 @@
+# =============================================================================
+# Rutas Control Cronicidad - Arquitectura Vertical Consolidada
+# Implementación Growth Tier siguiendo patrón establecido
+# Fecha: 15 septiembre 2025
+# =============================================================================
+
 from fastapi import APIRouter, HTTPException, status, Depends
 from supabase import Client
-from models import Atencion, ControlCronicidad, ControlHipertensionDetalles, ControlDiabetesDetalles, ControlERCDetalles, ControlDislipidemiaDetalles, ControlCronicidadPolimorfica
-from typing import Literal
+from models.control_cronicidad_model import (
+    ControlCronicidadCrear,
+    ControlCronicidadActualizar,
+    ControlCronicidadResponse,
+    ControlCronicidad,
+    calcular_imc,
+    evaluar_control_adecuado
+)
+from models.control_hipertension_model import ControlHipertensionDetalles
+from models.control_diabetes_model import ControlDiabetesDetalles
+from models.control_erc_model import ControlERCDetalles
+from models.control_dislipidemia_model import ControlDislipidemiaDetalles
 from database import get_supabase_client
-from typing import List
+from typing import List, Optional
 from uuid import UUID, uuid4
-from datetime import datetime
+from datetime import date, datetime
+from core.monitoring import apm_collector, health_metrics, PerformanceTimer
+import time
 
 router = APIRouter(
     prefix="/control-cronicidad",
     tags=["Control de Cronicidad"],
 )
 
-# --- Endpoints para ControlCronicidad (Tabla Padre) ---
+# =============================================================================
+# CRUD BÁSICO CONSOLIDADO
+# =============================================================================
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ControlCronicidad)
-def create_control_cronicidad(control: ControlCronicidadPolimorfica, db: Client = Depends(get_supabase_client)):
-    # Paso 1: Insertar el detalle específico en su tabla correspondiente
-    specific_detail_table = None
-    specific_detail_model = None
-    if control.tipo_cronicidad == "Hipertension":
-        specific_detail_table = "control_hipertension_detalles"
-        specific_detail_model = ControlHipertensionDetalles
-    elif control.tipo_cronicidad == "Diabetes":
-        specific_detail_table = "control_diabetes_detalles"
-        specific_detail_model = ControlDiabetesDetalles
-    elif control.tipo_cronicidad == "ERC":
-        specific_detail_table = "control_erc_detalles"
-        specific_detail_model = ControlERCDetalles
-    elif control.tipo_cronicidad == "Dislipidemia":
-        specific_detail_table = "control_dislipidemia_detalles"
-        specific_detail_model = ControlDislipidemiaDetalles
-    else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tipo de cronicidad no soportado")
-
-    # Asegurarse de que el ID del detalle específico sea generado si no viene
-    if not control.detalles.id:
-        control.detalles.id = uuid4()
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ControlCronicidadResponse)
+def crear_control_cronicidad(
+    control_data: ControlCronicidadCrear, 
+    db: Client = Depends(get_supabase_client)
+):
+    """
+    Crear nuevo control de cronicidad siguiendo patrón polimórfico.
     
-    specific_detail_dict = control.detalles.model_dump(mode='json', exclude_unset=True)
-    # Convertir UUIDs a string para la inserción en Supabase
-    for key, value in specific_detail_dict.items():
-        if isinstance(value, UUID):
-            specific_detail_dict[key] = str(value)
-
+    Funcionalidad consolidada que incluye:
+    - Validaciones básicas de datos
+    - Cálculo automático de IMC
+    - Patrón polimórfico: detalle primero, luego atención general
+    - Respuesta con campos calculados
+    """
     try:
-        detail_response = db.table(specific_detail_table).insert(specific_detail_dict).execute()
-        if not detail_response.data:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al crear el detalle de {control.tipo_cronicidad}")
-        created_specific_detail_id = detail_response.data[0]['id']
+        # 📊 APM: Track database operation timing
+        start_time = time.time()
+        
+        # Validar que el paciente existe
+        paciente_response = db.table("pacientes").select("id").eq("id", str(control_data.paciente_id)).execute()
+        if not paciente_response.data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El paciente especificado no existe"
+            )
+        
+        # Calcular IMC automáticamente si se proporciona peso y talla
+        control_dict = control_data.model_dump(mode='json', exclude_unset=True)
+        
+        if control_data.peso_kg and control_data.talla_cm:
+            control_dict['imc'] = calcular_imc(control_data.peso_kg, control_data.talla_cm)
+        
+        # Procesar campos especiales
+        for key, value in control_dict.items():
+            if isinstance(value, UUID):
+                control_dict[key] = str(value)
+            elif isinstance(value, date):
+                control_dict[key] = value.isoformat()
+            elif isinstance(value, datetime):
+                control_dict[key] = value.isoformat()
+        
+        # Paso 1: Crear control de cronicidad (sin atencion_id por ahora)
+        control_dict_sin_atencion = control_dict.copy()
+        if 'atencion_id' in control_dict_sin_atencion:
+            del control_dict_sin_atencion['atencion_id']
+            
+        response_control = db.table("control_cronicidad").insert(control_dict_sin_atencion).execute()
+        
+        if not response_control.data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al crear control de cronicidad"
+            )
+        
+        control_creado = response_control.data[0]
+        control_id = control_creado["id"]
+        
+        # Paso 2: Crear atención general que referencie al control
+        atencion_data = {
+            "paciente_id": str(control_data.paciente_id),
+            "medico_id": str(control_data.medico_id) if control_data.medico_id else None,
+            "tipo_atencion": f"Control Cronicidad - {control_data.tipo_cronicidad}",
+            "detalle_id": control_id,
+            "fecha_atencion": control_data.fecha_control.isoformat(),
+            "entorno": "IPS",
+            "descripcion": f"Control de {control_data.tipo_cronicidad}"
+        }
+        
+        response_atencion = db.table("atenciones").insert(atencion_data).execute()
+        
+        if not response_atencion.data:
+            # Si falla la atención, eliminar el control creado
+            db.table("control_cronicidad").delete().eq("id", control_id).execute()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al crear atención general para control de cronicidad"
+            )
+        
+        atencion_creada = response_atencion.data[0]
+        atencion_id = atencion_creada["id"]
+        
+        # Paso 3: Actualizar control con atencion_id
+        update_response = db.table("control_cronicidad").update({"atencion_id": atencion_id}).eq("id", control_id).execute()
+        
+        if not update_response.data:
+            # Si falla la actualización, limpiar ambas inserciones
+            db.table("atenciones").delete().eq("id", atencion_id).execute()
+            db.table("control_cronicidad").delete().eq("id", control_id).execute()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al vincular control con atención general"
+            )
+        
+        control_final = update_response.data[0]
+        
+        db_time = time.time() - start_time
+        apm_collector.track_database_operation(
+            table="control_cronicidad",
+            operation="CREATE",
+            response_time=db_time,
+            record_count=1
+        )
+        
+        # 🏥 Track healthcare business metric
+        health_metrics.track_medical_attention(
+            attention_type="control_cronicidad",
+            duration_minutes=30,  # Tiempo promedio de consulta
+            ead3_applied=False,
+            asq3_applied=False
+        )
+        
+        # Agregar campos calculados
+        control_final["control_adecuado"] = _evaluar_control_adecuado_basico(control_final)
+        control_final["riesgo_cardiovascular"] = _calcular_riesgo_cardiovascular(control_final)
+        control_final["adherencia_score"] = _calcular_adherencia_score(control_final)
+        control_final["proxima_cita_recomendada_dias"] = _calcular_proxima_cita_cronicidad(control_final)
+        
+        return ControlCronicidadResponse(**control_final)
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al insertar el detalle específico: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error al crear control de cronicidad: {e}"
+        )
 
-    # Paso 2: Crear el registro general de ControlCronicidad
-    # Excluir el campo 'detalles' ya que no va en la tabla principal de ControlCronicidad
-    control_general_dict = control.model_dump(mode='json', exclude={'detalles'})
-    control_general_dict['detalle_cronicidad_id'] = created_specific_detail_id
+@router.get("/{control_id}", response_model=ControlCronicidadResponse)
+def obtener_control_cronicidad(
+    control_id: UUID, 
+    db: Client = Depends(get_supabase_client)
+):
+    """Obtener control de cronicidad por ID con campos calculados."""
+    try:
+        response = db.table("control_cronicidad").select("*").eq("id", str(control_id)).execute()
+        
+        if not response.data or len(response.data) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Control de cronicidad no encontrado"
+            )
+        
+        control_data = response.data[0]
+        
+        # Agregar campos calculados
+        control_data["control_adecuado"] = _evaluar_control_adecuado_basico(control_data)
+        control_data["riesgo_cardiovascular"] = _calcular_riesgo_cardiovascular(control_data)
+        control_data["adherencia_score"] = _calcular_adherencia_score(control_data)
+        control_data["proxima_cita_recomendada_dias"] = _calcular_proxima_cita_cronicidad(control_data)
+        
+        return ControlCronicidadResponse(**control_data)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener control de cronicidad: {e}"
+        )
+
+@router.get("/", response_model=List[ControlCronicidadResponse])
+def listar_controles_cronicidad(
+    limite: int = 50,
+    offset: int = 0,
+    paciente_id: Optional[UUID] = None,
+    tipo_cronicidad: Optional[str] = None,
+    fecha_desde: Optional[date] = None,
+    fecha_hasta: Optional[date] = None,
+    estado_control: Optional[str] = None,
+    db: Client = Depends(get_supabase_client)
+):
+    """
+    Listar controles de cronicidad con filtros avanzados.
+    """
+    try:
+        # Construir consulta
+        query = db.table("control_cronicidad").select("*")
+        
+        # Aplicar filtros
+        if paciente_id:
+            query = query.eq("paciente_id", str(paciente_id))
+        if tipo_cronicidad:
+            query = query.eq("tipo_cronicidad", tipo_cronicidad)
+        if estado_control:
+            query = query.eq("estado_control", estado_control)
+        if fecha_desde:
+            query = query.gte("fecha_control", fecha_desde.isoformat())
+        if fecha_hasta:
+            query = query.lte("fecha_control", fecha_hasta.isoformat())
+        
+        # Aplicar paginación y ordenamiento
+        response = query.order("fecha_control", desc=True).range(offset, offset + limite - 1).execute()
+        
+        # Procesar respuesta y agregar campos calculados
+        controles_procesados = []
+        for control_data in response.data:
+            control_data["control_adecuado"] = _evaluar_control_adecuado_basico(control_data)
+            control_data["riesgo_cardiovascular"] = _calcular_riesgo_cardiovascular(control_data)
+            control_data["adherencia_score"] = _calcular_adherencia_score(control_data)
+            control_data["proxima_cita_recomendada_dias"] = _calcular_proxima_cita_cronicidad(control_data)
+            
+            controles_procesados.append(ControlCronicidadResponse(**control_data))
+        
+        return controles_procesados
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al listar controles de cronicidad: {e}"
+        )
+
+@router.put("/{control_id}", response_model=ControlCronicidadResponse)
+def actualizar_control_cronicidad(
+    control_id: UUID,
+    control_update: ControlCronicidadActualizar,
+    db: Client = Depends(get_supabase_client)
+):
+    """Actualizar control de cronicidad."""
+    try:
+        # Verificar que existe
+        existing = db.table("control_cronicidad").select("*").eq("id", str(control_id)).execute()
+        if not existing.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Control de cronicidad no encontrado"
+            )
+        
+        # Preparar datos de actualización
+        update_dict = control_update.model_dump(mode='json', exclude_unset=True)
+        
+        # Recalcular IMC si se actualizó peso o talla
+        existing_data = existing.data[0]
+        nuevo_peso = update_dict.get('peso_kg') or existing_data.get('peso_kg')
+        nueva_talla = update_dict.get('talla_cm') or existing_data.get('talla_cm')
+        
+        if nuevo_peso and nueva_talla:
+            update_dict['imc'] = calcular_imc(nuevo_peso, nueva_talla)
+        
+        # Procesar campos especiales
+        for key, value in update_dict.items():
+            if isinstance(value, UUID):
+                update_dict[key] = str(value)
+            elif isinstance(value, date):
+                update_dict[key] = value.isoformat()
+            elif isinstance(value, datetime):
+                update_dict[key] = value.isoformat()
+        
+        # Actualizar timestamp
+        update_dict['updated_at'] = datetime.now().isoformat()
+        
+        # Actualizar en base de datos
+        response = db.table("control_cronicidad").update(update_dict).eq("id", str(control_id)).execute()
+        
+        if not response.data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al actualizar control de cronicidad"
+            )
+        
+        updated_control = response.data[0]
+        
+        # Agregar campos calculados
+        updated_control["control_adecuado"] = _evaluar_control_adecuado_basico(updated_control)
+        updated_control["riesgo_cardiovascular"] = _calcular_riesgo_cardiovascular(updated_control)
+        updated_control["adherencia_score"] = _calcular_adherencia_score(updated_control)
+        updated_control["proxima_cita_recomendada_dias"] = _calcular_proxima_cita_cronicidad(updated_control)
+        
+        return ControlCronicidadResponse(**updated_control)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error al actualizar control de cronicidad: {e}"
+        )
+
+@router.delete("/{control_id}", status_code=status.HTTP_204_NO_CONTENT)
+def eliminar_control_cronicidad(
+    control_id: UUID, 
+    db: Client = Depends(get_supabase_client)
+):
+    """Eliminar control de cronicidad y su atención general asociada."""
+    try:
+        # Verificar que existe y obtener atencion_id
+        existing = db.table("control_cronicidad").select("id, atencion_id").eq("id", str(control_id)).execute()
+        if not existing.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Control de cronicidad no encontrado"
+            )
+        
+        atencion_id = existing.data[0].get("atencion_id")
+        
+        # Eliminar control de cronicidad (esto eliminará la atención asociada por CASCADE)
+        response = db.table("control_cronicidad").delete().eq("id", str(control_id)).execute()
+        
+        # Si existe atención asociada y no se eliminó automáticamente, eliminarla manualmente
+        if atencion_id:
+            try:
+                db.table("atenciones").delete().eq("id", atencion_id).execute()
+            except:
+                # No importa si falla, podría haberse eliminado por CASCADE
+                pass
+        
+        return None
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error al eliminar control de cronicidad: {e}"
+        )
+
+# =============================================================================
+# ENDPOINTS ESPECIALIZADOS POR TIPO DE CRONICIDAD
+# =============================================================================
+
+@router.get("/tipo/{tipo_cronicidad}", response_model=List[ControlCronicidadResponse])
+def listar_por_tipo_cronicidad(
+    tipo_cronicidad: str,
+    limite: int = 50,
+    offset: int = 0,
+    db: Client = Depends(get_supabase_client)
+):
+    """Listar controles por tipo específico de cronicidad."""
+    tipos_validos = ["Hipertension", "Diabetes", "ERC", "Dislipidemia"]
     
-    # Asegurarse de que el ID del control general sea generado si no viene
-    if not control_general_dict.get('id'):
-        control_general_dict['id'] = str(uuid4())
-
-    # Convertir UUIDs a string para la inserción en Supabase
-    for key, value in control_general_dict.items():
-        if isinstance(value, UUID):
-            control_general_dict[key] = str(value)
-
+    if tipo_cronicidad not in tipos_validos:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Tipo de cronicidad no válido. Tipos válidos: {tipos_validos}"
+        )
+    
     try:
-        control_cronicidad_response = db.table("control_cronicidad").insert(control_general_dict).execute()
-        if not control_cronicidad_response.data:
-            # Rollback manual del detalle específico si falla la creación del control general
-            db.table(specific_detail_table).delete().eq("id", created_specific_detail_id).execute()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al crear el registro general de ControlCronicidad")
-        created_control_cronicidad = control_cronicidad_response.data[0]
-        created_control_cronicidad_id = created_control_cronicidad['id']
+        response = db.table("control_cronicidad")\
+            .select("*")\
+            .eq("tipo_cronicidad", tipo_cronicidad)\
+            .order("fecha_control", desc=True)\
+            .range(offset, offset + limite - 1)\
+            .execute()
+        
+        controles_procesados = []
+        for control_data in response.data:
+            control_data["control_adecuado"] = _evaluar_control_adecuado_basico(control_data)
+            control_data["riesgo_cardiovascular"] = _calcular_riesgo_cardiovascular(control_data)
+            control_data["adherencia_score"] = _calcular_adherencia_score(control_data)
+            control_data["proxima_cita_recomendada_dias"] = _calcular_proxima_cita_cronicidad(control_data)
+            
+            controles_procesados.append(ControlCronicidadResponse(**control_data))
+        
+        return controles_procesados
+        
     except Exception as e:
-        # Rollback manual del detalle específico si falla la creación del control general
-        db.table(specific_detail_table).delete().eq("id", created_specific_detail_id).execute()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al insertar el control de cronicidad general: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener controles por tipo: {e}"
+        )
 
-    # Paso 3: Crear la entrada genérica en la tabla de atenciones
-    atencion_generica_dict = {
-        "paciente_id": str(control.paciente_id),
-        "medico_id": str(control.medico_id) if control.medico_id else None,
-        "fecha_atencion": control.fecha_control.isoformat(),
-        "entorno": "Institucional", # Asumido para cronicidad
-        "tipo_atencion": f"Control Cronicidad - {control.tipo_cronicidad}",
-        "detalle_id": created_control_cronicidad_id # Ahora apunta al ID del control general de cronicidad
-    }
+@router.get("/paciente/{paciente_id}/cronologicos", response_model=List[ControlCronicidadResponse])
+def obtener_controles_cronologicos_paciente(
+    paciente_id: UUID,
+    tipo_cronicidad: Optional[str] = None,
+    db: Client = Depends(get_supabase_client)
+):
+    """Obtener historial cronológico de controles de un paciente."""
     try:
-        atencion_response = db.table("atenciones").insert(atencion_generica_dict).execute()
-        if not atencion_response.data:
-            # Rollback manual del detalle específico y del control general
-            db.table(specific_detail_table).delete().eq("id", created_specific_detail_id).execute()
-            db.table("control_cronicidad").delete().eq("id", created_control_cronicidad_id).execute()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al crear la atención genérica de vínculo")
+        query = db.table("control_cronicidad")\
+            .select("*")\
+            .eq("paciente_id", str(paciente_id))
+        
+        if tipo_cronicidad:
+            query = query.eq("tipo_cronicidad", tipo_cronicidad)
+        
+        response = query.order("fecha_control", desc=False).execute()  # Cronológico ascendente
+        
+        controles_procesados = []
+        for control_data in response.data:
+            control_data["control_adecuado"] = _evaluar_control_adecuado_basico(control_data)
+            control_data["riesgo_cardiovascular"] = _calcular_riesgo_cardiovascular(control_data)
+            control_data["adherencia_score"] = _calcular_adherencia_score(control_data)
+            control_data["proxima_cita_recomendada_dias"] = _calcular_proxima_cita_cronicidad(control_data)
+            
+            controles_procesados.append(ControlCronicidadResponse(**control_data))
+        
+        return controles_procesados
+        
     except Exception as e:
-        # Rollback manual del detalle específico y del control general
-        db.table(specific_detail_table).delete().eq("id", created_specific_detail_id).execute()
-        db.table("control_cronicidad").delete().eq("id", created_control_cronicidad_id).execute()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error al crear la atención genérica: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener historial cronológico: {e}"
+        )
 
-    # Retornar el control general creado (que ahora incluye el detalle_cronicidad_id)
-    return ControlCronicidad(**created_control_cronicidad)
+# =============================================================================
+# ESTADÍSTICAS Y REPORTES
+# =============================================================================
 
-@router.get("/", response_model=List[ControlCronicidadPolimorfica])
-def get_all_control_cronicidad(db: Client = Depends(get_supabase_client)):
-    response = db.table("control_cronicidad").select("*").execute()
-    if not response.data:
-        return []
+@router.get("/estadisticas/basicas", response_model=dict)
+def obtener_estadisticas_basicas(db: Client = Depends(get_supabase_client)):
+    """Obtener estadísticas básicas de Control de Cronicidad."""
+    try:
+        # Total de controles
+        total_response = db.table("control_cronicidad").select("id", count="exact").execute()
+        total = total_response.count or 0
+        
+        # Por tipo de cronicidad
+        tipos = ["Hipertension", "Diabetes", "ERC", "Dislipidemia"]
+        estadisticas_por_tipo = {}
+        
+        for tipo in tipos:
+            tipo_response = db.table("control_cronicidad")\
+                .select("id", count="exact")\
+                .eq("tipo_cronicidad", tipo)\
+                .execute()
+            estadisticas_por_tipo[tipo] = tipo_response.count or 0
+        
+        # Controles controlados vs no controlados
+        controlados = db.table("control_cronicidad")\
+            .select("id", count="exact")\
+            .eq("estado_control", "Controlado")\
+            .execute().count or 0
+        
+        no_controlados = db.table("control_cronicidad")\
+            .select("id", count="exact")\
+            .eq("estado_control", "No controlado")\
+            .execute().count or 0
+        
+        # Adherencia al tratamiento
+        buena_adherencia = db.table("control_cronicidad")\
+            .select("id", count="exact")\
+            .eq("adherencia_tratamiento", "Buena")\
+            .execute().count or 0
+        
+        return {
+            "resumen_general": {
+                "total_controles": total,
+                "porcentaje_controlados": round((controlados / total * 100) if total > 0 else 0, 2),
+                "porcentaje_buena_adherencia": round((buena_adherencia / total * 100) if total > 0 else 0, 2)
+            },
+            "por_tipo_cronicidad": estadisticas_por_tipo,
+            "control_metabolico": {
+                "controlados": controlados,
+                "no_controlados": no_controlados,
+                "en_proceso": total - controlados - no_controlados
+            },
+            "fecha_calculo": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener estadísticas: {e}"
+        )
 
-    all_controls = []
-    for control_data in response.data:
-        tipo_cronicidad = control_data.get('tipo_cronicidad')
-        detalle_cronicidad_id = control_data.get('detalle_cronicidad_id')
-
-        if not tipo_cronicidad or not detalle_cronicidad_id:
-            all_controls.append(ControlCronicidad(**control_data))
-            continue
-
-        specific_detail_table = None
-        specific_detail_model = None
-        if tipo_cronicidad == "Hipertension":
-            specific_detail_table = "control_hipertension_detalles"
-            specific_detail_model = ControlHipertensionDetalles
-        elif tipo_cronicidad == "Diabetes":
-            specific_detail_table = "control_diabetes_detalles"
-            specific_detail_model = ControlDiabetesDetalles
-        elif tipo_cronicidad == "ERC":
-            specific_detail_table = "control_erc_detalles"
-            specific_detail_model = ControlERCDetalles
-        elif tipo_cronicidad == "Dislipidemia":
-            specific_detail_table = "control_dislipidemia_detalles"
-            specific_detail_model = ControlDislipidemiaDetalles
-        else:
-            all_controls.append(ControlCronicidad(**control_data))
-            continue
-
-        try:
-            detail_response = db.table(specific_detail_table).select("*").eq("id", str(detalle_cronicidad_id)).single().execute()
-            if detail_response.data:
-                combined_data = {**control_data, "detalles": detail_response.data[0]}
-                if tipo_cronicidad == "Hipertension":
-                    all_controls.append(ControlCronicidadHipertension(**combined_data))
-                elif tipo_cronicidad == "Diabetes":
-                    all_controls.append(ControlCronicidadDiabetes(**combined_data))
-                elif tipo_cronicidad == "ERC":
-                    all_controls.append(ControlCronicidadERC(**combined_data))
-                elif tipo_cronicidad == "Dislipidemia":
-                    all_controls.append(ControlCronicidadDislipidemia(**combined_data))
-                else:
-                    all_controls.append(ControlCronicidad(**control_data))
+@router.get("/reportes/adherencia", response_model=dict)
+def reporte_adherencia_tratamiento(
+    tipo_cronicidad: Optional[str] = None,
+    fecha_desde: Optional[date] = None,
+    fecha_hasta: Optional[date] = None,
+    db: Client = Depends(get_supabase_client)
+):
+    """Reporte de adherencia al tratamiento."""
+    try:
+        query = db.table("control_cronicidad").select("*")
+        
+        if tipo_cronicidad:
+            query = query.eq("tipo_cronicidad", tipo_cronicidad)
+        if fecha_desde:
+            query = query.gte("fecha_control", fecha_desde.isoformat())
+        if fecha_hasta:
+            query = query.lte("fecha_control", fecha_hasta.isoformat())
+        
+        response = query.execute()
+        controles = response.data
+        
+        # Análisis de adherencia
+        adherencia_stats = {
+            "Buena": 0,
+            "Regular": 0,
+            "Mala": 0,
+            "No especificada": 0
+        }
+        
+        for control in controles:
+            adherencia = control.get("adherencia_tratamiento", "No especificada")
+            if adherencia in adherencia_stats:
+                adherencia_stats[adherencia] += 1
             else:
-                all_controls.append(ControlCronicidad(**control_data))
-        except Exception as e:
-            print(f"Error al obtener detalles específicos para {tipo_cronicidad}: {e}")
-            all_controls.append(ControlCronicidad(**control_data))
-
-    return all_controls
-
-@router.get("/{control_id}", response_model=ControlCronicidadPolimorfica)
-def get_control_cronicidad_by_id(control_id: UUID, db: Client = Depends(get_supabase_client)):
-    response = db.table("control_cronicidad").select("*").eq("id", str(control_id)).single().execute()
-    if not response.data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registro de control de cronicidad no encontrado")
-    
-    control_data = response.data[0]
-    tipo_cronicidad = control_data.get('tipo_cronicidad')
-    detalle_cronicidad_id = control_data.get('detalle_cronicidad_id')
-
-    if not tipo_cronicidad or not detalle_cronicidad_id:
-        # Si no hay tipo o detalle_id, retornar el modelo base o manejar como error
-        return ControlCronicidad(**control_data)
-
-    specific_detail_table = None
-    specific_detail_model = None
-    if tipo_cronicidad == "Hipertension":
-        specific_detail_table = "control_hipertension_detalles"
-        specific_detail_model = ControlHipertensionDetalles
-    elif tipo_cronicidad == "Diabetes":
-        specific_detail_table = "control_diabetes_detalles"
-        specific_detail_model = ControlDiabetesDetalles
-    elif tipo_cronicidad == "ERC":
-        specific_detail_table = "control_erc_detalles"
-        specific_detail_model = ControlERCDetalles
-    elif tipo_cronicidad == "Dislipidemia":
-        specific_detail_table = "control_dislipidemia_detalles"
-        specific_detail_model = ControlDislipidemiaDetalles
-    else:
-        # Si el tipo no es reconocido, retornar el modelo base sin detalles específicos
-        return ControlCronicidad(**control_data)
-
-    try:
-        detail_response = db.table(specific_detail_table).select("*").eq("id", str(detalle_cronicidad_id)).single().execute()
-        if not detail_response.data:
-            # Si el detalle no se encuentra, retornar el control general sin detalles específicos
-            return ControlCronicidad(**control_data)
+                adherencia_stats["No especificada"] += 1
         
-        # Combinar los datos del control general con los detalles específicos
-        combined_data = {**control_data, "detalles": detail_response.data[0]}
+        total_controles = len(controles)
         
-        # Retornar la instancia del modelo polimórfico correcto
-        if tipo_cronicidad == "Hipertension":
-            return ControlCronicidadHipertension(**combined_data)
-        elif tipo_cronicidad == "Diabetes":
-            return ControlCronicidadDiabetes(**combined_data)
-        elif tipo_cronicidad == "ERC":
-            return ControlCronicidadERC(**combined_data)
-        elif tipo_cronicidad == "Dislipidemia":
-            return ControlCronicidadDislipidemia(**combined_data)
-        else:
-            return ControlCronicidad(**control_data) # Fallback
-
+        return {
+            "parametros_reporte": {
+                "tipo_cronicidad": tipo_cronicidad or "Todos",
+                "fecha_desde": fecha_desde.isoformat() if fecha_desde else None,
+                "fecha_hasta": fecha_hasta.isoformat() if fecha_hasta else None,
+                "total_controles_analizados": total_controles
+            },
+            "adherencia_absolutos": adherencia_stats,
+            "adherencia_porcentajes": {
+                key: round((value / total_controles * 100) if total_controles > 0 else 0, 2)
+                for key, value in adherencia_stats.items()
+            },
+            "fecha_generacion": datetime.now().isoformat()
+        }
+        
     except Exception as e:
-        # En caso de error al buscar detalles, retornar el control general sin detalles específicos
-        print(f"Error al obtener detalles específicos para {tipo_cronicidad}: {e}")
-        return ControlCronicidad(**control_data)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al generar reporte de adherencia: {e}"
+        )
 
-# --- Endpoints para Detalles (Tablas Hijo) ---
+# =============================================================================
+# FUNCIONES AUXILIARES PARA CAMPOS CALCULADOS
+# =============================================================================
 
+def _evaluar_control_adecuado_basico(control_data: dict) -> bool:
+    """Evaluar si el control es adecuado (lógica básica)."""
+    try:
+        estado_control = control_data.get('estado_control', '')
+        return estado_control == "Controlado"
+    except Exception:
+        return False
 
+def _calcular_riesgo_cardiovascular(control_data: dict) -> str:
+    """Calcular nivel de riesgo cardiovascular básico."""
+    try:
+        imc = control_data.get('imc', 0)
+        edad_estimada = 50  # Simplificado
+        
+        factores_riesgo = 0
+        
+        if imc > 30:  # Obesidad
+            factores_riesgo += 2
+        elif imc > 25:  # Sobrepeso
+            factores_riesgo += 1
+            
+        if control_data.get('estado_control') == "No controlado":
+            factores_riesgo += 2
+            
+        if control_data.get('adherencia_tratamiento') == "Mala":
+            factores_riesgo += 1
+            
+        if factores_riesgo <= 1:
+            return "Bajo"
+        elif factores_riesgo <= 3:
+            return "Moderado"
+        else:
+            return "Alto"
+            
+    except Exception:
+        return "No evaluado"
 
-@router.get("/hipertension-detalles/control/{control_cronicidad_id}", response_model=List[ControlHipertensionDetalles])
-def get_hipertension_detalles_by_control_id(control_cronicidad_id: UUID, db: Client = Depends(get_supabase_client)):
-    response = db.table("control_hipertension_detalles").select("*").eq("control_cronicidad_id", str(control_cronicidad_id)).execute()
-    if not response.data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron detalles de hipertensión para este control")
-    return response.data
+def _calcular_adherencia_score(control_data: dict) -> float:
+    """Calcular score de adherencia 0-100."""
+    try:
+        adherencia = control_data.get('adherencia_tratamiento', '')
+        
+        if adherencia == "Buena":
+            return 85.0
+        elif adherencia == "Regular":
+            return 60.0
+        elif adherencia == "Mala":
+            return 30.0
+        else:
+            return 50.0  # Valor neutro cuando no se especifica
+            
+    except Exception:
+        return 50.0
 
+def _calcular_proxima_cita_cronicidad(control_data: dict) -> int:
+    """Calcular días recomendados para próxima cita."""
+    try:
+        tipo_cronicidad = control_data.get('tipo_cronicidad', '')
+        estado_control = control_data.get('estado_control', '')
+        
+        # Lógica básica según tipo y control
+        if estado_control == "No controlado":
+            return 30  # Seguimiento más frecuente
+        elif estado_control == "En proceso":
+            return 60  # Seguimiento intermedio
+        elif tipo_cronicidad in ["Diabetes", "Hipertension"]:
+            return 90  # Cada 3 meses para DM/HTA controlada
+        else:
+            return 120  # Cada 4 meses para otras cronicidades
+            
+    except Exception:
+        return 90  # Default: 3 meses

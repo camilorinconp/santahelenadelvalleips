@@ -11,5 +11,6 @@ class Atencion(BaseModel):
     entorno: Optional[str] = None
     tipo_atencion: str
     detalle_id: UUID
+    descripcion: Optional[str] = None  # Añadir campo descripcion
     creado_en: Optional[datetime] = None
     updated_at: Optional[datetime] = None
