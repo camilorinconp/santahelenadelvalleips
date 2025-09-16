@@ -32,15 +32,19 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 - **👥 [Estrategia Perfiles Duales](../03-architecture/dual-profiles-strategy.md)** - Clínico + Call Center
 - **📋 [Recomendaciones Expertas](../03-architecture/external-recommendations.md)** - Guía arquitectónica externa
 - **🛣️ [Roadmap Perfiles Duales](../03-architecture/roadmap-dual-profiles.md)** - Cronograma implementación
+- **🗺️ [Roadmap Estratégico](../03-architecture/strategic-roadmap.md)** - Análisis y hoja de ruta maestra
 
 ### 👨‍💻 **Guías Desarrollo** → [docs/04-development/](../04-development/)
 **Para:** Desarrolladores activos, equipo técnico día a día
 - **📚 [Lecciones Aprendidas](../04-development/lessons-learned.md)** - Mejores prácticas críticas
 - **🧪 [Guía Testing](../04-development/testing-guide.md)** - Suite pruebas automatizadas
 - **📊 [Estado Actual](../04-development/current-status.md)** - Progreso y próximos pasos
+- **🏗️ [Framework Mejores Prácticas](../04-development/best-practices-framework.md)** - Metodología enterprise
+- **⚙️ [Workflow de Desarrollo](../04-development/development-workflow.md)** - Flujo completo desarrollo
 
 ### 📜 **Registros Históricos** → [docs/05-logs/](../05-logs/)
 **Para:** Referencias históricas, troubleshooting, auditorías
+- **[Milestones](../05-logs/milestones/)** - Hitos importantes del proyecto
 - **[Logs de Sesiones](../05-logs/session-logs/)** - Registros sesiones específicas
 - **[Infraestructura](../05-logs/infrastructure/)** - Verificaciones técnicas
 
