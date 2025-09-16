@@ -81,7 +81,7 @@ Obligatorio para:
 |------------|--------|-------------|--------------|
 | **RPMS Primera Infancia** | ✅ Completado | 100% | - |
 | **RPMS Infancia** | ✅ Completado | 100% | - |
-| **RPMS Adolescencia** | ⏸️ Pendiente | 0% | Implementar siguiente |
+| **RPMS Adolescencia** | ✅ Completado | 100% | - |
 | **RIAMP** | 🔄 En progreso | 40% | Continuar desarrollo |
 | **Anexos Técnicos** | ⏸️ Pendiente | 0% | Instrumentos evaluación |
 
