@@ -101,7 +101,15 @@ supabase db push
 ## Important Considerations
 
 ### Resolution 3280 Compliance
-This project strictly follows Colombian health regulations (Resolución 3280 de 2018). All data models, business logic, and workflows must align with these requirements. The document `docs/02-regulations/resolucion-3280-master.md` is the ultimate authority for implementation decisions.
+This project strictly follows Colombian health regulations (Resolución 3280 de 2018). All data models, business logic, and workflows must align with these requirements. 
+
+**📊 ANÁLISIS COMPLIANCE CRÍTICO:** `docs/02-regulations/compliance-analysis-3280.md` - Documento de referencia permanente que identifica:
+- Estado actual: 35% compliance (DEFICIENTE)
+- Gap crítico: 5/6 momentos del curso de vida faltantes
+- Plan estratégico: 4 fases para alcanzar 100% compliance
+- Próximo paso: Implementar Infancia (6-11 años)
+
+The document `docs/02-regulations/resolucion-3280-master.md` is the ultimate authority for implementation decisions.
 
 ### Architecture References
 

@@ -20,6 +20,7 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 
 ### 📋 **Compliance Normativo** → [docs/02-regulations/](../02-regulations/)
 **Para:** Auditores, equipo médico, responsables compliance
+- **⭐ [ANÁLISIS COMPLIANCE 3280](../02-regulations/compliance-analysis-3280.md)** - Articulación completa con normativa ⭐
 - **🏛️ [Resolución 3280 Maestro](../02-regulations/resolucion-3280-master.md)** - Documento normativo definitivo
 - **📊 [Estrategia Resolución 202](../02-regulations/resolucion-202-strategy.md)** - Desarrollo híbrido PEDT
 - **🔍 [Análisis Completo 202](../02-regulations/resolucion-202-analysis.md)** - 540+ líneas análisis detallado
