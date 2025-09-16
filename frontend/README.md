@@ -9,7 +9,7 @@ Single Page Application (React + TypeScript) para gestión de RIAS con interface
 
 ## 🔧 **Configuración AI Assistant**
 - 📋 [Configuración Frontend](CLAUDE.md) - Setup desarrollo React con AI
-- 🧠 [Contexto Técnico](GEMINI.md) - Historia arquitectónica frontend
+- 🧠 [Contexto Técnico](FRONTEND-STATUS.md) - Historia arquitectónica frontend
 
 ## 📚 **Documentación Organizada**
 La documentación técnica está estructurada por especialización:

@@ -212,7 +212,7 @@ Resolución 3280 compliance    // Colombian health regulation
 
 ### **📖 Configuración AI:**
 - **[CLAUDE.md](../../CLAUDE.md)** - Configuración desarrollo con AI
-- **[GEMINI.md](../../GEMINI.md)** - Contexto histórico técnico
+- **[FRONTEND-STATUS.md](../../FRONTEND-STATUS.md)** - Contexto histórico técnico
 - **[Lessons Learned](../04-development/lessons-learned.md)** - Mejores prácticas críticas
 
 ### **🌐 Referencias Externas:**

@@ -38,7 +38,7 @@ Para mantener la consistencia entre el entorno de desarrollo local y el remoto, 
 ### 5. Fuentes de la Verdad (Lectura Obligatoria)
 1.  **`docs/01-ARCHITECTURE-GUIDE.md`**: Fuente de la verdad para la arquitectura de datos, incluyendo el patrón polimórfico y la estrategia de tipado (ENUMs, JSONB, TEXT).
 2.  **`docs/02-DEVELOPMENT-WORKFLOW.md`**: Guía detallada sobre el flujo de trabajo de desarrollo, incluyendo el manejo de migraciones.
-3.  **`backend/GEMINI.md`**: Contexto sobre cómo los modelos de la API se relacionan con el esquema de la base de datos.
+3.  **`backend/DATABASE-STATUS.md`**: Contexto sobre cómo los modelos de la API se relacionan con el esquema de la base de datos.
 
 ### 6. Idioma de Interacción
 La comunicación con el asistente de IA y los comentarios en las migraciones deben realizarse preferentemente en **español**.

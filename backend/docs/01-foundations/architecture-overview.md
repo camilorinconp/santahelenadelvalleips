@@ -20,11 +20,14 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 
 ### 📋 **Compliance Normativo** → [docs/02-regulations/](../02-regulations/)
 **Para:** Auditores, equipo médico, responsables compliance
-- **⭐ [ANÁLISIS COMPLIANCE 3280](../02-regulations/compliance-analysis-3280.md)** - Articulación completa con normativa ⭐
-- **🏛️ [Resolución 3280 Maestro](../02-regulations/resolucion-3280-master.md)** - Documento normativo definitivo
+- **⭐ [RESUMEN EJECUTIVO 3280](../02-regulations/resolucion-3280-overview.md)** - Navegación inteligente Resolución 3280 ⭐
+- **🏛️ [Marco Normativo](../02-regulations/resolucion-3280-articles.md)** - Artículos y impacto técnico
+- **🎯 [RPMS Detallada](../02-regulations/resolucion-3280-rpms.md)** - Promoción y mantenimiento salud
+- **🤱 [RIAMP Detallada](../02-regulations/resolucion-3280-riamp.md)** - Atención materno-perinatal
+- **📎 [Anexos Técnicos](../02-regulations/resolucion-3280-annexes/)** - 11 instrumentos especializados
+- **⭐ [ANÁLISIS COMPLIANCE](../02-regulations/compliance-analysis-3280.md)** - Estado técnico actual
 - **📊 [Estrategia Resolución 202](../02-regulations/resolucion-202-strategy.md)** - Desarrollo híbrido PEDT
 - **🔍 [Análisis Completo 202](../02-regulations/resolucion-202-analysis.md)** - 540+ líneas análisis detallado
-- **🏛️ [Estrategia Catálogos](../02-regulations/catalogs-strategy.md)** - Catálogos transversales críticos
 - **👥 [Insights Consultores](../02-regulations/external-consultant-insights.md)** - Análisis equipo externo
 
 ### 🏗️ **Arquitectura Estratégica** → [docs/03-architecture/](../03-architecture/)
@@ -55,7 +58,7 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 ### **1. 🧬 Polimorfismo Anidado**
 **Decisión:** Arquitectura polimórfica con tablas base + detalles específicos  
 **Impacto:** Escalabilidad normativa sin refactorizaciones  
-**Documento:** [Contexto Polimorfismo](../../GEMINI.md) ⭐
+**Documento:** [Contexto Polimorfismo](../../PROJECT-STATUS.md) ⭐
 
 ### **2. 👥 Estrategia Perfiles Duales**  
 **Decisión:** Backend unificado + frontends especializados (Clínico + Call Center)  
@@ -82,7 +85,7 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 ## ⚡ **Inicio Rápido por Rol**
 
 ### **👨‍💻 Desarrollador Nuevo:**
-1. **Contexto técnico:** [CLAUDE.md](../../CLAUDE.md) + [GEMINI.md](../../GEMINI.md)
+1. **Contexto técnico:** [CLAUDE.md](../../CLAUDE.md) + [PROJECT-STATUS.md](../../PROJECT-STATUS.md)
 2. **Lecciones críticas:** [Lecciones Aprendidas](../04-development/lessons-learned.md)
 3. **Estado actual:** [Estado Actual](../04-development/current-status.md)
 4. **Testing:** [Guía Testing](../04-development/testing-guide.md)
@@ -95,7 +98,7 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 ### **🏗️ Arquitecto/Líder Técnico:**
 1. **Visión estratégica:** [Estrategia Perfiles Duales](../03-architecture/dual-profiles-strategy.md)
 2. **Recomendaciones:** [Recomendaciones Expertas](../03-architecture/external-recommendations.md)
-3. **Contexto polimorfismo:** [GEMINI.md](../../GEMINI.md)
+3. **Contexto polimorfismo:** [PROJECT-STATUS.md](../../PROJECT-STATUS.md)
 
 ### **👔 Stakeholder/Gerencia:**
 1. **Estrategia perfiles:** [Estrategia Perfiles Duales](../03-architecture/dual-profiles-strategy.md)
@@ -169,7 +172,7 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 
 - **[Repositorio Principal](../../)** - Código fuente completo
 - **[Configuración AI](../../CLAUDE.md)** - Setup asistente técnico
-- **[Contexto Histórico](../../GEMINI.md)** - Evolución arquitectónica
+- **[Contexto Histórico](../../PROJECT-STATUS.md)** - Evolución arquitectónica
 - **[Frontend](../../../frontend/)** - Interfaz usuario (en desarrollo)
 - **[Base Datos](../../../supabase/)** - Migraciones y configuración
 

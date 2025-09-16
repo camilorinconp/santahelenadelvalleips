@@ -9,7 +9,7 @@ El sistema integral de gestión de RIAS (Rutas Integrales de Atención en Salud)
 
 ## 🔧 **Configuración AI Assistant**
 - 📋 [Configuración Completa](CLAUDE.md) - Setup desarrollo con AI
-- 🧠 [Contexto Polimorfismo](GEMINI.md) - Historia técnica arquitectura
+- 📊 [Estado del Proyecto](PROJECT-STATUS.md) - Progreso y estado actual por módulos
 
 ## 📚 **Documentación Organizada**
 La documentación técnica está estructurada por propósito:

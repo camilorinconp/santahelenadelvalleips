@@ -248,7 +248,7 @@ pg_dump [connection] > schema_backup.sql
 
 ### **📖 Documentación Database:**
 - **[CLAUDE.md](../../CLAUDE.md)** - Configuración AI para database work
-- **[GEMINI.md](../../GEMINI.md)** - Contexto histórico database workflow
+- **[DATABASE-STATUS.md](../../DATABASE-STATUS.md)** - Contexto histórico database workflow
 - **[Migration Guide](../02-migrations/migration-guide.md)** - Workflow detallado migraciones
 
 ### **🌐 Referencias Externas:**

@@ -129,7 +129,7 @@ The document `docs/02-regulations/resolucion-3280-master.md` is the ultimate aut
 - **`docs/03-architecture/external-recommendations.md`**: Guía arquitectónica expertos
 
 ### **📋 Contexto Histórico y Lecciones**
-- **`GEMINI.md`**: Contexto del polimorfismo de datos y estrategia inicial
+- **`PROJECT-STATUS.md`**: Estado actual del proyecto y progreso por módulos
 - **`docs/04-development/lessons-learned.md`**: Lecciones aprendidas críticas
 - **`docs/04-development/current-status.md`**: Estado actual y próximos pasos
 

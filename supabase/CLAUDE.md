@@ -42,7 +42,7 @@ La base de datos implementa un diseño híbrido que combina:
 ### Configuration
 - `config.toml`: Supabase project configuration
 - `migrations/`: All database schema changes as SQL files
-- `GEMINI.md`: Database context and workflow documentation
+- `DATABASE-STATUS.md`: Database context and workflow documentation
 
 ### Migration History
 Las migraciones están organizadas cronológicamente y documentan la evolución del esquema:
