@@ -1,5 +1,5 @@
 # Contexto del Proyecto (Backend): API para IPS Santa Helena del Valle
-**Última Actualización:** 14 de septiembre, 2025
+**Última Actualización:** 16 de septiembre, 2025
 
 ## 1. Propósito y Dominio
 El proyecto es una API REST para una Institución Prestadora de Salud (IPS) en Colombia. Su objetivo es gestionar las Rutas Integrales de Atención en Salud (RIAS) según la normativa colombiana, específicamente la **Resolución 3280 de 2018**, y generar los reportes de cumplimiento exigidos por la **Resolución 202 de 2021**.
@@ -39,8 +39,11 @@ El backend sigue una arquitectura de 3 capas para una clara separación de respo
 
 ## 5. Módulos Clave y Estado de Avance
 
-- **Núcleo y Arquitectura (80%):** La base del proyecto (FastAPI, conexión a BD, estructura de carpetas, sistema de migraciones, RLS) es sólida y madura.
-- **RIAMP (Ruta Materno Perinatal) (35%):** La estructura polimórfica está implementada. Los modelos de datos son aún esqueléticos y requieren la adición de la mayoría de los campos granulares de la Res. 3280.
+- **Núcleo y Arquitectura (85%):** La base del proyecto (FastAPI, conexión a BD, estructura de carpetas, sistema de migraciones, RLS) es sólida y madura. Arquitectura vertical consolidada.
+- **RIAMP (Ruta Materno Perinatal) (40%):** La estructura polimórfica anidada está implementada. Los modelos de datos incluyen campos granulares específicos de la Res. 3280.
+- **Primera Infancia (100%):** **COMPLETADO.** Implementación completa con arquitectura vertical, 14 tests pasando, EAD-3 y ASQ-3 funcionales, endpoints especializados y estadísticas.
+- **Control Cronicidad (95%):** **COMPLETADO.** Arquitectura vertical consolidada, 4 tipos de cronicidad (Diabetes, HTA, ERC, Dislipidemia), pruebas exhaustivas.
+- **Tamizaje Oncológico (100%):** **COMPLETADO.** Implementación completa siguiendo patrón vertical, 4 tipos de tamizaje (Cuello Uterino, Mama, Próstata, Colon y Recto), 21 tests comprehensivos, campos calculados, endpoints especializados, estadísticas y reportes de adherencia.
 - **RPMS (Rutas de Promoción y Mantenimiento) (15%):** Existen modelos y rutas esqueléticas, pero la implementación de la lógica de negocio detallada por momento de vida no ha comenzado.
 - **Reportería Regulatoria (Res. 202) (20%):** **Iniciado.** La existencia del servicio `reporteria_pedt.py` y sus tests (`test_reporteria_pedt.py`) confirma que el desarrollo de la "Capa de Reportería Inteligente" ha comenzado, siguiendo la estrategia híbrida acordada.
 - **Gestión Proactiva (Demanda Inducida) (0%):** No iniciado. Las tablas `oportunidades_cuidado` y `gestiones_contacto` aún no han sido creadas.
@@ -52,5 +55,47 @@ El backend sigue una arquitectura de 3 capas para una clara separación de respo
 - Las pruebas deben ser autocontenidas y no depender del estado de la base de datos.
 - La guía de testing detallada se encuentra en `backend/docs/04-development/testing-guide.md`.
 
-## 7. Idioma de Interacción
+## 7. Implementaciones RIAS Completadas
+
+### 7.1. Tamizaje Oncológico (Completado - 16 Sep 2025)
+**Arquitectura:** Vertical con patrón polimórfico de 3 pasos siguiendo el modelo establecido en Control Cronicidad.
+
+**Características Técnicas:**
+- **Tipos Soportados:** 4 tipos de tamizaje (Cuello Uterino, Mama, Próstata, Colon y Recto)
+- **Patrón de Creación:** Polimórfico de 3 pasos (crear tamizaje → crear atención → actualizar referencia)
+- **Campos Calculados:** 4 funciones automáticas:
+  - `nivel_riesgo`: Bajo/Moderado/Alto según resultados específicos por tipo
+  - `adherencia_tamizaje`: Buena/Regular/Mala según temporalidad
+  - `proxima_cita_recomendada_dias`: 30/90/365/730/1095 días según riesgo y tipo
+  - `completitud_tamizaje`: 0-100% según campos completados
+
+**Endpoints Implementados:**
+- CRUD básico: `POST /tamizaje-oncologico/`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`
+- Especializados: `/tipo/{tipo_tamizaje}`, `/paciente/{id}/cronologicos`
+- Estadísticas: `/estadisticas/basicas` con distribución por tipo y resultados
+- Reportes: `/reportes/adherencia` con filtros avanzados
+- Legacy: `/tamizajes-oncologicos/` para compatibilidad
+
+**Testing:** 21 tests comprehensivos organizados en 6 grupos:
+1. CRUD básico (5 tests)
+2. Endpoints especializados (4 tests) 
+3. Estadísticas y reportes (3 tests)
+4. Casos edge y validaciones (5 tests)
+5. Funcionalidad integrada (2 tests)
+6. Compatibilidad legacy (2 tests)
+
+**Base de Datos:** Migración `20250916020000_fix_tamizaje_oncologico_nullable_atencion_id.sql` aplicada para permitir patrón polimórfico con `atencion_id` nullable.
+
+**Archivos Clave:**
+- `models/tamizaje_oncologico_model.py`: Modelos Crear/Actualizar/Response con campos calculados
+- `routes/tamizaje_oncologico.py`: Rutas con patrón vertical y endpoints especializados
+- `tests/test_tamizaje_oncologico_completo.py`: Suite completa de 21 tests
+
+### 7.2. Control Cronicidad (Completado - Sep 2025)
+Implementación vertical completa para manejo de 4 tipos de cronicidad con arquitectura polimórfica consolidada.
+
+### 7.3. Primera Infancia (Completado - Sep 2025)
+Implementación 100% funcional con EAD-3, ASQ-3, arquitectura vertical y 14 tests.
+
+## 8. Idioma de Interacción
 La comunicación con el asistente de IA y toda la terminología del proyecto debe ser en **español**.
