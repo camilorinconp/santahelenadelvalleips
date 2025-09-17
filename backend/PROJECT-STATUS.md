@@ -1,6 +1,9 @@
 # Contexto del Proyecto (Backend): API para IPS Santa Helena del Valle
 **Última Actualización:** 17 de septiembre, 2025 - MILESTONE ADULTEZ COMPLETADO + TESTING RESTAURADO 🚀
 
+**🔥 CONTEXTO ACTIVO**: Para retomar desarrollo, lee `/DEV-CONTEXT.md`
+**📊 ESTADO COMPLETO**: Este archivo documenta el estado histórico y arquitectónico completo
+
 ## 1. Propósito y Dominio
 El proyecto es una API REST para una Institución Prestadora de Salud (IPS) en Colombia. Su objetivo es gestionar las Rutas Integrales de Atención en Salud (RIAS) según la normativa colombiana, específicamente la **Resolución 3280 de 2018**, y generar los reportes de cumplimiento exigidos por la **Resolución 202 de 2021**.
 

@@ -1,5 +1,9 @@
 # Claude Code - Frontend Configuration
 
+## 🎯 ENTRADA RÁPIDA
+**¿Vienes a retomar desarrollo?** → Lee primero: `/DEV-CONTEXT.md`
+**¿Necesitas contexto técnico específico?** → Continúa leyendo este archivo
+
 ## About This Project
 
 Este es el frontend de la IPS Santa Helena del Valle, una Single Page Application (SPA) desarrollada con React y TypeScript que proporciona la interfaz de usuario para gestionar las Rutas Integrales de Atención en Salud (RIAS) según la normativa colombiana (Resolución 3280 de 2018).

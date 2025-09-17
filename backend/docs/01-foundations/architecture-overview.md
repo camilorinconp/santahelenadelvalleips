@@ -190,6 +190,15 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 
 ---
 
-**🔄 Este documento se actualiza con cada hito arquitectónico significativo**  
-**👥 Mantenido por:** Equipo Técnico Principal  
+## 🎯 ENTRADA RÁPIDA PARA DESARROLLO ACTIVO
+
+**🚨 IMPORTANTE**: Si vienes a retomar desarrollo después de un paré, lee PRIMERO:
+📖 **`/DEV-CONTEXT.md`** - Contexto dinámico y tareas actuales
+
+Este documento (architecture-overview.md) es para entender la arquitectura completa del proyecto. El DEV-CONTEXT.md es para saber qué hacer HOY.
+
+---
+
+**🔄 Este documento se actualiza con cada hito arquitectónico significativo**
+**👥 Mantenido por:** Equipo Técnico Principal
 **🤖 Optimizado para:** AI Assistant navigation + Human readability

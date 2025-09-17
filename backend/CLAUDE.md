@@ -1,5 +1,9 @@
 # Claude Code - Backend Configuration
 
+## 🎯 ENTRADA RÁPIDA
+**¿Vienes a retomar desarrollo?** → Lee primero: `/DEV-CONTEXT.md`
+**¿Necesitas contexto técnico específico?** → Continúa leyendo este archivo
+
 ## About This Project
 
 Este es el backend de la IPS Santa Helena del Valle, una API REST desarrollada con FastAPI para gestionar las Rutas Integrales de Atención en Salud (RIAS) según la normativa colombiana (Resolución 3280 de 2018).

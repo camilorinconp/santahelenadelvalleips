@@ -1,5 +1,9 @@
 # Claude Code - Supabase Database Configuration
 
+## 🎯 ENTRADA RÁPIDA
+**¿Vienes a retomar desarrollo?** → Lee primero: `/DEV-CONTEXT.md`
+**¿Necesitas contexto técnico específico?** → Continúa leyendo este archivo
+
 ## About This Project
 
 Esta carpeta contiene toda la configuración y migraciones de la base de datos PostgreSQL gestionada por Supabase para el proyecto de la IPS Santa Helena del Valle. Es la fuente de la verdad para la estructura de la base de datos que soporta las Rutas Integrales de Atención en Salud (RIAS) según la Resolución 3280 de 2018.
