@@ -52,7 +52,8 @@ def create_paciente(paciente: Paciente, db: Client = Depends(get_supabase_client
 @router.put("/{paciente_id}")
 def update_paciente(paciente_id: str, paciente: Paciente, db: Client = Depends(get_supabase_client)):
     # Forzar la serialización a JSON para manejar tipos de datos complejos como 'date'
-    paciente_dict = paciente.model_dump(mode='json', exclude={'id'})
+    # Excluir campos de auditoría que se manejan automáticamente por la DB
+    paciente_dict = paciente.model_dump(mode='json', exclude={'id', 'creado_en', 'updated_at'})
     response = db.table("pacientes").update(paciente_dict).eq("id", paciente_id).execute()
     if not response.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Paciente no encontrado para actualizar")

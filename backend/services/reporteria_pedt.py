@@ -214,12 +214,28 @@ class GeneradorReportePEDT:
     def _calcular_sifilis_gestacional(self, paciente_id: UUID) -> int:
         """
         Calcula sífilis gestacional (Variable 15)
-        
-        TODO: Implementar lógica específica cuando se agreguen campos de laboratorio
-        Por ahora retorna valor por defecto
+
+        Implementa lógica específica basada en atención materno perinatal
         """
-        # TODO: Implementar consulta a resultados laboratorio sífilis
-        return 0  # Default: No aplica / No se ha realizado
+        try:
+            # Buscar atenciones materno perinatales del paciente con resultados de sífilis
+            mp_response = self.db.table("atencion_materno_perinatal").select(
+                "resultado_tamizaje_sifilis, fecha_atencion"
+            ).eq("paciente_id", str(paciente_id)).order("fecha_atencion", desc=True).limit(1).execute()
+
+            if mp_response.data:
+                resultado = mp_response.data[0].get("resultado_tamizaje_sifilis")
+                if resultado == "POSITIVO":
+                    return 1  # Sífilis gestacional detectada
+                elif resultado == "NEGATIVO":
+                    return 2  # Descartada
+                elif resultado in ["REACTIVO", "NO_REACTIVO"]:
+                    return 1 if resultado == "REACTIVO" else 2
+
+            return 0  # No aplica / No se ha realizado
+        except Exception as e:
+            logger.warning(f"Error consultando sífilis gestacional: {e}")
+            return 0
     
     def _calcular_variables_test_vejez(self, paciente_id: UUID, datos_paciente: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -344,19 +360,43 @@ class GeneradorReportePEDT:
     def _calcular_variables_crecimiento_desarrollo(self, paciente_id: UUID, datos_paciente: Dict[str, Any]) -> Dict[str, Any]:
         """
         Variables crecimiento y desarrollo primera infancia (46-55)
+        Implementa lógica específica basada en atención primera infancia y datos EAD-3/ASQ-3
         """
         edad = self._calcular_edad(datos_paciente.get('fecha_nacimiento'))
-        
+
         if edad and edad <= 10:
-            # TODO: Implementar cuando se agreguen campos EAD-3
-            return {
-                **{f'var_{i}_crecimiento_desarrollo': 0 for i in range(46, 56)}
-            }
+            # Buscar atenciones de primera infancia con datos EAD-3/ASQ-3
+            try:
+                pi_response = self.db.table("atencion_primera_infancia").select(
+                    "peso_kg, talla_cm, estado_nutricional, desarrollo_fisico_motor_observaciones, "
+                    "desarrollo_cognitivo_observaciones, esquema_vacunacion_completo, "
+                    "ead_resultado_global, asq_resultado_global, fecha_atencion"
+                ).eq("paciente_id", str(paciente_id)).order("fecha_atencion", desc=True).limit(1).execute()
+
+                if pi_response.data:
+                    datos_pi = pi_response.data[0]
+                    return {
+                        'var_46_peso_actual': datos_pi.get('peso_kg', 0),
+                        'var_47_talla_actual': datos_pi.get('talla_cm', 0),
+                        'var_48_estado_nutricional': self._mapear_estado_nutricional(datos_pi.get('estado_nutricional')),
+                        'var_49_desarrollo_motor': self._evaluar_desarrollo_motor(datos_pi.get('desarrollo_fisico_motor_observaciones')),
+                        'var_50_desarrollo_cognitivo': self._evaluar_desarrollo_cognitivo(datos_pi.get('desarrollo_cognitivo_observaciones')),
+                        'var_51_esquema_vacunacion': 1 if datos_pi.get('esquema_vacunacion_completo') else 0,
+                        'var_52_ead_resultado': self._mapear_ead_resultado(datos_pi.get('ead_resultado_global')),
+                        'var_53_asq_resultado': self._mapear_asq_resultado(datos_pi.get('asq_resultado_global')),
+                        'var_54_desarrollo_global': self._calcular_desarrollo_global(datos_pi),
+                        'var_55_alertas_desarrollo': self._identificar_alertas_desarrollo(datos_pi)
+                    }
+                else:
+                    # Sin datos de primera infancia
+                    return {**{f'var_{i}_crecimiento_desarrollo': 0 for i in range(46, 56)}}
+
+            except Exception as e:
+                logger.warning(f"Error consultando datos primera infancia: {e}")
+                return {**{f'var_{i}_crecimiento_desarrollo': 0 for i in range(46, 56)}}
         else:
             # No aplica por edad
-            return {
-                **{f'var_{i}_crecimiento_desarrollo': 0 for i in range(46, 56)}
-            }
+            return {**{f'var_{i}_crecimiento_desarrollo': 0 for i in range(46, 56)}}
     
     def _calcular_variables_consultas_curso_vida(self, paciente_id: UUID, datos_paciente: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -576,3 +616,119 @@ class GeneradorReportePEDT:
             campos.append(str(valor))
         
         return '|'.join(campos)
+
+    # =====================================================
+    # MÉTODOS AUXILIARES PARA MAPEO DE DATOS ESPECÍFICOS
+    # =====================================================
+
+    def _mapear_estado_nutricional(self, estado: str) -> int:
+        """Mapea estado nutricional a código PEDT"""
+        mapeo = {
+            'NORMAL': 1,
+            'DESNUTRICION_AGUDA': 2,
+            'SOBREPESO': 3,
+            'OBESIDAD': 4,
+            'RIESGO_DESNUTRICION': 5
+        }
+        return mapeo.get(estado, 0)
+
+    def _evaluar_desarrollo_motor(self, observaciones: str) -> int:
+        """Evalúa desarrollo motor basado en observaciones"""
+        if not observaciones:
+            return 0
+
+        observaciones_lower = observaciones.lower()
+        if 'normal' in observaciones_lower or 'adecuado' in observaciones_lower:
+            return 1
+        elif 'riesgo' in observaciones_lower or 'alerta' in observaciones_lower:
+            return 2
+        elif 'retraso' in observaciones_lower or 'alterado' in observaciones_lower:
+            return 3
+        return 0
+
+    def _evaluar_desarrollo_cognitivo(self, observaciones: str) -> int:
+        """Evalúa desarrollo cognitivo basado en observaciones"""
+        if not observaciones:
+            return 0
+
+        observaciones_lower = observaciones.lower()
+        if 'normal' in observaciones_lower or 'adecuado' in observaciones_lower:
+            return 1
+        elif 'riesgo' in observaciones_lower or 'alerta' in observaciones_lower:
+            return 2
+        elif 'retraso' in observaciones_lower or 'alterado' in observaciones_lower:
+            return 3
+        return 0
+
+    def _mapear_ead_resultado(self, resultado: str) -> int:
+        """Mapea resultado EAD-3 a código PEDT"""
+        if not resultado:
+            return 0
+
+        mapeo = {
+            'NORMAL': 1,
+            'ALERTA': 2,
+            'MEDIO': 2,
+            'ALTO': 3
+        }
+        return mapeo.get(resultado, 0)
+
+    def _mapear_asq_resultado(self, resultado: str) -> int:
+        """Mapea resultado ASQ-3 a código PEDT"""
+        if not resultado:
+            return 0
+
+        mapeo = {
+            'NORMAL': 1,
+            'SEGUIMIENTO': 2,
+            'REFERIR': 3
+        }
+        return mapeo.get(resultado, 0)
+
+    def _calcular_desarrollo_global(self, datos_pi: Dict[str, Any]) -> int:
+        """Calcula desarrollo global basado en múltiples indicadores"""
+        ead = self._mapear_ead_resultado(datos_pi.get('ead_resultado_global'))
+        asq = self._mapear_asq_resultado(datos_pi.get('asq_resultado_global'))
+
+        # Si ambos están normales
+        if ead == 1 and asq == 1:
+            return 1  # Normal
+        # Si alguno tiene alerta
+        elif ead == 2 or asq == 2:
+            return 2  # Seguimiento
+        # Si alguno requiere referencia
+        elif ead == 3 or asq == 3:
+            return 3  # Intervención
+
+        return 0  # No evaluado
+
+    def _identificar_alertas_desarrollo(self, datos_pi: Dict[str, Any]) -> int:
+        """Identifica si hay alertas de desarrollo que requieren acción"""
+        alertas = 0
+
+        # Verificar alertas en EAD-3
+        if datos_pi.get('ead_resultado_global') in ['ALERTA', 'ALTO']:
+            alertas += 1
+
+        # Verificar alertas en ASQ-3
+        if datos_pi.get('asq_resultado_global') in ['REFERIR']:
+            alertas += 1
+
+        # Verificar estado nutricional
+        if datos_pi.get('estado_nutricional') in ['DESNUTRICION_AGUDA', 'OBESIDAD']:
+            alertas += 1
+
+        return min(alertas, 3)  # Máximo 3 alertas
+
+    def _mapear_riesgo_biopsicosocial(self, riesgo: str) -> int:
+        """Mapea riesgo biopsicosocial a código PEDT"""
+        if not riesgo:
+            return 0
+
+        mapeo = {
+            'BAJO': 1,
+            'MEDIO': 2,
+            'ALTO': 3,
+            'MUY_ALTO': 4
+        }
+        return mapeo.get(riesgo, 0)

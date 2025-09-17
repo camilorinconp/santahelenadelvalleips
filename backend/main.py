@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import pacientes, atenciones, intervenciones_colectivas, atencion_primera_infancia, atencion_infancia, atencion_adolescencia, atencion_materno_perinatal, tamizaje_oncologico, control_cronicidad, entornos_salud_publica, familia_integral_salud_publica, atencion_integral_transversal_salud, catalogo_ocupaciones_simple #, medicos, codigos_rias
+from routes import pacientes, atenciones, intervenciones_colectivas, atencion_primera_infancia, atencion_infancia, atencion_adolescencia, atencion_adultez, atencion_materno_perinatal, tamizaje_oncologico, control_cronicidad, entornos_salud_publica, familia_integral_salud_publica, atencion_integral_transversal_salud, catalogo_ocupaciones_simple #, medicos, codigos_rias
 
 # Importar configuración de error handling, monitoring y security
 from core.error_handling import setup_error_handling
@@ -37,6 +37,7 @@ app.include_router(intervenciones_colectivas.router)
 app.include_router(atencion_primera_infancia.router)  # VERSIÓN CONSOLIDADA - Arquitectura vertical
 app.include_router(atencion_infancia.router)  # NUEVO - Momento curso de vida 6-11 años
 app.include_router(atencion_adolescencia.router)  # NUEVO - Momento curso de vida 12-29 años
+app.include_router(atencion_adultez.router)  # NUEVO - Momento curso de vida 30-59 años
 app.include_router(atencion_materno_perinatal.router)
 app.include_router(tamizaje_oncologico.router)
 app.include_router(control_cronicidad.router)
@@ -75,6 +76,7 @@ async def root():
             "primera_infancia": "/atenciones-primera-infancia/",
             "infancia": "/atencion-infancia/",
             "adolescencia": "/atencion-adolescencia/",
+            "adultez": "/atencion-adultez/",
             "pacientes": "/pacientes/",
             "ocupaciones": "/ocupaciones/"
         }

@@ -28,7 +28,7 @@ class Paciente(BaseModel):
     
     # Campos de auditoría
     creado_en: Optional[datetime] = None
-    actualizado_en: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 class PacienteResponse(Paciente):
     """Modelo de respuesta que incluye datos de ocupación expandidos"""
