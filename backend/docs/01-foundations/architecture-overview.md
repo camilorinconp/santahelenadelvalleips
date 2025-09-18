@@ -1,8 +1,68 @@
 # 🏗️ Guía Arquitectónica Maestra - IPS Santa Helena del Valle
 
-**📅 Última actualización:** 13 septiembre 2025  
-**📍 Versión:** v2.0 - Post reorganización documental  
+**📅 Última actualización:** 17 septiembre 2025  
+**📍 Versión:** v2.1 - Post-Auditoría Externa  
 **🎯 Propósito:** Hub central navegación arquitectónica completa
+
+---
+
+## 🗺️ **Mapa Visual de la Arquitectura Documental**
+
+El siguiente diagrama ilustra el flujo de navegación y la relación entre los documentos clave del proyecto.
+
+```mermaid
+graph TD
+    subgraph "Puntos de Entrada Principales"
+        A["<b style='font-size:14px'>DEV-CONTEXT.md</b><br><i>Cockpit Dinámico del Desarrollador</i>"]
+        B["<b>README.md</b> en Raíz y Módulos"]
+    end
+
+    subgraph "Hubs de Navegación"
+        C["<b style='font-size:16px'>architecture-overview.md</b><br><b>(ESTE DOCUMENTO)</b><br><i>Mapa Maestro de Documentación</i>"]
+        D["<b>CLAUDE.md</b><br><i>Guías Rápidas por Componente</i>"]
+    end
+
+    subgraph "Documentación Detallada (Radios)"
+        E["<b>/docs/02-regulations/</b><br>Normativa y Compliance"]
+        F["<b>/docs/03-architecture/</b><br>Decisiones Arquitectónicas"]
+        G["<b>/docs/04-development/</b><br>Guías y Workflows"]
+        H["<b>/docs/05-logs/</b><br>Bitácoras e Historial"]
+        I_BE["<b style='color:firebrick'>backend/docs/06-auditorias/</b><br><i>Auditorías Backend</i>"]
+        I_FE["<b style='color:firebrick'>frontend/docs/06-auditorias/</b><br><i>Auditorías Frontend</i>"]
+        I_SB["<b style='color:firebrick'>supabase/docs/04-auditorias/</b><br><i>Auditorías Base de Datos</i>"]
+    end
+
+    subgraph "Otros Documentos Clave"
+        J["<b>PROJECT-STATUS.md</b><br><i>Estado Histórico y Avance</i>"]
+        K["<b style='color:firebrick'>recomendaciones_equipo_asesor_externo.md</b><br><i>Resumen Ejecutivo Auditorías</i>"]
+    end
+
+    A --> C
+    B --> C
+    B --> D
+    C --> E
+    C --> F
+    C --> G
+    C --> H
+    C --> I_BE
+    C --> I_FE
+    C --> I_SB
+    C --> J
+    A --> J
+    K --> I_BE
+    K --> I_FE
+    K --> I_SB
+
+    classDef entry fill:#D6EAF8,stroke:#5DADE2,stroke-width:2px;
+    classDef hub fill:#D1F2EB,stroke:#48C9B0,stroke-width:2px;
+    classDef detail fill:#FEF9E7,stroke:#F4D03F,stroke-width:1px;
+    classDef other fill:#EAEDED,stroke:#99A3A4,stroke-width:1px;
+
+    class A,B entry
+    class C,D hub
+    class E,F,G,H,I_BE,I_FE,I_SB detail
+    class J,K other
+```
 
 ---
 
@@ -39,6 +99,7 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 
 ### 👨‍💻 **Guías Desarrollo** → [docs/04-development/](../04-development/)
 **Para:** Desarrolladores activos, equipo técnico día a día
+- **🚀 [Guía de CI/CD](../04-development/CI-CD-pipeline.md)** - Implementación de Despliegue Continuo ⭐
 - **📚 [Lecciones Aprendidas](../04-development/lessons-learned.md)** - Mejores prácticas críticas
 - **🧪 [Guía Testing](../04-development/testing-guide.md)** - Suite pruebas automatizadas
 - **📊 [Estado Actual](../04-development/current-status.md)** - Progreso y próximos pasos
@@ -180,7 +241,7 @@ El proyecto IPS Santa Helena del Valle es un **sistema integral de gestión de R
 
 ## 🎯 **Filosofía del Proyecto**
 
-> **"Dos caras de una misma moneda: evento clínico y evento administrativo, unidos por datos compartidos pero con interfaces diferenciadas por tipo de usuario"**
+> "Dos caras de una misma moneda: evento clínico y evento administrativo, unidos por datos compartidos pero con interfaces diferenciadas por tipo de usuario"
 
 **Principios fundamentales:**
 1. **Compliance normativo** como restricción de diseño

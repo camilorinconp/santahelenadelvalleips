@@ -57,12 +57,16 @@ def crear_medico_test():
     return str(uuid4())
 
 def crear_atencion_vejez_test_data(paciente_id: str):
-    """Crear datos de atención vejez de test."""
+    """Crear datos de atención vejez conforme Resolución 3280 - Art. 3.3.6 (Vejez 60+ años)."""
     return {
+        # === CAMPOS BÁSICOS OBLIGATORIOS ===
         "paciente_id": paciente_id,
         "medico_id": crear_medico_test(),
         "fecha_atencion": date.today().isoformat(),
-        "edad_anos": 72,
+        "edad_anos": 72,  # Obligatorio: 60+ años
+        "entorno": "CONSULTA_EXTERNA",
+
+        # === ANTROPOMETRÍA Y SIGNOS VITALES ===
         "peso_kg": 65.0,
         "talla_cm": 165.0,
         "peso_perdido_6_meses_kg": 2.0,
@@ -70,15 +74,15 @@ def crear_atencion_vejez_test_data(paciente_id: str):
         "presion_diastolica": 90.0,
         "frecuencia_cardiaca": 78,
 
-        # Evaluación cognitiva
-        "mini_mental_score": 26,
+        # === EVALUACIÓN COGNITIVA (Mini Mental State - Anexo 28) ===
+        "mini_mental_score": 26,  # Resolución 3280: "Minimental State"
         "clock_test_score": 8,
         "memoria_inmediata": True,
         "orientacion_tiempo_lugar": True,
         "cambios_cognitivos_reportados": False,
         "dificultad_actividades_complejas": False,
 
-        # Riesgo de caídas
+        # === EVALUACIÓN RIESGO DE CAÍDAS ===
         "caidas_ultimo_ano": 1,
         "mareo_al_levantarse": False,
         "medicamentos_que_causan_mareo": 1,
@@ -88,9 +92,10 @@ def crear_atencion_vejez_test_data(paciente_id: str):
         "equilibrio_alterado": False,
         "tiempo_up_and_go": 12.5,
 
-        # Autonomía funcional
-        "barthel_score": 85,
-        "lawton_score": 6,
+        # === EVALUACIÓN AUTONOMÍA FUNCIONAL ===
+        # Resolución 3280: "El índice de Barthel (Anexo 25)" y "La escala de Lawton-Brody (Anexo 26)"
+        "barthel_score": 85,  # Índice de Barthel obligatorio
+        "lawton_score": 6,    # Escala de Lawton-Brody obligatoria
         "independiente_bano": True,
         "independiente_vestirse": True,
         "independiente_comer": True,
@@ -99,7 +104,7 @@ def crear_atencion_vejez_test_data(paciente_id: str):
         "maneja_finanzas": True,
         "usa_transporte": False,
 
-        # Salud mental
+        # === EVALUACIÓN SALUD MENTAL ===
         "yesavage_score": 3,
         "estado_animo_deprimido": False,
         "perdida_interes_actividades": False,
