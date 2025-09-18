@@ -19,6 +19,7 @@ from models.control_diabetes_model import ControlDiabetesDetalles
 from models.control_erc_model import ControlERCDetalles
 from models.control_dislipidemia_model import ControlDislipidemiaDetalles
 from database import get_supabase_client
+from services.control_cronicidad_service import ControlCronicidadService
 from typing import List, Optional
 from uuid import UUID, uuid4
 from datetime import date, datetime
@@ -35,100 +36,24 @@ router = APIRouter(
 # =============================================================================
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=ControlCronicidadResponse)
-def crear_control_cronicidad(
-    control_data: ControlCronicidadCrear, 
+async def crear_control_cronicidad(
+    control_data: ControlCronicidadCrear,
     db: Client = Depends(get_supabase_client)
 ):
     """
-    Crear nuevo control de cronicidad siguiendo patrón polimórfico.
-    
-    Funcionalidad consolidada que incluye:
-    - Validaciones básicas de datos
-    - Cálculo automático de IMC
-    - Patrón polimórfico: detalle primero, luego atención general
-    - Respuesta con campos calculados
+    Crear nuevo control de cronicidad - SPRINT #2 COMPLETO:
+    ✅ RPC Transaccional: Operaciones atómicas (replica patrón Sprint Piloto #1)
+    ✅ Capa de Servicio: Lógica centralizada (ControlCronicidadService)
+    ✅ Validaciones: Business logic separada de infrastructure
+    ✅ Recomendaciones: Generación automática basada en tipo de cronicidad
     """
     try:
         # 📊 APM: Track database operation timing
         start_time = time.time()
-        
-        # Validar que el paciente existe
-        paciente_response = db.table("pacientes").select("id").eq("id", str(control_data.paciente_id)).execute()
-        if not paciente_response.data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El paciente especificado no existe"
-            )
-        
-        # Calcular IMC automáticamente si se proporciona peso y talla
-        control_dict = control_data.model_dump(mode='json', exclude_unset=True)
-        
-        if control_data.peso_kg and control_data.talla_cm:
-            control_dict['imc'] = calcular_imc(control_data.peso_kg, control_data.talla_cm)
-        
-        # Procesar campos especiales
-        for key, value in control_dict.items():
-            if isinstance(value, UUID):
-                control_dict[key] = str(value)
-            elif isinstance(value, date):
-                control_dict[key] = value.isoformat()
-            elif isinstance(value, datetime):
-                control_dict[key] = value.isoformat()
-        
-        # Paso 1: Crear control de cronicidad (sin atencion_id por ahora)
-        control_dict_sin_atencion = control_dict.copy()
-        if 'atencion_id' in control_dict_sin_atencion:
-            del control_dict_sin_atencion['atencion_id']
-            
-        response_control = db.table("control_cronicidad").insert(control_dict_sin_atencion).execute()
-        
-        if not response_control.data:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Error al crear control de cronicidad"
-            )
-        
-        control_creado = response_control.data[0]
-        control_id = control_creado["id"]
-        
-        # Paso 2: Crear atención general que referencie al control
-        atencion_data = {
-            "paciente_id": str(control_data.paciente_id),
-            "medico_id": str(control_data.medico_id) if control_data.medico_id else None,
-            "tipo_atencion": f"Control Cronicidad - {control_data.tipo_cronicidad}",
-            "detalle_id": control_id,
-            "fecha_atencion": control_data.fecha_control.isoformat(),
-            "entorno": "IPS",
-            "descripcion": f"Control de {control_data.tipo_cronicidad}"
-        }
-        
-        response_atencion = db.table("atenciones").insert(atencion_data).execute()
-        
-        if not response_atencion.data:
-            # Si falla la atención, eliminar el control creado
-            db.table("control_cronicidad").delete().eq("id", control_id).execute()
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Error al crear atención general para control de cronicidad"
-            )
-        
-        atencion_creada = response_atencion.data[0]
-        atencion_id = atencion_creada["id"]
-        
-        # Paso 3: Actualizar control con atencion_id
-        update_response = db.table("control_cronicidad").update({"atencion_id": atencion_id}).eq("id", control_id).execute()
-        
-        if not update_response.data:
-            # Si falla la actualización, limpiar ambas inserciones
-            db.table("atenciones").delete().eq("id", atencion_id).execute()
-            db.table("control_cronicidad").delete().eq("id", control_id).execute()
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Error al vincular control con atención general"
-            )
-        
-        control_final = update_response.data[0]
-        
+
+        # Delegar toda la lógica compleja al servicio centralizado
+        control_result = await ControlCronicidadService.crear_control_cronicidad_completo(control_data)
+
         db_time = time.time() - start_time
         apm_collector.track_database_operation(
             table="control_cronicidad",
@@ -136,7 +61,7 @@ def crear_control_cronicidad(
             response_time=db_time,
             record_count=1
         )
-        
+
         # 🏥 Track healthcare business metric
         health_metrics.track_medical_attention(
             attention_type="control_cronicidad",
@@ -144,21 +69,16 @@ def crear_control_cronicidad(
             ead3_applied=False,
             asq3_applied=False
         )
-        
-        # Agregar campos calculados
-        control_final["control_adecuado"] = _evaluar_control_adecuado_basico(control_final)
-        control_final["riesgo_cardiovascular"] = _calcular_riesgo_cardiovascular(control_final)
-        control_final["adherencia_score"] = _calcular_adherencia_score(control_final)
-        control_final["proxima_cita_recomendada_dias"] = _calcular_proxima_cita_cronicidad(control_final)
-        
-        return ControlCronicidadResponse(**control_final)
-        
-    except HTTPException:
-        raise
+
+        return control_result
+
+    except ValueError as e:
+        # Errores de validación de negocio
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Error al crear control de cronicidad: {e}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno del servidor: {str(e)}"
         )
 
 @router.get("/{control_id}", response_model=ControlCronicidadResponse)
