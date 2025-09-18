@@ -201,3 +201,20 @@ async def obtener_estadisticas_infancia(
     except Exception as e:
         print(f"Error en obtener_estadisticas_infancia: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.get("/estadisticas/basicas")
+async def obtener_estadisticas_infancia_basicas(
+    db=Depends(get_supabase_client)
+):
+    """
+    Obtener estadísticas básicas de atenciones infancia - SPRINT #4:
+    ✅ Delegación completa al service layer
+    ✅ Estadísticas centralizadas
+    """
+    try:
+        # Delegar cálculos especializados al servicio
+        return await AtencionInfanciaService.obtener_estadisticas_infancia()
+
+    except Exception as e:
+        print(f"Error en obtener_estadisticas_infancia_basicas: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")

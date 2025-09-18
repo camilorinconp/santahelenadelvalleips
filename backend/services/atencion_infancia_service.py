@@ -104,7 +104,7 @@ class AtencionInfanciaService:
         # Calcular IMC si hay datos
         if atencion_data.peso_kg and atencion_data.talla_cm:
             imc = atencion_data.peso_kg / (atencion_data.talla_cm / 100) ** 2
-            indicadores["imc_calculado"] = round(imc, 1)
+            indicadores["indice_masa_corporal"] = round(imc, 1)
 
             # Estado nutricional usando función del modelo
             estado_nutricional = calcular_estado_nutricional(
@@ -177,7 +177,7 @@ class AtencionInfanciaService:
 
         # Recomendaciones por estado nutricional
         estado_nutricional = indicadores.get("estado_nutricional")
-        if estado_nutricional == EstadoNutricionalInfancia.DESNUTRICION:
+        if estado_nutricional == EstadoNutricionalInfancia.DELGADEZ:
             recomendaciones.append("Plan nutricional para recuperación ponderal en infancia")
             recomendaciones.append("Seguimiento nutricional cada 2 semanas")
         elif estado_nutricional == EstadoNutricionalInfancia.SOBREPESO:
@@ -215,13 +215,13 @@ class AtencionInfanciaService:
 
         # Recomendaciones por factores de riesgo
         factores_riesgo = atencion_data.factores_riesgo_identificados or []
-        if FactorRiesgo.VIOLENCIA_INTRAFAMILIAR in factores_riesgo:
+        if FactorRiesgo.VIOLENCIA_ESCOLAR in factores_riesgo:
             recomendaciones.append("Activación de ruta de protección integral")
             recomendaciones.append("Seguimiento por trabajo social")
 
-        if FactorRiesgo.TRABAJO_INFANTIL in factores_riesgo:
-            recomendaciones.append("Activación de ruta de protección contra trabajo infantil")
-            recomendaciones.append("Vincular a programas de protección social")
+        if FactorRiesgo.SEDENTARISMO in factores_riesgo:
+            recomendaciones.append("Plan de actividad física progresiva")
+            recomendaciones.append("Vincular a programas deportivos escolares")
 
         # Recomendaciones por actividad física
         if not atencion_data.actividad_fisica_semanal_horas or atencion_data.actividad_fisica_semanal_horas < 3:
@@ -298,12 +298,12 @@ class AtencionInfanciaService:
                 atencion_dict['factores_riesgo_identificados'] = [str(factor) for factor in atencion_dict['factores_riesgo_identificados']]
 
             # Agregar observaciones con recomendaciones
-            observaciones_final = atencion_data.observaciones_adicionales or ""
+            observaciones_final = atencion_data.observaciones_profesional_infancia or ""
             if recomendaciones:
                 observaciones_final += "\n\nRECOMENDACIONES AUTOMÁTICAS:\n"
                 observaciones_final += "\n".join(f"- {rec}" for rec in recomendaciones)
 
-            atencion_dict['observaciones_adicionales'] = observaciones_final
+            atencion_dict['observaciones_profesional_infancia'] = observaciones_final
 
             # PASO 6A: Crear atención de infancia
             response_infancia = db.table("atencion_infancia").insert(atencion_dict).execute()
