@@ -1,116 +1,53 @@
-# 🎯 CONTEXTO DE DESARROLLO ACTIVO
-**📅 Última Actualización**: 17 septiembre 2025, 12:00 PM
-**👤 Último Desarrollador**: Claude (Equipo Principal)
-**🎯 Sprint Completado**: ✅ VEJEZ (60+ años) → **83% Compliance ALCANZADO**
+# 🚀 Panel de Control: Auditoría Continua Asistida
+**📅 Última Actualización:** 17 septiembre 2025
 
 ---
 
-## ⚡ INICIO INMEDIATO (2 minutos)
+## ✅ CHECKLIST DE INICIO DE JORNADA (OBLIGATORIO)
+*Antes de empezar a programar, verifica los siguientes puntos:*
 
-### 🏃 Comandos de Arranque
-```bash
-cd /Users/user/proyecto_salud
-git log --oneline -3                    # Verificar último commit
-cd backend && source venv/bin/activate  # Entorno Python
-cd ../supabase && supabase status       # Verificar BD
-cd ../backend && python -c "from main import app; print('✅ API OK')"
-```
-
-### 📊 Estado Sistema (30 segundos de lectura)
-- **🚀 Último Sprint**: VEJEZ COMPLETADO - Módulo 60+ años funcional
-- **✅ Compliance**: **83%** (5/6 momentos curso de vida)
-- **✅ Tests Core**: Primera Infancia 14/14, Vejez 25+ tests PASSING
-- **✅ BD**: 42 migraciones aplicadas, nueva tabla atencion_vejez
+- [ ] **1. Objetivo del Sprint:** He leído y entiendo el **objetivo** definido en la sección "ESTADO ACTUAL DEL SPRINT".
+- [ ] **2. Rama de Git:** Estoy trabajando en la **rama Git** correcta para este sprint.
+- [ ] **3. Revisión del Asesor:** He verificado el **estado de la revisión** del Asesor Externo. Si hay cambios solicitados, son mi prioridad.
 
 ---
 
-## ✅ TRABAJO COMPLETADO - MILESTONE VEJEZ
+## 🎯 ESTADO ACTUAL DEL SPRINT
 
-### ✅ Objetivo Sprint Completado: Módulo Vejez (60+ años)
-**⏱️ Tiempo Real**: 4 horas de desarrollo
-**🎯 Resultado**: **83% compliance Resolución 3280 ALCANZADO**
-
-### 📋 Tareas Completadas ✅
-1. **✅ [COMPLETADO] Modelo**: `atencion_vejez_model.py`
-   - ✅ ENUMs implementados: deterioro_cognitivo, riesgo_caidas, autonomia_funcional
-   - ✅ 10 funciones de evaluación automática para síndromes geriátricos
-   - ✅ Cálculo nivel riesgo global específico para vejez
-
-2. **✅ [COMPLETADO] Rutas**: `atencion_vejez.py`
-   - ✅ CRUD completo con patrón polimórfico 3 pasos
-   - ✅ Endpoints especializados: deterioro cognitivo, riesgo caídas, reportes
-
-3. **✅ [COMPLETADO] BD**: Migración `20250917120000_create_atencion_vejez_table.sql`
-   - ✅ Tabla atencion_vejez con 11 índices optimizados
-   - ✅ Campos calculados automáticamente (IMC, evaluaciones)
-   - ✅ Triggers para alertas automáticas
-
-4. **✅ [COMPLETADO] Integración**: Registrado en `main.py`
-   - ✅ Endpoint `/atencion-vejez/` disponible
-5. **✅ [COMPLETADO] Validación**: 25+ tests CRUD completos
-   - ✅ Tests evaluaciones especializadas, estadísticas, validaciones
-
-### 🚨 Blockers Conocidos
-- **Tests Adolescencia**: Fallan por sincronización → `supabase db reset` si es necesario
-- **Migración Adultez**: Si tabla no existe → Aplicar migración manual
+- **Objetivo:** **Sprint Piloto #1** - Refactorizar el endpoint `crear_atencion_vejez` para usar un RPC transaccional y mover la lógica de negocio a una capa de servicio.
+- **Rama Git:** `arch/refactor-vejez-rpc`
+- **Pull Request:** (Pendiente de creación)
+- **Estado Asesor Externo:** `PENDIENTE DE INICIO`
 
 ---
 
-## 📚 DOCUMENTACIÓN CONTEXTUAL (según necesidad)
+## 🔄 FLUJO DE TRABAJO: AUDITORÍA CONTINUA ASISTIDA (Paso a Paso)
 
-### 🔥 Para CONTINUAR desarrollo inmediato
-- **📖 Este archivo** - Contexto dinámico actualizado
+Este documento es la guía operativa para la colaboración entre el **Equipo Principal** y el **Asesor Externo**, articulada por el **Human-in-the-Loop (HITL)**.
 
-### 🏗️ Para ENTENDER arquitectura (si es necesario)
-- **📖 `backend/docs/01-foundations/architecture-overview.md`** - Hub central navegable ⭐
-- **📖 `backend/PROJECT-STATUS.md`** - Estado completo del proyecto
+### **Paso 1: Planificación del Sprint**
+1.  El **Equipo Principal** define el **Objetivo del Sprint** y lo documenta en la sección de arriba.
+2.  (Opcional) El **HITL** presenta el plan al **Asesor Externo** para una validación rápida.
 
-### 🔧 Para RESOLVER problemas técnicos (si surgen)
-- **📖 `backend/CLAUDE.md`** - Contexto técnico backend
-- **📖 `supabase/CLAUDE.md`** - Resolución problemas BD
-- **📖 `backend/docs/04-development/testing-guide.md`** - Debug tests
+### **Paso 2: Desarrollo**
+1.  El **Equipo Principal** crea una nueva rama Git y desarrolla la funcionalidad.
 
-### 📋 Para COMPLIANCE normativo (si es relevante)
-- **📖 `backend/docs/02-regulations/resolucion-3280-master.md`** - Autoridad normativa
+### **Paso 3: Punto de Control (Pull Request)**
+1.  Al finalizar, el **Equipo Principal** abre un **Pull Request (PR)** y notifica al **HITL**.
+2.  El **Human-in-the-Loop (HITL)** asume sus responsabilidades:
+    *   **Articular:** Actúa como el canal de comunicación oficial.
+    *   **Notificar:** Informa al **Asesor Externo** que el PR está listo para revisión, proporcionando el enlace y los archivos clave a revisar.
+    *   **Gestionar:** Recibe el veredicto del Asesor (`APROBADO` o `CAMBIOS REQUERIDOS`).
+    *   **Actualizar:** Refleja el nuevo **"Estado Asesor Externo"** en este documento.
 
----
-
-## 🔄 MANTENIMIENTO DE ESTE ARCHIVO
-
-### ✅ Al FINALIZAR sesión de desarrollo:
-1. Actualizar "Último Desarrollador" y fecha
-2. Mover tareas completadas de "Ready-to-Code" a "✅ Completado"
-3. Redefinir próximo "Objetivo Sprint" si es necesario
-4. Commit: `git add DEV-CONTEXT.md && git commit -m "chore: Update dev context"`
-
-### ✅ Al DETECTAR problemas:
-1. Agregar a "Blockers Conocidos" con solución
-2. Nunca duplicar información que ya existe en documentación técnica
+### **Paso 4: Integración**
+1.  Si hay `CAMBIOS REQUERIDOS`, el **Equipo Principal** los implementa y se reinicia el ciclo en el Paso 3.
+2.  Si el PR es `APROBADO`, un líder del **Equipo Principal** realiza el "merge".
+3.  El **Equipo Principal** y el **HITL** actualizan este documento para planificar el siguiente sprint.
 
 ---
 
-## 🎯 PRÓXIMO MILESTONE - OBJETIVO 100% COMPLIANCE
+## 📚 REFERENCIAS CLAVE PARA ESTE SPRINT
 
-### 🎯 Sprint Siguiente: Materno-Perinatal Completitud
-**Meta**: 100% Compliance Resolución 3280
-**Tiempo Estimado**: 3-4 horas de desarrollo
-**Resultado**: 100% compliance (6/6 momentos curso de vida)
-
-### 📋 Próximas Tareas Ready-to-Code
-1. **[2h] Completar Campos**: Revisar y completar `atencion_materno_perinatal_model.py`
-   - 📖 **Referencia**: Resolución 3280 Art. 3.3.1-3.3.4
-   - 🎯 **Focus**: Campos faltantes para compliance total
-
-2. **[1h] Validación**: Tests de compliance 100%
-3. **[30min] Documentación**: Actualizar referencias a 100% compliance
-
-### 🚀 Objetivos Post-100% Compliance
-1. **Frontend Especializado**: Interfaces por módulo
-2. **Reportería RIPS**: Integración automática ADRES
-3. **Optimización Performance**: Índices avanzados
-
----
-
-**🚀 FILOSOFÍA**: Este archivo es tu **cockpit de desarrollo**. Todo lo que necesitas para continuar está aquí o referenciado desde aquí.
-
-**📖 REGLA DE ORO**: Si necesitas leer más de 2 documentos para retomar el desarrollo, este archivo necesita mejorarse.
+- **Guía de Remediación:** [Informe de Auditoría de Backend](../backend/docs/06-auditorias/2025-09-17_informe_auditoria_backend.md)
+- **Mejores Prácticas:** [Framework de Mejores Prácticas](../backend/docs/04-development/best-practices-overview.md)
