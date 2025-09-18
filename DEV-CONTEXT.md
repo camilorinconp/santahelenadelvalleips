@@ -1,6 +1,11 @@
 # 🚀 Panel de Control: Auditoría Continua Asistida
 **📅 Última Actualización:** 18 septiembre 2025
 
+## 📝 **RESPONSABILIDADES DE MODIFICACIÓN**
+- **👥 Equipo Principal:** Actualiza "ESTADO ACTUAL DEL SPRINT" y "REFERENCIAS CLAVE"
+- **🎯 Asesor Externo:** Actualiza "Estado Asesor Externo", "Retroalimentación" y "HISTORIAL DE SPRINTS"
+- **🔄 HITL:** Facilita y coordina actualizaciones entre ambos equipos
+
 ---
 
 ## ✅ CHECKLIST DE INICIO DE JORNADA (OBLIGATORIO)
@@ -14,8 +19,8 @@
 
 ## 🎯 ESTADO ACTUAL DEL SPRINT
 
-- **Objetivo:** **Sprint #4** - Implementar un nuevo módulo RIAS aplicando el **patrón RPC+Service perfeccionado** establecido en Sprint #3. Usar como referencia máxima la centralización TOTAL de `atencion_vejez`.
-- **Rama Git:** (Por definir - siguiente módulo)
+- **Objetivo:** **Sprint #4** - Refactorizar módulo **Atención Infancia** (6-11 años) aplicando **patrón RPC+Service perfeccionado**. Usar `AtencionVejezService` como referencia máxima de centralización TOTAL de lógica de negocio.
+- **Rama Git:** `arch/infancia-rpc-service-centralized` (Por crear)
 - **Pull Request:** (Pendiente de creación)
 - **Estado Asesor Externo:** `PENDIENTE DE INICIO SPRINT #4`
 - **Sprint #3 INTEGRADO EXITOSAMENTE:**
@@ -43,7 +48,7 @@ Este documento es la guía operativa para la colaboración entre el **Equipo Pri
     *   **Articular:** Actúa como el canal de comunicación oficial.
     *   **Notificar:** Informa al **Asesor Externo** que el PR está listo para revisión, proporcionando el enlace y los archivos clave a revisar.
     *   **Gestionar:** Recibe el veredicto del Asesor (`APROBADO` o `CAMBIOS REQUERIDOS`).
-    *   **Actualizar:** Refleja el nuevo **"Estado Asesor Externo"** y la **"Retroalimentación del Asesor"** en este documento.
+    *   **⚠️ IMPORTANTE:** El **Asesor Externo** actualiza DIRECTAMENTE este documento con su veredicto y retroalimentación.
 
 ### **Paso 4: Integración**
 1.  Si hay `CAMBIOS REQUERIDOS`, el **Equipo Principal** los implementa y se reinicia el ciclo en el Paso 3.
