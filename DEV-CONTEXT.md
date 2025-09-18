@@ -15,9 +15,9 @@
 ## 🎯 ESTADO ACTUAL DEL SPRINT
 
 - **Objetivo:** **Sprint Piloto #1** - Refactorizar el endpoint `crear_atencion_vejez` para usar un RPC transaccional y mover la lógica de negocio a una capa de servicio.
-- **Rama Git:** `arch/refactor-vejez-rpc`
-- **Pull Request:** (Pendiente de creación)
-- **Estado Asesor Externo:** `PENDIENTE DE INICIO`
+- **Rama Git:** `arch/refactor-vejez-rpc` ✅
+- **Pull Request:** https://github.com/camilorinconp/santahelenadelvalleips/pull/new/arch/refactor-vejez-rpc ✅
+- **Estado Asesor Externo:** `ESPERANDO REVISIÓN` (Actualizado 17 sept 2025)
 
 ---
 
