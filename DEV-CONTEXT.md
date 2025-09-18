@@ -14,10 +14,11 @@
 
 ## 🎯 ESTADO ACTUAL DEL SPRINT
 
-- **Objetivo:** **Sprint Piloto #1** - Refactorizar el endpoint `crear_atencion_vejez` para usar un RPC transaccional y mover la lógica de negocio a una capa de servicio.
-- **Rama Git:** `arch/refactor-vejez-rpc` ✅
-- **Pull Request:** https://github.com/camilorinconp/santahelenadelvalleips/pull/new/arch/refactor-vejez-rpc ✅
-- **Estado Asesor Externo:** `ESPERANDO REVISIÓN` (Actualizado 17 sept 2025)
+- **Objetivo:** **Sprint #2** - Refactorizar el módulo `control_cronicidad` para usar el patrón RPC+Service, siguiendo el modelo exacto implementado en `atencion_vejez`.
+- **Rama Git:** `arch/refactor-cronicidad-rpc`
+- **Pull Request:** (Pendiente de creación)
+- **Estado Asesor Externo:** `PENDIENTE DE INICIO`
+- **Retroalimentación del Asesor:** El objetivo es replicar el éxito del sprint piloto en un módulo con un patrón de datos diferente. La clave es la consistencia arquitectónica.
 
 ---
 
