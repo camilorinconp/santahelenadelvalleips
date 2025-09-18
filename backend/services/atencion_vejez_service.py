@@ -1,14 +1,21 @@
 # =============================================================================
-# Servicio Atención Vejez - Sprint Piloto #1
+# Servicio Atención Vejez - Sprint #3: CENTRALIZACIÓN TOTAL
 # Fecha: 17 septiembre 2025
-# Objetivo: Centralizar lógica de negocio (Auditoría Backend - Recomendación #2)
+# Objetivo: Aplicar sugerencias del Asesor Externo - CENTRALIZACIÓN TOTAL
+# Evolución: Sprint Piloto #1 → Sprint #2 → Sprint #3 (Perfeccionado)
 # Base Normativa: Resolución 3280 de 2018 - Art. 3.3.6 (Vejez 60+ años)
+#
+# MEJORAS SPRINT #3:
+# ✅ CRUD COMPLETO CENTRALIZADO: Todas las operaciones en service layer
+# ✅ VALIDACIONES TOTALES: Create, Read, Update, Delete + validaciones específicas
+# ✅ CONSISTENCY TOTAL: Patrón idéntico a control_cronicidad perfeccionado
+# ✅ ZERO BUSINESS LOGIC EN ENDPOINTS: Delegación 100% centralizada
 # =============================================================================
 
 from typing import Dict, List, Optional, Any
 from datetime import date, datetime
 from uuid import UUID
-from models.atencion_vejez_model_fixed import AtencionVejezCrear, AtencionVejezResponse
+from models.atencion_vejez_model_fixed import AtencionVejezCrear, AtencionVejezActualizar, AtencionVejezResponse
 from database import get_supabase_client
 
 class AtencionVejezService:
@@ -309,6 +316,182 @@ class AtencionVejezService:
             raise Exception("Error obteniendo atención vejez creada")
 
         return AtencionVejezResponse(**vejez_complete.data[0])
+
+    @staticmethod
+    async def obtener_atencion_vejez_por_id(atencion_id: UUID) -> AtencionVejezResponse:
+        """
+        Obtener atención vejez por ID con validaciones de negocio centralizadas.
+
+        Args:
+            atencion_id: ID de la atención a buscar
+
+        Returns:
+            Atención vejez encontrada
+
+        Raises:
+            ValueError: Si la atención no existe
+            Exception: Si error en consulta
+        """
+        db = get_supabase_client()
+
+        response = db.table("atencion_vejez").select("*").eq("id", str(atencion_id)).execute()
+
+        if not response.data:
+            raise ValueError("Atención vejez no encontrada")
+
+        return AtencionVejezResponse(**response.data[0])
+
+    @staticmethod
+    async def listar_atenciones_vejez(skip: int = 0, limit: int = 100) -> List[AtencionVejezResponse]:
+        """
+        Listar atenciones vejez con paginación y validaciones centralizadas.
+
+        Args:
+            skip: Número de registros a omitir
+            limit: Límite de registros a retornar
+
+        Returns:
+            Lista de atenciones vejez
+
+        Raises:
+            ValueError: Si parámetros inválidos
+            Exception: Si error en consulta
+        """
+        # Validaciones de negocio centralizadas
+        if skip < 0:
+            raise ValueError("skip debe ser mayor o igual a 0")
+        if limit < 1 or limit > 1000:
+            raise ValueError("limit debe estar entre 1 y 1000")
+
+        db = get_supabase_client()
+
+        response = db.table("atencion_vejez").select("*").range(skip, skip + limit - 1).execute()
+
+        return [AtencionVejezResponse(**item) for item in response.data]
+
+    @staticmethod
+    async def listar_atenciones_vejez_por_paciente(paciente_id: UUID) -> List[AtencionVejezResponse]:
+        """
+        Listar atenciones vejez por paciente con validaciones centralizadas.
+
+        Args:
+            paciente_id: ID del paciente
+
+        Returns:
+            Lista de atenciones vejez del paciente
+
+        Raises:
+            Exception: Si error en consulta
+        """
+        db = get_supabase_client()
+
+        response = db.table("atencion_vejez").select("*").eq("paciente_id", str(paciente_id)).order("fecha_atencion", desc=True).execute()
+
+        return [AtencionVejezResponse(**item) for item in response.data]
+
+    @staticmethod
+    def validar_datos_actualizacion_vejez(atencion_data: dict) -> None:
+        """
+        Validar datos específicos para actualización de atención vejez.
+
+        Args:
+            atencion_data: Datos de actualización
+
+        Raises:
+            ValueError: Si alguna validación falla
+        """
+        # Validación edad vejez si se proporciona
+        if "edad_anos" in atencion_data and atencion_data["edad_anos"] is not None:
+            if atencion_data["edad_anos"] < 60:
+                raise ValueError("La atención vejez requiere edad mínima de 60 años")
+
+        # Validación IMC si se proporcionan peso y talla
+        peso = atencion_data.get("peso_kg")
+        talla = atencion_data.get("talla_cm")
+        if peso and talla:
+            imc = peso / (talla / 100) ** 2
+            if imc < 10 or imc > 60:
+                raise ValueError("IMC calculado fuera de rango válido (10-60)")
+
+        # Validación coherencia Mini Mental
+        mini_mental = atencion_data.get("mini_mental_score")
+        cambios_cognitivos = atencion_data.get("cambios_cognitivos_reportados")
+        if mini_mental is not None and mini_mental < 10 and not cambios_cognitivos:
+            raise ValueError("Puntaje Mini Mental bajo debe ir acompañado de cambios cognitivos reportados")
+
+    @staticmethod
+    async def actualizar_atencion_vejez(atencion_id: UUID, atencion_data: dict) -> AtencionVejezResponse:
+        """
+        Actualizar atención vejez con validaciones de negocio centralizadas.
+
+        Args:
+            atencion_id: ID de la atención a actualizar
+            atencion_data: Datos de actualización
+
+        Returns:
+            Atención vejez actualizada
+
+        Raises:
+            ValueError: Si validaciones fallan o atención no existe
+            Exception: Si error en actualización
+        """
+        db = get_supabase_client()
+
+        # Verificar que existe
+        existing = db.table("atencion_vejez").select("id").eq("id", str(atencion_id)).execute()
+        if not existing.data:
+            raise ValueError("Atención vejez no encontrada")
+
+        # Filtrar datos no nulos
+        update_data = {k: v for k, v in atencion_data.items() if v is not None}
+
+        if not update_data:
+            raise ValueError("No hay campos para actualizar")
+
+        # Validaciones de negocio centralizadas
+        AtencionVejezService.validar_datos_actualizacion_vejez(update_data)
+
+        # Actualizar
+        response = db.table("atencion_vejez").update(update_data).eq("id", str(atencion_id)).execute()
+
+        if not response.data:
+            raise Exception("Error actualizando atención vejez")
+
+        return AtencionVejezResponse(**response.data[0])
+
+    @staticmethod
+    async def eliminar_atencion_vejez(atencion_id: UUID) -> Dict[str, str]:
+        """
+        Eliminar atención vejez y su atención general asociada con lógica centralizada.
+
+        Args:
+            atencion_id: ID de la atención a eliminar
+
+        Returns:
+            Mensaje de confirmación
+
+        Raises:
+            ValueError: Si atención no existe
+            Exception: Si error en eliminación
+        """
+        db = get_supabase_client()
+
+        # Obtener atencion_id general antes de eliminar
+        vejez_record = db.table("atencion_vejez").select("atencion_id").eq("id", str(atencion_id)).execute()
+
+        if not vejez_record.data:
+            raise ValueError("Atención vejez no encontrada")
+
+        atencion_general_id = vejez_record.data[0].get("atencion_id")
+
+        # Eliminar de atencion_vejez
+        delete_vejez = db.table("atencion_vejez").delete().eq("id", str(atencion_id)).execute()
+
+        # Eliminar de atenciones si existe referencia
+        if atencion_general_id:
+            db.table("atenciones").delete().eq("id", atencion_general_id).execute()
+
+        return {"message": "Atención vejez eliminada correctamente"}
 
     @staticmethod
     async def obtener_estadisticas_vejez() -> Dict[str, Any]:
