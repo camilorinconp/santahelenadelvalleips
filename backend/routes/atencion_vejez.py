@@ -1,8 +1,15 @@
 # =============================================================================
-# Rutas Atención Vejez - SINCRONIZADO CON MIGRACIÓN REAL
-# Fecha: 17 septiembre 2025 - CORRECCIÓN CRÍTICA
+# Rutas Atención Vejez - SPRINT #3: CENTRALIZACIÓN TOTAL COMPLETADA
+# Fecha: 17 septiembre 2025 - APLICACIÓN SUGERENCIAS ASESOR EXTERNO
+# Objetivo: Perfeccionar patrón RPC+Service con centralización TOTAL de lógica
 # Base Normativa: Resolución 3280 de 2018 - Art. 3.3.6 (Vejez 60+ años)
 # Migración Base: 20250917120000_create_atencion_vejez_table.sql
+#
+# ARQUITECTURA SPRINT #3:
+# ✅ CENTRALIZACIÓN TOTAL: 100% lógica delegada al service layer
+# ✅ VALIDACIONES CENTRALIZADAS: Todas en AtencionVejezService
+# ✅ CERO LÓGICA EN ENDPOINTS: Solo delegación y manejo de errores
+# ✅ PATRÓN RPC+SERVICE PERFECCIONADO: Consistencia total con control_cronicidad
 # =============================================================================
 
 from fastapi import APIRouter, HTTPException, Depends, Query
@@ -20,16 +27,8 @@ from services.atencion_vejez_service import AtencionVejezService
 router = APIRouter(prefix="/atencion-vejez", tags=["Atención Vejez"])
 
 # =============================================================================
-# FUNCIONES HELPER
-# =============================================================================
-
-def agregar_metadatos_auditoria(data: dict) -> dict:
-    """Agregar metadatos de auditoría"""
-    # Esta tabla no tiene campos creado_en/updated_at según migración real
-    return data
-
-# =============================================================================
-# ENDPOINTS CRUD BÁSICOS - SINCRONIZADOS CON MIGRACIÓN REAL
+# ENDPOINTS CRUD BÁSICOS - SPRINT #3: CENTRALIZACIÓN TOTAL
+# Patrón: Delegación completa al service layer, cero lógica en endpoints
 # =============================================================================
 
 @router.post("/", response_model=AtencionVejezResponse, status_code=201)
@@ -61,18 +60,21 @@ async def obtener_atencion_vejez(
     atencion_id: UUID,
     db=Depends(get_supabase_client)
 ):
-    """Obtener atención vejez por ID"""
+    """
+    Obtener atención vejez por ID - SPRINT #3 CENTRALIZACIÓN TOTAL:
+    ✅ Delegación completa al service layer
+    ✅ Validaciones de negocio centralizadas
+    ✅ Patrón RPC+Service perfeccionado
+    """
     try:
-        response = db.table("atencion_vejez").select("*").eq("id", str(atencion_id)).execute()
+        # Delegar toda la lógica al servicio centralizado
+        return await AtencionVejezService.obtener_atencion_vejez_por_id(atencion_id)
 
-        if not response.data:
-            raise HTTPException(status_code=404, detail="Atención vejez no encontrada")
-
-        return AtencionVejezResponse(**response.data[0])
-
-    except HTTPException:
-        raise
+    except ValueError as e:
+        # Errores de validación de negocio (ej: no encontrada)
+        raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
+        print(f"Error en obtener_atencion_vejez: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 
@@ -82,13 +84,21 @@ async def listar_atenciones_vejez(
     limit: int = Query(100, ge=1, le=1000),
     db=Depends(get_supabase_client)
 ):
-    """Listar todas las atenciones vejez con paginación"""
+    """
+    Listar atenciones vejez con paginación - SPRINT #3 CENTRALIZACIÓN TOTAL:
+    ✅ Delegación completa al service layer
+    ✅ Validaciones de paginación centralizadas
+    ✅ Patrón RPC+Service perfeccionado
+    """
     try:
-        response = db.table("atencion_vejez").select("*").range(skip, skip + limit - 1).execute()
+        # Delegar toda la lógica al servicio centralizado
+        return await AtencionVejezService.listar_atenciones_vejez(skip, limit)
 
-        return [AtencionVejezResponse(**item) for item in response.data]
-
+    except ValueError as e:
+        # Errores de validación de negocio (ej: parámetros inválidos)
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        print(f"Error en listar_atenciones_vejez: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 
@@ -97,13 +107,18 @@ async def listar_atenciones_vejez_por_paciente(
     paciente_id: UUID,
     db=Depends(get_supabase_client)
 ):
-    """Listar atenciones vejez de un paciente específico"""
+    """
+    Listar atenciones vejez por paciente - SPRINT #3 CENTRALIZACIÓN TOTAL:
+    ✅ Delegación completa al service layer
+    ✅ Lógica de filtrado centralizada
+    ✅ Patrón RPC+Service perfeccionado
+    """
     try:
-        response = db.table("atencion_vejez").select("*").eq("paciente_id", str(paciente_id)).order("fecha_atencion", desc=True).execute()
-
-        return [AtencionVejezResponse(**item) for item in response.data]
+        # Delegar toda la lógica al servicio centralizado
+        return await AtencionVejezService.listar_atenciones_vejez_por_paciente(paciente_id)
 
     except Exception as e:
+        print(f"Error en listar_atenciones_vejez_por_paciente: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 
@@ -113,30 +128,28 @@ async def actualizar_atencion_vejez(
     atencion_data: AtencionVejezActualizar,
     db=Depends(get_supabase_client)
 ):
-    """Actualizar atención vejez existente"""
+    """
+    Actualizar atención vejez - SPRINT #3 CENTRALIZACIÓN TOTAL:
+    ✅ Delegación completa al service layer
+    ✅ Validaciones de negocio centralizadas
+    ✅ Lógica de actualización centralizada
+    ✅ Patrón RPC+Service perfeccionado
+    """
     try:
-        # Verificar que existe
-        existing = db.table("atencion_vejez").select("id").eq("id", str(atencion_id)).execute()
-        if not existing.data:
-            raise HTTPException(status_code=404, detail="Atención vejez no encontrada")
-
-        # Preparar datos para actualización
+        # Preparar datos para el servicio
         update_data = {k: v for k, v in atencion_data.model_dump(exclude_unset=True).items() if v is not None}
 
-        if not update_data:
-            raise HTTPException(status_code=400, detail="No hay campos para actualizar")
+        # Delegar toda la lógica al servicio centralizado
+        return await AtencionVejezService.actualizar_atencion_vejez(atencion_id, update_data)
 
-        # Actualizar
-        response = db.table("atencion_vejez").update(update_data).eq("id", str(atencion_id)).execute()
-
-        if not response.data:
-            raise HTTPException(status_code=500, detail="Error actualizando atención vejez")
-
-        return AtencionVejezResponse(**response.data[0])
-
-    except HTTPException:
-        raise
+    except ValueError as e:
+        # Errores de validación de negocio
+        if "no encontrada" in str(e):
+            raise HTTPException(status_code=404, detail=str(e))
+        else:
+            raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        print(f"Error en actualizar_atencion_vejez: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 
@@ -145,28 +158,22 @@ async def eliminar_atencion_vejez(
     atencion_id: UUID,
     db=Depends(get_supabase_client)
 ):
-    """Eliminar atención vejez y su atención general asociada"""
+    """
+    Eliminar atención vejez - SPRINT #3 CENTRALIZACIÓN TOTAL:
+    ✅ Delegación completa al service layer
+    ✅ Lógica de eliminación transaccional centralizada
+    ✅ Validaciones de existencia centralizadas
+    ✅ Patrón RPC+Service perfeccionado
+    """
     try:
-        # Obtener atencion_id general antes de eliminar
-        vejez_record = db.table("atencion_vejez").select("atencion_id").eq("id", str(atencion_id)).execute()
+        # Delegar toda la lógica al servicio centralizado
+        return await AtencionVejezService.eliminar_atencion_vejez(atencion_id)
 
-        if not vejez_record.data:
-            raise HTTPException(status_code=404, detail="Atención vejez no encontrada")
-
-        atencion_general_id = vejez_record.data[0].get("atencion_id")
-
-        # Eliminar de atencion_vejez
-        delete_vejez = db.table("atencion_vejez").delete().eq("id", str(atencion_id)).execute()
-
-        # Eliminar de atenciones si existe referencia
-        if atencion_general_id:
-            db.table("atenciones").delete().eq("id", atencion_general_id).execute()
-
-        return {"message": "Atención vejez eliminada correctamente"}
-
-    except HTTPException:
-        raise
+    except ValueError as e:
+        # Errores de validación de negocio (ej: no encontrada)
+        raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
+        print(f"Error en eliminar_atencion_vejez: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 
