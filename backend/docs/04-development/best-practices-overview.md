@@ -1,9 +1,19 @@
 # 🏗️ Framework de Mejores Prácticas - Índice Maestro
 
-**📅 Versión:** v3.0 - Enterprise Ready  
-**📍 Fecha:** 16 septiembre 2025  
+**📅 Versión:** v3.1 - Post-Auditoría  
+**📍 Fecha:** 17 septiembre 2025  
 **🎯 Basado en:** IPS Santa Helena del Valle  
 **👥 Audiencia:** Líderes técnicos, arquitectos, equipos desarrollo
+
+---
+
+### ⚠️ **Nota Post-Auditoría Externa (Septiembre 2025)**
+
+*Una auditoría externa completa del proyecto ha validado que los principios y prácticas descritos en este framework son de alta calidad y representan el estado objetivo deseado. Sin embargo, la misma auditoría identificó desviaciones críticas en la implementación actual con respecto a estos estándares.*
+
+*Se ha generado un plan de remediación para cerrar esta brecha. Las recomendaciones de la auditoría deben considerarse la máxima prioridad para alinear la ejecución del proyecto con su visión arquitectónica.*
+
+**➡️ [Ver Resumen Ejecutivo y Recomendaciones de la Auditoría](../../../recomendaciones_equipo_asesor_externo.md)**
 
 ---
 
@@ -223,4 +233,4 @@ Este framework estaba originalmente en un documento monolítico de 4,731 líneas
 ✅ **Navegación contextual** por rol  
 ✅ **Profundidad técnica** sin pérdida información  
 
-*📖 Para consultar el documento histórico completo, ver `best-practices-framework-historical.md`*
+*📖 Para consultar el documento histórico completo, ver `best-practices-framework-historical.md`*",
